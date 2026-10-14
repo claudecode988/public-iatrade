@@ -96,6 +96,7 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 <div class="mut status" id="auto-st">Les agents sont à l'arrêt : aucune nouvelle entrée. Ils ne tournent que quand tu les démarres.</div>
 <div class="mut" id="msg"></div>
 <h2>Niveau de preuve</h2><div class="card" id="preuve"></div>
+<h2>Forward test 24 h/24 (serveur)</h2><div class="card" id="srv"></div>
 <h2>Forward test (journal de décisions)</h2><div class="card" id="fwd"></div>
 <h2>Dernière décision du Chef</h2><div class="card" id="dec">Aucune décision pour l'instant. Touche « Démarrer les agents » ou « Évaluer maintenant ».</div>
 <h2>Position et fiabilité</h2><div class="card" id="cal"></div>
@@ -174,6 +175,9 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 <div class="mut" id="stock"></div>
 <div class="act2"><button class="btn ghost" id="excsv">Trades (CSV)</button><button class="btn ghost" id="exjson">Tout (JSON)</button></div>
 <label>Restaurer une sauvegarde JSON<input id="imjson" type="file" accept="application/json,.json"></label>
+<h3>Geler la configuration</h3>
+<div class="mut" id="gelst"></div>
+<button class="btn ghost" id="gelgo">Geler la configuration</button>
 <h3>Journal de décisions</h3>
 <div class="mut">Chaque décision des agents (entrée, sortie, abstention) est enregistrée avant son résultat, avec l'heure, les prix vus, les données d'entrée et l'empreinte de la version des agents et des réglages. Aucune ligne ne peut être modifiée ou supprimée ici.</div>
 <div class="act2"><button class="btn ghost" id="jcsv">Journal (CSV)</button><button class="btn ghost" id="jjson">Journal et archives (JSON)</button></div>
@@ -411,7 +415,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 16:17';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 16:42';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({pk:10000,cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:.5,ddMax:15,hb:5,npT1:30,npJ1:30,npT2:100,npJ2:90,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
@@ -770,21 +774,41 @@ function cmpHTML(C){if(!C||C.v!==1||!C.rows.length)return'<span class="mut">Pas 
   <p class="mut">* moins de 30 trades : trop peu pour conclure. Les règles actives ont été choisies avec la durée « ${C.tfLab} » : sur les autres durées, elles n’ont pas été sélectionnées pour elles. Sur environ 2 mois, la durée 1 h donne peu de trades. Le passé ne garantit pas l’avenir.</p>`}
 // Niveau de preuve : trades hors échantillon (walk-forward, sinon partie test), jours de forward test (journal),
 // résultat sous coûts × 2 (test de robustesse) et Sharpe corrigé du nombre d'essais (SR > SR0, soit DSR > 50 %).
-function niveauPreuve(){const c=S.cfg,M=S.sim,tr=M?(M.wf?M.wf.test.n:M.fin.test.n):0,j=JR.debut?(Date.now()-JR.debut)/864e5:0,
-  x2=S.robu&&S.robu.rows.find(r=>r.k===2),c2=x2?x2.test.pnl>0&&(!x2.wf||x2.wf.pnl>0):null,sh=M&&M.dsr?M.dsr.sr>M.dsr.sr0:null;
-  const niv=tr<c.npT1||j<c.npJ1?'insuffisant':tr<c.npT2||j<c.npJ2||c2!==true||sh!==true?'limité':'correct';return{niv,tr,j,c2,sh}}
+// Serveur : GitHub Actions fait tourner le même moteur toutes les 5 minutes avec une configuration gelée et publie ses fichiers
+// sur la branche forward-test du dépôt public. Le site les lit en lecture seule (aucune donnée envoyée).
+const SRV='https://raw.githubusercontent.com/claudecode988/public-iatrade/forward-test/forward/',SV={res:null,lg:null,cfg:null,err:'',at:0};
+async function lireServeur(){try{const g=async f=>{const r=await fetch(SRV+f+'?t='+Math.floor(Date.now()/6e4),{cache:'no-store'});return r.ok?r.json():null};
+    [SV.res,SV.cfg,SV.lg]=await Promise.all([g('resume.json'),g('config.json'),g('mesure-longue.json')]);SV.err=SV.cfg?'':'Pas encore de données publiées par le serveur.'}
+  catch(e){SV.err='Serveur injoignable depuis ce navigateur.'}SV.at=Date.now();srvHTML();preuveHTML()}
+setTimeout(lireServeur,1500);setInterval(lireServeur,5*6e4);
+function srvHTML(){const e=$('srv');if(!e)return;const r=SV.res,g=SV.cfg,L=SV.lg;
+  if(!g&&!r){e.innerHTML=`<span class="mut">${SV.at?SV.err:'Lecture des données du serveur…'} Le serveur décide toutes les 5 minutes, même quand cette page est fermée.</span>`;return}
+  const j=r?(Date.now()-r.debut)/864e5:0,pf=x=>x===null||x===undefined?'–':x.toFixed(2).replace('.',',');
+  e.innerHTML=(r?`<div class="dd"><span class="chip ${Date.now()-r.maj<20*6e4?'long':'short'}">${Date.now()-r.maj<20*6e4?'EN SERVICE':'EN RETARD'}</span><span class="mut">dernier passage ${new Date(r.maj).toLocaleString('fr-FR')}</span></div>
+    <b>${r.decisions}</b> décisions en <b>${Math.floor(j)} j ${Math.floor(j%1*24)} h</b> · ${r.trades} trades clos · bilan net <span class="${r.bilan>=0?'up':'dn'}">${fmt(r.bilan)}</span> · PF ${pf(r.pf)} · baisse depuis le plus haut ${pct(r.baisse)}
+    ${r.position?`<br>Position ouverte : ${r.position.paire} en ${r.position.sens==='long'?'hausse':'baisse'}, ${fmt(r.position.taille)}, stop ${fp(r.position.stop)}.`:''}
+    <br><span class="mut">Bougies de ${r.tf}, configuration gelée le ${g&&g.geleeLe?new Date(g.geleeLe).toLocaleString('fr-FR'):'–'} (règles : ${(r.regles||[]).join(', ')||'version de départ'}). Retard médian d’un passage : ${r.retardMedianS??'–'} s (GitHub lance parfois les tâches en retard). Journal public, ajout seulement, chaîné par empreintes.${r.faux?' ⚠ Données de test (prix inventés).':''}</span>`:'<span class="mut">Configuration gelée publiée ; premier passage du serveur en attente.</span>')+
+   (L?`<h3>Mesure longue (${L.mois} mois, serveur)</h3>${L.wf?`Walk-forward : ${L.wf.test.n} trades hors échantillon, bilan net <span class="${L.wf.test.pnl>=0?'up':'dn'}">${fmt(L.wf.test.pnl)}</span> (entraînement ${fmt(L.wf.ent.pnl)}), PF ${pf(L.wf.test.pf)}, ${L.wf.test.pos}/${L.wf.fen.length} fenêtres positives. `:''}
+    Coûts × 2 : ${L.robustesse?fmt(L.robustesse[1].test.pnl):'–'} · × 3 : ${L.robustesse?fmt(L.robustesse[2].test.pnl):'–'}. Règle simple : ${L.agents?fmt(L.agents.ref.pnl):'–'} · acheter et garder : ${L.agents?fmt(L.agents.act.bh):'–'}.
+    <br><b>Fiabilité : ${L.fiabilite.niveau}</b> — ${L.fiabilite.raison} <span class="mut">${L.nEssais} configurations testées, du ${dt(L.du)} au ${dt(L.au)}, mise à jour ${new Date(L.maj).toLocaleString('fr-FR')}.${L.faux?' ⚠ Données de test (prix inventés).':''}</span>`:'<p class="mut">Mesure longue (12 mois) : pas encore publiée par le serveur (une fois par semaine).</p>')}
+// Sources : la mesure la plus fournie (mesure longue du serveur si elle existe, sinon celle de ce navigateur) et le forward test
+// le plus long AVEC une configuration gelée (serveur, ou ce navigateur si « Geler la configuration » est actif).
+function niveauPreuve(){const c=S.cfg,M=S.sim,L=SV.lg&&!SV.lg.faux?SV.lg:null,trL=L&&L.wf?L.wf.test.n:0,trM=M?(M.wf?M.wf.test.n:M.fin.test.n):0,useL=trL>=trM&&L;
+  const tr=Math.max(trL,trM),jS=SV.res&&!SV.res.faux?(Date.now()-SV.res.debut)/864e5:0,jL=S.gel&&JR.debut?(Date.now()-Math.max(S.gel.at,JR.debut))/864e5:0,j=Math.max(jS,jL);
+  const x2=useL?L.robustesse&&L.robustesse[1]:S.robu&&S.robu.rows.find(r=>r.k===2),c2=x2?x2.test.pnl>0&&(!x2.wf||x2.wf.pnl>0):null,dd=useL?L.dsr:M&&M.dsr,sh=dd?dd.sr>dd.sr0:null;
+  const niv=tr<c.npT1||j<c.npJ1?'insuffisant':tr<c.npT2||j<c.npJ2||c2!==true||sh!==true?'limité':'correct';return{niv,tr,j,c2,sh,src:useL?'mesure longue du serveur':'mesure de ce navigateur',srcJ:jS>=jL&&jS?'serveur':jL?'ce navigateur (gelé)':'aucun forward test gelé'}}
 function preuveHTML(){const e=$('preuve');if(!e)return;const n=niveauPreuve(),c=S.cfg,k=(b,t)=>`<li class="${b===true?'up':b===false?'dn':'mut'}">${b===true?'✓':b===false?'✗':'–'} ${t}</li>`;
   document.body.classList.toggle('pi',n.niv==='insuffisant');
   e.innerHTML=`<div class="fiab ${n.niv==='insuffisant'?'faible':n.niv==='limité'?'moyenne':'correcte'}"><b>Niveau de preuve : ${n.niv}</b>${n.niv==='insuffisant'?'<br>Résultat non concluant : les chiffres de gain sont grisés.':n.niv==='limité'?'<br>Indications seulement : pas encore assez de recul pour conclure.':'<br>Assez de recul selon tes seuils. Le passé ne garantit toujours pas l’avenir.'}</div>
-  <ul class="crit">${k(n.tr>=c.npT2?true:n.tr>=c.npT1?null:false,`${n.tr} trades hors échantillon (paliers ${c.npT1} puis ${c.npT2})${S.sim?'':' : lance la mesure'}`)}
-  ${k(n.j>=c.npJ2?true:n.j>=c.npJ1?null:false,`${n.j.toFixed(1).replace('.',',')} jours de forward test (paliers ${c.npJ1} puis ${c.npJ2})`)}
+  <ul class="crit">${k(n.tr>=c.npT2?true:n.tr>=c.npT1?null:false,`${n.tr} trades hors échantillon, source : ${n.src} (paliers ${c.npT1} puis ${c.npT2})`)}
+  ${k(n.j>=c.npJ2?true:n.j>=c.npJ1?null:false,`${n.j.toFixed(1).replace('.',',')} jours de forward test avec configuration gelée, source : ${n.srcJ} (paliers ${c.npJ1} puis ${c.npJ2})`)}
   ${k(n.c2,n.c2===null?'Coûts doublés : test de robustesse pas encore lancé':n.c2?'Résultat positif avec des coûts doublés':'Résultat négatif avec des coûts doublés')}
   ${k(n.sh,n.sh===null?'Sharpe corrigé du nombre d’essais : non calculable':n.sh?'Sharpe corrigé du nombre d’essais positif':'Sharpe corrigé du nombre d’essais négatif ou nul')}</ul>`}
 function fwdHTML(){preuveHTML();const e=$('fwd');if(!e)return;if(!JR.db){e.innerHTML=`<span class="mut">${JR.err||'Ouverture du journal…'}</span>`;return}
   const d=JR.debut?Date.now()-JR.debut:0,j=Math.floor(d/864e5),h=Math.floor(d%864e5/H1),m=Math.floor(d%H1/6e4);
   e.innerHTML=`<b id="fwdn">${JR.n}</b> décision${JR.n>1?'s':''} enregistrée${JR.n>1?'s':''}. ${JR.debut?`Forward test en cours depuis <b>${j} j ${h} h ${m} min</b> (début le ${new Date(JR.debut).toLocaleString('fr-FR')}).`:'Le forward test commencera à la première décision.'}
   <br><span class="mut">Version des agents ${JR.vAg||'–'}. ${JR.integre===null?'Vérification de la chaîne en cours…':JR.integre?'⚠ '+JR.integre:'Chaîne d’empreintes intacte : aucune ligne modifiée.'} Un forward test se juge sur des semaines de décisions, pas sur quelques heures.</span>`}
-function fillCfg(){for(const k in S.cfg)if($(k))$(k).value=S.cfg[k]}
+function fillCfg(){for(const k in S.cfg)if($(k))$(k).value=S.cfg[k];gelHTML()}
 let timer=null;
 function stopAuto(m){clearTimeout(timer);timer=null;$('auto').textContent=$('auto2').textContent='Démarrer les agents';$('auto').classList.remove('stop');
   $('auto-st').textContent=m||'Les agents sont à l\'arrêt : aucune nouvelle entrée. Un stop sur une position ouverte reste surveillé au tick.';renderAgents()}
@@ -796,9 +820,11 @@ $('go').onclick=()=>decider(0,true);
 $('kill2').onclick=()=>$('kill').onclick();
 $('kill').onclick=()=>{S.stop=!S.stop;if(S.stop&&timer)stopAuto('Arrêt d\'urgence actif : agents arrêtés, aucune nouvelle entrée. Un stop ouvert reste surveillé.');save();render();$('msg').textContent=S.stop?'Tout est suspendu : aucun nouvel ordre.':'Reprise possible.'};
 const NUM={npT1:[1,1e4],npJ1:[1,3650],npT2:[1,1e5],npJ2:[1,3650],riskPct:[.05,5],ddMax:[1,50],hb:[2,60],nb:[1,10],size:[10,1e6],maxLoss:[.5,100],maxTrades:[1,1000],sl:[.5,50],thr:[50,99],hold:[0,200],atrK:[.5,10],fee:[0,2],slip:[0,2],maxRuns:[1,100000]};
-$('save').onclick=()=>{for(const k in NUM){const v=parseFloat(String($(k).value).replace(',','.'));if(isFinite(v))S.cfg[k]=Math.min(NUM[k][1],Math.max(NUM[k][0],v))}
+const STRAT=['tf','nb','size','maxLoss','maxTrades','sl','thr','hold','atrK','fee','slip','riskPct','ddMax','rsrc','news'];
+$('save').onclick=()=>{const avant=JSON.stringify(STRAT.map(k=>S.cfg[k])),cfg0={...S.cfg};for(const k in NUM){const v=parseFloat(String($(k).value).replace(',','.'));if(isFinite(v))S.cfg[k]=Math.min(NUM[k][1],Math.max(NUM[k][0],v))}
   const tf0=S.cfg.tf;S.cfg.tf=+$('tf').value;S.cfg.news=$('news').value;S.cfg.rsrc=$('rsrc').value;S.cfg.tn=$('tn').value;KEYS={k:$('k').value.trim(),s:$('s').value.trim()};RD.at=0;
-  $('k').value='';$('s').value='';fillCfg();S.sim=0;S.rules={};save();render();$('setmsg').textContent='Réglages enregistrés. Relance la mesure : les changements gardés dépendent de ces réglages.'+(KEYS.k?' Clés gardées en mémoire pour cette session.':'');
+  if(S.gel&&JSON.stringify(STRAT.map(k=>S.cfg[k]))!==avant){S.cfg=cfg0;fillCfg();$('setmsg').textContent='Configuration gelée : dégèle-la d’abord pour changer les réglages de stratégie (la preuve repartira de zéro).';return}
+  $('k').value='';$('s').value='';fillCfg();if(JSON.stringify(STRAT.map(k=>S.cfg[k]))!==avant){S.sim=0;S.rules={}}save();render();$('setmsg').textContent='Réglages enregistrés. Relance la mesure : les changements gardés dépendent de ces réglages.'+(KEYS.k?' Clés gardées en mémoire pour cette session.':'');
   if(S.cfg.tf!==tf0){if(S.pos){S.cfg.tf=tf0;save();$('setmsg').textContent='Ferme d’abord la position ouverte avant de changer la durée des bougies.';fillCfg();return}$('setmsg').textContent='Durée des bougies changée : rechargement des prix…';setTimeout(()=>location.reload(),600)}};
 let RZ=0;$('reset').onclick=()=>{const b=$('reset');
   if(!RZ){RZ=setTimeout(()=>{RZ=0;b.textContent='Remettre la simulation à zéro'},4000);b.textContent='Touche encore pour confirmer';return}
@@ -806,6 +832,10 @@ let RZ=0;$('reset').onclick=()=>{const b=$('reset');
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
   document.querySelectorAll('.sec').forEach((s,i)=>s.classList.toggle('on',i==b.dataset.t))});
 $('auto2').onclick=()=>$('auto').onclick();
+function gelHTML(){const g=S.gel,e=$('gelst');if(!e)return;e.textContent=g?`Gelée le ${new Date(g.at).toLocaleString('fr-FR')} (empreinte ${g.h}). Réglages de stratégie et règles actives figés : seuls les jours passés avec cette configuration comptent dans le niveau de preuve.`:'Non gelée : tant que tu peux changer les réglages, le forward test de ce navigateur ne compte pas dans le niveau de preuve.';
+  $('gelgo').textContent=g?'Dégeler (la preuve de ce navigateur repart de zéro)':'Geler la configuration';STRAT.forEach(k=>{if($(k))$(k).disabled=!!g})}
+let GZ=0;$('gelgo').onclick=async()=>{const b=$('gelgo');if(S.gel){if(!GZ){GZ=setTimeout(()=>{GZ=0;gelHTML()},4000);b.textContent='Touche encore pour dégeler';return}clearTimeout(GZ);GZ=0;S.gel=null}
+  else S.gel={at:Date.now(),h:await vReglages()};save();gelHTML();render()};
 $('jcsv').onclick=async()=>{await JR.file;const L=await jrTout(),n=x=>x===undefined||x===null||!isFinite(x)?'':String(+(+x).toFixed(8)).replace('.',','),t=x=>(x==null?'':String(x)).replace(/[;\r\n]/g,',');
   const H=['numero','horodatage','agent','decision','paire','sens','raison','indice_confiance','prix_achat','prix_vente','note_prisme','tendance_longue','cassure','regime_rsi','volume','atr','actualite','version_agents','version_reglages','resultat','gain_net_usdt','frais_usdt','glissement_usdt','variation_prix_1h','empreinte','empreinte_precedente'];
   const rows=L.map(r=>{const p=r.entrees&&r.entrees.prisme||{},x=r.resultat||{};return[r.id,new Date(r.ts).toLocaleString('fr-FR'),r.agent,r.type,r.paire||'',r.sens==='long'?'hausse':r.sens==='short'?'baisse':'',t(r.raison),n(r.confiance),n(r.prix&&r.prix.achat),n(r.prix&&r.prix.vente),n(p.note),n(p.tendance),n(p.cassure),n(p.regimeRSI),n(p.volume),n(p.atr),t(r.entrees&&r.entrees.radar&&r.entrees.radar.actualite),r.vAgents,r.vReglages,t(x.statut||'en attente'),n(x.net),n(x.frais),n(x.glissement),n(x.variation1h),r.h,r.prev].join(';')});
@@ -861,7 +891,7 @@ $('simgo').onclick=async()=>{const b=$('simgo');b.disabled=true;const st=m=>$('s
     const wf=walkForward(FF,S.cfg);ESSAI=null;enregistrerEssais();const srs=Object.values(ESS).map(x=>x.sr),d=wf?dsr(wf.test.ret,srs):null;
     M.wf=wf;M.dsr=d;M.nEssais=srs.length;M.nModifs=nModifs();M.fiab=fiabilite(wf,d,M.nModifs);
     S.sim=JSON.parse(JSON.stringify(M,(k,v)=>k==='ret'||k==='eqs'?undefined:v)); // rendements détaillés et courbes non stockés
-    S.rules=M.R;save();render();
+    if(S.gel)M.gelee=true;else S.rules=M.R;save();render();
     st(`Mesure terminée. Changements gardés pour les agents : ${RULES().join(', ')||'aucun (version de départ)'}.${al.ecartees.length||bad.length?' Paires écartées (historique trop court ou inexistantes) : '+[...new Set([...al.ecartees,...bad])].join(', ')+'.':''}`)}
   catch(e){st('Erreur pendant la mesure : '+(e&&e.message||e))}b.disabled=false};
 jrOuvrir().then(render);fillCfg();render();$('ver').textContent=`Version du ${VERSION} (heure de Paris)`;

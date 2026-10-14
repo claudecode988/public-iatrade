@@ -17,6 +17,9 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
     if(st){for(let t=+st;t<=now&&a.length<lim;t+=d)a.push(bar(s,t,d))}else{const e=en?Math.floor(+en/d)*d:now,t0=now-18000*d;for(let t=e;t>=Math.max(t0,e-(lim-1)*d);t-=d)a.unshift(bar(s,t,d))}
     r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(a)})});
   await p.route('https://api.alternative.me/**',r=>r.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:JSON.stringify({data:[{value:'55',value_classification:'Greed',timestamp:String(Math.floor((Date.now()-H)/1000))}]})}));
+  // Faux fichiers du serveur (forward test 24 h/24 et mesure longue), marqués « données de test »
+  const FW=process.env.FW;await p.route('https://raw.githubusercontent.com/**',r=>{const f=new URL(r.request().url()).pathname.split('/').pop();
+    try{r.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:require('fs').readFileSync(path.join(FW,f),'utf8')})}catch(e){r.fulfill({status:404,body:''})}});
   // Faux flux WebSocket : bookTicker toutes les 100 ms par paire, miniTicker et kline toutes les secondes.
   let mode='live',conns=0,cur=null,shift={},sent=0;const SY=[];
   await p.routeWebSocket(/stream\.binance\.com/,ws=>{conns++;if(mode==='refuse'){ws.close();return}cur=ws;
@@ -40,6 +43,13 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   if(pos){const t0=Date.now();shift[pos.q]=pos.side==='long'?-.05:.05;
     await p.waitForFunction(()=>!S.pos,null,{timeout:5000}).catch(()=>{});const dt=Date.now()-t0,lg=await p.textContent('#log');
     ok(/stop touché au tick/.test(lg),`stop déclenché au tick (sortie ${dt} ms après le saut de prix)`);shift={}}
+  // Serveur et gel
+  await p.waitForFunction(()=>SV.at>0,null,{timeout:10000});const sv=await p.textContent('#srv');
+  ok(/décisions en/.test(sv)&&/Mesure longue \(\d+ mois, serveur\)/.test(sv)&&/Données de test/.test(sv),'forward test 24 h/24 et mesure longue du serveur affichés');
+  await p.click('nav button[data-t="2"]');await p.click('#gelgo');await p.waitForFunction(()=>!!S.gel);
+  ok(await p.isDisabled('#thr')&&/Gelée le/.test(await p.textContent('#gelst')),'geler la configuration : réglages de stratégie verrouillés');
+  await p.click('#gelgo');await p.click('#gelgo');ok(await p.evaluate(()=>!S.gel)&&!(await p.isDisabled('#thr')),'dégeler avec confirmation');
+  await p.click('nav button[data-t="0"]');
   // Journal de décisions
   await p.waitForFunction(()=>JR.n>=2,null,{timeout:5000}).catch(()=>{});
   const J=await p.evaluate(async()=>{await JR.file;return jrTout()});const je=J.find(r=>r.agent==='Boussole'&&r.type==='entrée'),jso=J.find(r=>r.agent==='Bouclier'&&r.type==='sortie');
