@@ -60,6 +60,8 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 #hst{min-height:1.4em;margin-bottom:10px;color:#cfe3ff;background:#101a27;border:1px solid #1d2a3a;border-radius:6px;padding:6px 8px}
 .conn{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#101a27;border:1px solid #1d2a3a;border-radius:6px;padding:6px 8px;margin-bottom:6px;color:#9fb3cc}.conn b{padding:1px 8px;border-radius:99px}.conn b.ok{background:#12372b;color:#4cc9a0}.conn b.wait{background:#3a3118;color:#f2c14e}.conn b.ko{background:#3d1d1d;color:#ff8a80}.cn{color:#f2c14e;min-height:0}.cn:empty{display:none}
 .scan{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 2px}.scan span{background:#101a27;border:1px solid #1d2a3a;border-radius:99px;padding:2px 8px;font-size:11px;color:#9fb3cc}.scan .u{color:#4cc9a0}.scan .d{color:#ff8a80}
+.cn2{color:#9fb3cc;background:#101a27;border:1px solid #1d2a3a;border-radius:6px;padding:6px 8px;margin-bottom:6px}
+.rep dl{margin:4px 0 0;display:grid;grid-template-columns:auto 1fr;gap:2px 8px}.rep dt{color:#7f93ad}.rep dd{margin:0;color:#9fb3cc;min-width:0;overflow-wrap:anywhere}.rep>div{min-width:0}
 .rep{display:flex;gap:8px;padding:8px 0;border-top:1px solid #1d2a3a}.rep:first-child{border:0}.rep>i{flex:none;width:10px;height:10px;border-radius:50%;margin-top:4px}.rep b{color:#fff}.rep em{font-style:normal;color:#7f93ad}.rep p{margin:2px 0 0;color:#9fb3cc}
 .fl>div{padding:4px 0;border-top:1px solid #1d2a3a;color:#9fb3cc}.fl b{color:#fff}
 .sec{display:none}.sec.on{display:block}
@@ -104,7 +106,7 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 <div class="scan" id="scan"></div><div class="cn" id="exclu"></div>
 <canvas id="house" role="img" aria-label="Maison des agents : chacun travaille dans sa pièce et apporte son rapport au suivant."></canvas><div id="hst">Les agents attendent dans leur maison.</div>
 <div class="fh"><b>ACTIVITÉ</b><span>récente</span></div><div class="fl" id="flog"></div>
-<div class="fh" style="margin-top:10px"><b>RAPPORTS</b><span>par agent</span></div><div class="fl" id="reps"></div></div>
+<div class="fh" style="margin-top:10px"><b>FICHES DES AGENTS</b><span>règles · entrées · décision</span></div><div class="cn2">Les six « agents IA » sont des programmes à règles fixes écrites dans le code. Aucun n’utilise de modèle d’intelligence artificielle ni d’apprentissage : ils appliquent les mêmes calculs à chaque bougie.</div><div class="fl" id="reps"></div></div>
 <button class="btn" id="auto2">Démarrer les agents</button>
 <div class="mut" id="mkts">Les prix arrivent en continu. Les agents décident d'une entrée seulement à la fermeture de chaque bougie (5 min, 10 min ou 1 h, à choisir dans Réglages), avec de l'argent fictif. Le stop est vérifié à chaque prix reçu.</div>
 <button class="btn" id="simgo" style="background:var(--card);color:var(--ink);border:1px solid var(--line)">Mesurer sur l'historique réel</button>
@@ -302,7 +304,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 14:58';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 15:01';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
@@ -368,7 +370,7 @@ async function cloturer(price,raison,manuel){const P=S.pos,c=S.cfg,r=fermer(P,pr
   S.cash+=P.size+r.g-r.xf;S.trades.push(r.pnl);S.hist.push({p:P.p,side:P.side,pnl:r.pnl,dur:(Date.now()-(P.te||P.t0+TF.bar))/H1,q:P.q,nb:P.nb||1,size:P.size,te:P.te||P.t0+TF.bar,ts:Date.now(),pin:P.fill,pout:r.fx,fees:P.fe+r.xf,why:raison,tf:TF.min});S.hist=S.hist.slice(-5000);S.lossToday+=r.pnl;S.nToday+=P.nb||1;S.lastX=Math.floor(Date.now()/TF.bar)*TF.bar;
   let ex=`${P.q} : sortie fictive à ${fp(r.fx)} (${raison}) : ${fmt(r.pnl)} frais et glissement compris.`;
   if(c.tn==='1'&&manuel&&P.side==='long'&&TNP.includes(P.q))ex+=' '+await testnetOrder('SELL',(Math.floor(P.n*1e4)/1e4).toFixed(4),0,P.q);
-  logA(`${P.q} : sortie à ${fp(r.fx)} : ${fmt(r.pnl)} (${raison})`);S.pos=null;S.ags=S.ags.map(a=>a.n==='Exécuteur fictif'?{...a,t:ex,s:'Position fermée'}:a);save();render();return ex}
+  logA(`${P.q} : sortie à ${fp(r.fx)} : ${fmt(r.pnl)} (${raison})`);S.pos=null;S.ags=S.ags.map(a=>a.n==='Exécuteur fictif'?{...a,t:ex,s:'Position fermée',at:Date.now()}:a);save();render();return ex}
 let RA={news:'neutre',s:'Pas d’information',t:'Pas encore consulté.'};
 async function decider(t,manuel){if(LV.busy)return;LV.busy=1;try{await decider0(t,manuel)}finally{LV.busy=0}}
 async function decider0(t,manuel){const c=S.cfg,A=[],d0=today(),R=S.rules,W=v=>v>0?'hausse':v<0?'baisse':'neutre';if(S.day!==d0){S.day=d0;S.nToday=0;S.lossToday=0}
@@ -402,7 +404,7 @@ async function decider0(t,manuel){const c=S.cfg,A=[],d0=today(),R=S.rules,W=v=>v
   A.push({n:'Exécuteur fictif',s:act==='open'&&ok&&S.pos?'Ordre passé':act==='close'?'Position fermée':'Aucun ordre',t:ex+(c.tn==='1'&&manuel?' Le testnet ne reçoit que BTC et ETH, en hausse.':'')});
   const L=S.trades.length,w=S.trades.filter(x=>x>0).length;
   A.push({n:'Journal',s:`${L} trades notés`,t:L?`${L} trades, ${w} gagnants. Compare l’indice annoncé à la réussite réelle dans l’accueil.`:'Pas encore de trade clôturé.'});
-  S.ags=A;house.play(A,q);S.dec={d,why,conf:pc+' %',rr};S.eq=(S.eq||[]).concat(valeur()).slice(-300);save();render();$('msg').textContent=manuel?'Évaluation terminée.':`Décision prise à la fermeture de ${hr(tb+TF.bar)}.`}
+  const at=Date.now();S.ags=A.map(a=>({...a,at}));house.play(A,q);S.dec={d,why,conf:pc+' %',rr};S.eq=(S.eq||[]).concat(valeur()).slice(-300);save();render();$('msg').textContent=manuel?'Évaluation terminée.':`Décision prise à la fermeture de ${hr(tb+TF.bar)}.`}
 const valeur=()=>{const P=S.pos;if(!P)return S.cash;const px=(P.side==='long'?LV.bid[P.q]:LV.ask[P.q])||LV.px[P.q]||P.px;return S.cash+P.size+(P.side==='long'?1:-1)*P.n*(px-P.fill)};
 
 const AG=[{n:'Actualités',who:'Radar',job:'Surveille les nouvelles du marché',c:'#d9902f',sh:'50%'},
@@ -506,7 +508,15 @@ function renderAgents(){delete PV.fst;
   $('live').textContent=timer?'Agents en service':"À l'arrêt";$('live').classList.toggle('on',!!timer);
   $('scan').innerHTML=(S.scan||[]).map(x=>`<span>${x.q.replace('USDT','')} <b class="${x.sc>0?'u':x.sc<0?'d':''}">${x.sc>0?'▲':x.sc<0?'▼':'–'} ${Math.round((.5+.5*Math.abs(x.sc))*100)} %</b></span>`).join('');
   $('exclu').textContent=LV.excl.length?`Trop calmes pour couvrir les frais (ATR sous 3 × le coût aller-retour) : ${LV.excl.map(x=>x.replace('USDT','')).join(', ')}. Le forex y est souvent : c’est normal.`:'';
-  $('reps').innerHTML=AG.map(g=>{const a=S.ags.find(x=>x.n===g.n);return `<div class="rep"><i style="background:${g.c}"></i><div><b>${g.who}</b> <em>· ${g.job}</em><p>${a?a.t:attente()}${g.n==='Journal'&&S.sim?'<br>'+simLine(S.sim):''}</p></div></div>`}).join('')}
+  const c=S.cfg,R=S.rules,E={
+    'Actualités':c.rsrc==='manuel'?'Ta saisie manuelle dans Réglages (haussier, neutre ou baissier), appliquée aux cryptos seulement.':'Indice peur et avidité d’alternative.me (une valeur par jour, ignorée si elle a plus de 24 h), appliqué aux cryptos seulement.',
+    'Analyste technique':`Bougies fermées de ${TF.lab} et de ${TF.clab} de Binance pour chaque paire. Signaux : ${R.sig?'tendance EMA 20/50 sur bougies de '+TF.clab+', cassure du plus haut ou plus bas des 20 bougies, régime du RSI':'EMA 9/21, MACD, élan, RSI et Bollinger'}, plus volume, ATR et l’actualité de Radar.`,
+    'Chef':`Notes de Prisme pour chaque paire, seuil de l’indice (${c.thr} %), position ouverte et changements gardés par la mesure (${RULES().join(', ')||'aucun'}).`,
+    'Risque':`Arrêt d’urgence, trades du jour (max ${c.maxTrades}), perte du jour (max ${String(c.maxLoss).replace('.',',')} %), solde fictif, fraîcheur des prix (pause après 5 s sans données).`,
+    'Exécuteur fictif':`Prix d’achat et de vente en direct de Binance, frais ${String(c.fee).replace('.',',')} % et glissement ${String(c.slip).replace('.',',')} % par côté, ${c.nb} achat${c.nb>1?'s':''} de ${fmt(c.size)} par décision, stop ${R.atr?'ATR suiveur ':''}plafonné à ${String(c.sl).replace('.',',')} %.`,
+    'Journal':'Trades clôturés (résultat, durée, indice annoncé) et résultats de la mesure sur l’historique.'};
+  $('reps').innerHTML=AG.map(g=>{const a=S.ags.find(x=>x.n===g.n);return `<div class="rep"><i style="background:${g.c}"></i><div><b>${g.who}</b> <em>· ${g.job}</em>
+    <dl><dt>Type</dt><dd>Règles fixes, sans modèle d’IA</dd><dt>Entrées</dt><dd>${E[g.n]}</dd><dt>Dernière décision</dt><dd>${a?`${a.at?hr(a.at).slice(0,5)+' · ':''}${a.t}`:attente()}${g.n==='Journal'&&S.sim?'<br>'+simLine(S.sim):''}</dd></dl></div></div>`}).join('')}
 function render(){
   const pnl=S.trades.reduce((a,b)=>a+b,0),w=S.trades.filter(x=>x>0).length,L=S.trades.length,P=S.pos,eq=valeur(),H=S.hist,n=H.length;
   $('bal').textContent=fmt(eq);$('pnl').textContent=fmt(pnl);$('pnl').className=pnl>=0?'up':'dn';
