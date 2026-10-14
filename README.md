@@ -24,4 +24,14 @@ Simulateur de trading avec argent fictif, en un seul fichier : `index.html` (ouv
   résultat dans `forward/mesure-longue.json`.
 - Changer `forward/config.json` archive le journal et fait repartir le forward test de zéro.
 
+## Sources des pros et pistes de régularité
+
+Ce que regardent les traders professionnels, en version gratuite, publique et sans clé :
+
+- **Régime du bitcoin** : clôture journalière au-dessus ou au-dessous de sa moyenne 50 jours (marché haussier ou baissier).
+- **Calendrier de la Fed (FOMC)** : dates des décisions de taux 2025-2026 inscrites dans le code (à compléter chaque année). Pause de 12 h avant à 6 h après l'annonce.
+- **Taux de financement** des contrats perpétuels Binance (`fapi.binance.com`, lecture seule ; historique sur `data.binance.vision`). Au-dessus de 0,05 % par 8 h, il y a trop d'acheteurs à crédit.
+
+Ces sources sont des **règles à essayer** (`regime`, `macro`, `fund`), désactivées dans la configuration gelée. La mesure longue les ajoute une par une aux agents (tableau « Pistes pour des résultats plus réguliers ») et compare aussi trois familles prudentes : tendance + régime, tendance + volatilité cible (2,5 % par jour, ne fait que réduire l'exposition), et la combinaison des deux avec la pause Fed. Rien n'est adopté automatiquement.
+
 Version en ligne : https://claudecode988.github.io/public-iatrade/

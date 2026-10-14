@@ -1,9 +1,11 @@
-# Forward test 24 h/24 : toutes les 5 minutes, le même moteur que le site décide sur la dernière bougie fermée
-# avec la configuration gelée de forward/config.json (branche forward-test). Argent fictif, aucun ordre, aucune clé.
+# Forward test 24 h/24 : le même moteur que le site décide sur chaque bougie fermée avec la configuration gelée de
+# forward/config.json (branche forward-test). Argent fictif, aucun ordre, aucune clé.
+# GitHub retarde souvent les tâches programmées : chaque tâche reste donc active environ 50 minutes et vérifie chaque
+# minute si une nouvelle bougie s'est fermée ; une nouvelle tâche est demandée tous les quarts d'heure (une seule à la fois).
 name: Forward test 24 h/24
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 permissions:
   contents: write
@@ -13,7 +15,7 @@ concurrency:
 jobs:
   passage:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 58
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,15 +27,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Décision sur la dernière bougie fermée
-        run: node code/tools/forward.cjs data/forward
-      - name: Enregistrer le journal
+      - name: Décisions sur chaque bougie fermée pendant environ 50 minutes
         run: |
           cd data
           git config user.name "forward-test"
           git config user.email "forward-test@users.noreply.github.com"
-          git add -A forward
-          if ! git diff --cached --quiet; then
-            git commit -q -m "Forward test $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            git pull -q --rebase origin forward-test && git push -q origin HEAD:forward-test
-          fi
+          fin=$(( $(date +%s) + 50*60 ))
+          while [ $(date +%s) -lt $fin ]; do
+            node ../code/tools/forward.cjs forward || true
+            git add -A forward
+            if ! git diff --cached --quiet; then
+              git commit -q -m "Forward test $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              git pull -q --rebase origin forward-test && git push -q origin HEAD:forward-test || true
+            fi
+            sleep 60
+          done
