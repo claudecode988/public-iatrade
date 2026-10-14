@@ -3,7 +3,7 @@
 // le fonctionnement de l'appli (flux, coupure, reconnexion, stop au tick…), pas les résultats de la stratégie.
 //   Usage : node tools/test-navigateur.cjs      (CHROMIUM=/chemin/chromium et SORTIE=dossier facultatifs)
 const { chromium } = require('playwright'),path=require('path');
-const H=36e5,IV={'5m':3e5,'1h':36e5,'4h':144e5},BAD=['GBPUSDT','AUDUSDT'],ok=(c,m)=>{console.log((c?'OK   ':'ÉCHEC ')+m);if(!c)process.exitCode=1};
+const H=36e5,IV={'1m':6e4,'5m':3e5,'1h':36e5,'4h':144e5},BAD=['GBPUSDT','AUDUSDT'],ok=(c,m)=>{console.log((c?'OK   ':'ÉCHEC ')+m);if(!c)process.exitCode=1};
 const px=(s,t)=>{const k=s.charCodeAt(0)+s.charCodeAt(1)*3,b=s.startsWith('BTC')?60000:s.startsWith('ETH')?3000:10+k%50;return b*(1+.06*Math.sin(t/H/60+k)+.02*Math.sin(t/H/9+k*2)+.004*Math.sin(t/H*1.7+k))};
 const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math.max(o,c)*1.002),String(Math.min(o,c)*.998),String(c),String(100+60*Math.abs(Math.sin(t/H/5))),t+d-1]};
 (async()=>{
@@ -40,6 +40,14 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   if(pos){const t0=Date.now();shift[pos.q]=pos.side==='long'?-.05:.05;
     await p.waitForFunction(()=>!S.pos,null,{timeout:5000}).catch(()=>{});const dt=Date.now()-t0,lg=await p.textContent('#log');
     ok(/stop touché au tick/.test(lg),`stop déclenché au tick (sortie ${dt} ms après le saut de prix)`);shift={}}
+  // Journal de décisions
+  await p.waitForFunction(()=>JR.n>=2,null,{timeout:5000}).catch(()=>{});
+  const J=await p.evaluate(async()=>{await JR.file;return jrTout()});const je=J.find(r=>r.agent==='Boussole'&&r.type==='entrée'),jso=J.find(r=>r.agent==='Bouclier'&&r.type==='sortie');
+  ok(je&&je.prix&&je.entrees&&je.entrees.prisme&&je.vAgents&&je.vReglages&&je.h&&je.confiance>=50,'journal : entrée écrite avec prix, données d’entrée, versions et empreinte');
+  ok(jso&&jso.trade===je.id,'journal : sortie sur stop écrite et reliée à l’entrée');
+  ok(je&&je.resultat&&je.resultat.statut==='trade clos'&&typeof je.resultat.net==='number'&&jso.resultat&&jso.resultat.net===je.resultat.net,'journal : résultat net ajouté après la clôture');
+  ok(J.every((r,k)=>k===0||r.prev===J[k-1].h)&&await p.evaluate(async()=>(await jrVerifier())===0),'journal : chaîne d’empreintes intacte');
+  ok(/décisions? enregistrée/.test(await p.textContent('#fwd'))&&/Forward test en cours depuis/.test(await p.textContent('#fwd')),'accueil : nombre de décisions et durée du forward test');
   // Sauvegarde et export
   await p.click('nav button[data-t="2"]');
   const [dl]=await Promise.all([p.waitForEvent('download'),p.click('#excsv')]);const csv=require('fs').readFileSync(await dl.path(),'utf8');
@@ -57,6 +65,9 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   for(const dt of [3e5,6e5])for(const s of SY){const t=last+dt,c=px(s,t);if((t+3e5)%6e5&&dt===6e5)continue;
     cur.send(JSON.stringify({stream:s.toLowerCase()+'@kline_5m',data:{e:'kline',E:Date.now(),s,k:{t,T:t+3e5-1,s,i:'5m',o:String(c),c:String(c),h:String(c*1.001),l:String(c*.999),v:'150',x:true}}}))}
   await p.waitForFunction(()=>/Décision prise à la fermeture/.test(document.getElementById('msg').textContent),null,{timeout:10000}).then(()=>ok(true,'décision prise à la fermeture d’une bougie de 5 min du flux')).catch(()=>ok(false,'décision à la fermeture de bougie'));
+  await p.waitForFunction(()=>JR.n>=4,null,{timeout:8000}).catch(()=>{});
+  const nab=await p.evaluate(async()=>{await jrCompleter(Date.now()+2*36e5);await new Promise(r=>setTimeout(r,1500));await JR.file;return(await jrTout()).filter(r=>r.resultat&&r.resultat.statut&&/pas de trade/.test(r.resultat.statut)).length});
+  ok(nab>=1,`journal : abstentions complétées par la variation du prix 1 h plus tard (${nab})`);
   await p.click('#kill');ok(/Arrêt d'urgence actif/.test(await p.textContent('#auto-st')),'arrêt d’urgence stoppe les agents');await p.click('#kill');
   // Coupure : plus aucun message -> données figées ; puis connexion fermée et refusée -> reconnexion avec délai croissant
   mode='silent';await p.waitForFunction(()=>document.getElementById('cst').textContent==='DONNÉES FIGÉES',null,{timeout:9000}).then(()=>ok(true,'silence de plus de 5 s : « DONNÉES FIGÉES »')).catch(()=>ok(false,'données figées'));
@@ -71,6 +82,10 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   await p.click('#cmpgo');await p.waitForFunction(()=>/Comparatif terminé|Erreur|injoignable/.test(document.getElementById('cmpst').textContent),null,{timeout:120000});
   const cr=await p.evaluate(()=>S.cmp&&S.cmp.rows.map(r=>r.lab));console.log('     ',await p.textContent('#cmpst'));
   ok(cr&&cr.join()==='5 min,10 min,1 h'&&/1 h · active/.test(await p.textContent('#cmpres')),'comparatif 5 min / 10 min / 1 h affiché');
+  await p.click('nav button[data-t="2"]');const [dj2]=await Promise.all([p.waitForEvent('download'),p.click('#jcsv')]);const jc=require('fs').readFileSync(await dj2.path(),'utf8');
+  ok(/numero;horodatage;agent;decision/.test(jc)&&jc.split('\r\n').length>4,'journal : export CSV');
+  const n0=await p.evaluate(()=>JR.n);await p.click('#jreset');await p.click('#jreset');await p.waitForFunction(()=>JR.n===0,null,{timeout:5000});
+  const arc=await p.evaluate(()=>idb('archives','readonly',tx=>tx.objectStore('archives').getAll()));ok(arc.length===1&&arc[0].n===n0,`journal : remise à zéro avec archive (${n0} décisions archivées)`);
   await p.click('nav button[data-t="0"]');const sr=await p.textContent('#simres');
   ok(/Départ · entraînement/.test(sr)&&/Départ · test/.test(sr)&&/Durée moy/.test(sr)&&/Glissement/.test(sr)&&/actualité neutre/.test(sr),'résultats départ/après, calibrage/test, durée, frais, glissement');
   ok(/Entraînement \(70 %\)/.test(sr)&&/test \(30 %\)/.test(sr)&&/côte à côte/.test(sr)&&(/⚠/.test(sr)||/Aucun signal d’alerte/.test(sr)),'entraînement 70 % / test 30 % côte à côte, avec alertes');
