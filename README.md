@@ -40,4 +40,13 @@ Ces sources sont des **règles à essayer** (`regime`, `macro`, `fund`), désact
 - **Familles sur 3 ans** (bougies d'1 h, `MOIS3=36`) dans la mesure longue, pour voir plusieurs phases de marché.
 - **`tools/familles-fw.cjs`** : forward test 24 h/24 de toutes les familles, 10 000 $ fictifs chacune, une décision par heure fermée, journal `familles.jsonl` chaîné par SHA-256.
 
+## Habitudes des traders professionnels
+
+- **Liste de contrôle** (`conf`) : entrée seulement avec au moins 3 confirmations indépendantes sur 4 (tendance longue, cassure, régime du RSI, régime du bitcoin).
+- **Pause après 3 pertes de suite** (`serie`) : 12 h sans entrée, comme les coupe-circuit des sociétés de trading.
+- **Heures creuses évitées** (`heures`) : pas d'entrée le week-end ni entre 0 h et 6 h UTC (résultats d'études mitigés).
+- **Mesure de la qualité** : espérance par trade en multiples du risque (R), SQN de Van Tharp, et Monte-Carlo par blocs de 5 jours (1000 trajectoires) pour la chance de finir en perte et la pire baisse probable à 95 %.
+
+Ces règles sont à essayer : elles ne sont pas actives dans la configuration gelée et sont mesurées dans le tableau « Pistes ».
+
 Version en ligne : https://claudecode988.github.io/public-iatrade/

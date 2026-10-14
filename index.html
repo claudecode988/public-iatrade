@@ -265,6 +265,15 @@ function joursFermes(T,J){const jc=J.map(x=>x.c),ji=new Array(T.length);let j=0;
 // Dernier taux de financement connu à la fin de chaque bougie (null si absent ou de plus de 9 h). L : [{t,r}] trié.
 function financement(T,L){const o=new Array(T.length).fill(null);if(!L||!L.length)return o;let j=-1;
   for(let i=0;i<T.length;i++){const fin=T[i]+TF.bar;while(j+1<L.length&&L[j+1].t<=fin)j++;if(j>=0&&fin-L[j].t<=9*H1)o[i]=L[j].r}return o}
+// Heures creuses : samedi, dimanche, et 0 h à 6 h UTC (volumes plus faibles, Wang et al. 2020 ; résultats d'études mitigés).
+const heureCreuse=t=>{const d=new Date(t),j=d.getUTCDay(),h=d.getUTCHours();return j===0||j===6||h<6};
+// Série de pertes : vrai si les 3 derniers trades sont perdants et que la dernière sortie date de moins de 12 h.
+const pauseSerie=(T,lastX,t)=>T.length>=3&&T.slice(-3).every(x=>x<0)&&t-lastX<12*H1;
+// Monte-Carlo par blocs (5 jours) sur des rendements journaliers : 1000 trajectoires de même longueur, tirage reproductible.
+// Donne la probabilité de finir en perte, le 5e centile du rendement et la pire baisse atteinte dans 95 % des cas.
+function monteCarlo(rj,n=1000,bloc=5){if(!rj||rj.length<30)return null;let g=12345;const rnd=()=>(g=(g*1103515245+12345)%2147483648)/2147483648,L=rj.length,F=[],DD=[];
+  for(let k=0;k<n;k++){let v=1,pk=1,dd=0,i=0;while(i<L){const a=Math.floor(rnd()*(L-bloc+1));for(let j=0;j<bloc&&i<L;j++,i++){v*=1+rj[a+j];pk=Math.max(pk,v);dd=Math.max(dd,(pk-v)/pk)}}F.push(v-1);DD.push(dd)}
+  F.sort((a,b)=>a-b);DD.sort((a,b)=>a-b);return{pPerte:F.filter(x=>x<0).length/n,r5:F[Math.floor(n*.05)],r50:F[Math.floor(n*.5)],dd95:DD[Math.floor(n*.95)]}}
 // Changements essayés un par un par mesurer(), dans cet ordre.
 const CHANGES=[
   {id:'mtf',nom:'Confirmation sur bougies longues',txt:'Entrée seulement si la tendance des bougies longues (4 h pour des bougies d’1 h, 1 h pour 10 min ; EMA 20 contre EMA 50) va dans le même sens.'},
@@ -278,6 +287,9 @@ const CHANGES=[
   {id:'excl',nom:'Marchés trop calmes exclus',txt:'Paire ignorée si son ATR 14 bougies est sous 3 fois le coût aller-retour.'},
   {id:'regime',nom:'Régime du bitcoin',txt:'Achat refusé quand le bitcoin clôture sous sa moyenne EMA 50 jours (marché baissier), vente refusée quand il est au-dessus. Moins de 50 jours connus : pas de filtre.'},
   {id:'macro',nom:'Pause autour des annonces de la Fed',txt:'Aucune entrée de 12 h avant à 6 h après une décision de taux de la Fed (calendrier officiel 2025-2026).'},
+  {id:'conf',nom:'Liste de contrôle (3 confirmations sur 4)',txt:'Comme la liste de contrôle des traders avant d’entrer : au moins 3 confirmations indépendantes sur 4 dans le sens du trade (tendance des bougies longues, cassure des 20 bougies, régime du RSI, régime du bitcoin).'},
+  {id:'serie',nom:'Pause après 3 pertes de suite',txt:'Après 3 trades perdants d’affilée, aucune entrée pendant 12 h (coupe-circuit des séries, comme chez les sociétés de trading). Ne fait que réduire le risque.'},
+  {id:'heures',nom:'Heures creuses évitées',txt:'Aucune entrée le samedi, le dimanche, ni entre 0 h et 6 h UTC : moins d’échanges, écarts plus larges selon les études sur le bitcoin.'},
   {id:'fund',nom:'Taux de financement',txt:'Achat refusé si le taux de financement des contrats perpétuels Binance dépasse 0,05 % par 8 h (trop d’acheteurs à crédit) ; vente refusée sous −0,05 %. Sans donnée : pas de filtre.'}];
 const kl=x=>({t:+x[0],o:+x[1],h:+x[2],l:+x[3],c:+x[4],v:+x[5]});
 // Requête REST publique avec pause sur 429/418 (en-tête Retry-After, 60 s si illisible).
@@ -338,6 +350,8 @@ function refusEntree(P,t,dir,c,R){const k=rt(c);
   if(R.fee&&1.5*P.atrP[t]<3*k)return'mouvement attendu trop faible face aux frais';
   if(R.regime&&P.reg&&P.reg[t]&&P.reg[t]!==(dir==='long'?1:-1))return`bitcoin ${P.reg[t]<0?'sous':'au-dessus de'} sa moyenne 50 jours`;
   if(R.macro&&P.tm){const f=pauseFed(P.tm[t]+TF.bar);if(f.pause)return`pause autour de l’annonce de la Fed du ${new Date(f.d).toISOString().slice(0,10)}`}
+  if(R.conf){const d=dir==='long'?1:-1,n=(P.tr4[t]===d)+(P.brk[t]===d)+(P.rr[t]===d)+(!!P.reg&&P.reg[t]===d);if(n<3)return`liste de contrôle : ${n} confirmation${n>1?'s':''} sur 4 (3 demandées)`}
+  if(R.heures&&P.tm&&heureCreuse(P.tm[t]+TF.bar))return'heures creuses (week-end ou 0 h à 6 h UTC)';
   if(R.fund&&P.fr&&P.fr[t]!==null&&(dir==='long'?P.fr[t]>FUND_MAX:P.fr[t]<-FUND_MAX))return`taux de financement ${(P.fr[t]*100).toFixed(3).replace('.',',')} % par 8 h`;
   return''}
 // Gaston : meilleure paire qui passe le seuil et les règles actives à la bougie t.
@@ -376,17 +390,17 @@ function fermer(P,price,c){const s=c.slip/100,f=c.fee/100,fx=P.side==='long'?pri
 function acheterGarder(F,from,to,c){const s=c.slip/100,f=c.fee/100,a=1e4/F.Q.length;let v=0;
   for(const q of F.Q){const P=F.p[q],fill=P.c[from]*(1+s),n=a*(1-f)/fill,fx=P.c[to-1]*(1-s);v+=n*fx*(1-f)}return v-1e4}
 // Rejoue les règles heure par heure entre from et to (exclu) avec 10 000 $ fictifs. Stop vérifié dans chaque bougie (plus bas / plus haut).
-function simuler(F,from,to,c,R){let cash=1e4,P=null,nT=0,lossD=0,pk=1e4,dd=0,day='',fees=0,slip=0,lastX=-1e15,m=0,st=0,se=0,stt=0,see=0,ste=0;const T=[],Du=[],H=[],Rt=[],AC=[],EQ=[],ech=Math.max(1,Math.floor((to-from)/150)),sum=a=>a.reduce((x,y)=>x+y,0);
-  const sortir=(t,price)=>{const r=fermer(P,price,c);cash+=P.size+r.g-r.xf;fees+=P.fe+r.xf;slip+=r.slip;T.push(r.pnl);Rt.push(r.pnl/P.size);AC.push([P.acc,r.pnl]);Du.push((F.T[t]-P.t0)/H1);H.push(P.p);lossD+=r.pnl;nT+=P.nb;lastX=F.T[t];P=null};
+function simuler(F,from,to,c,R){let cash=1e4,P=null,nT=0,lossD=0,pk=1e4,dd=0,day='',fees=0,slip=0,lastX=-1e15,m=0,st=0,se=0,stt=0,see=0,ste=0;const T=[],Du=[],H=[],Rt=[],AC=[],EQ=[],RM=[],ech=Math.max(1,Math.floor((to-from)/150)),sum=a=>a.reduce((x,y)=>x+y,0);
+  const sortir=(t,price)=>{const r=fermer(P,price,c);cash+=P.size+r.g-r.xf;fees+=P.fe+r.xf;slip+=r.slip;T.push(r.pnl);Rt.push(r.pnl/P.size);RM.push(P.n*P.dist>0?r.pnl/(P.n*P.dist):0);AC.push([P.acc,r.pnl]);Du.push((F.T[t]-P.t0)/H1);H.push(P.p);lossD+=r.pnl;nT+=P.nb;lastX=F.T[t];P=null};
   const JR_=[];for(let t=from;t<to;t++){const dj=new Date(F.T[t]).toISOString().slice(0,10);if(dj!==day){if(day)JR_.push(cash+(P?P.size+(P.side==='long'?1:-1)*P.n*(F.p[P.q].c[t-1]-P.fill):0));day=dj;nT=0;lossD=0}
     if(P){const x=F.p[P.q].C[t],hit=stopTick(P,x.l,x.h,R,x.o);if(hit!==null)sortir(t,hit);else if(sortieCloture(F,P,t,c,R))sortir(t,x.c)}
-    else if(nT+(c.nb||1)<=c.maxTrades&&-lossD<1e4*c.maxLoss/100&&cash>=c.size*(c.nb||1)*(1+c.fee/100)&&(!R.cool||(F.T[t]-lastX)/TF.bar>=4)){const{b}=choisir(F,t,c,R);
+    else if(nT+(c.nb||1)<=c.maxTrades&&-lossD<1e4*c.maxLoss/100&&cash>=c.size*(c.nb||1)*(1+c.fee/100)&&(!R.cool||(F.T[t]-lastX)/TF.bar>=4)&&!(R.serie&&pauseSerie(T,lastX,F.T[t]))){const{b}=choisir(F,t,c,R);
       if(b){const rk=risque(c,cash,pk,distanceStop(F,b.q,t,c,R));if(rk.ok){P=ouvrir(F,b.q,t,b.dir,b.pr,c,R,undefined,rk.taille);{const d=b.dir==='long'?1:-1,Pq=F.p[b.q];P.acc=Pq.mt[t]===d&&Pq.tr4[t]===d}cash-=P.size+P.fe;nT+=P.nb}}}
     const un=P?(P.side==='long'?1:-1)*P.n*(F.p[P.q].c[t]-P.fill):0,eq=cash+(P?P.size+un:0);pk=Math.max(pk,eq);dd=Math.max(dd,(pk-eq)/pk);m++;st+=m;se+=eq;stt+=m*m;see+=eq*eq;ste+=m*eq;if(m%ech===0)EQ.push(+eq.toFixed(2))}
   if(P)sortir(to-1,F.p[P.q].c[to-1]); // une position encore ouverte est clôturée au dernier prix pour être comptée
   const w=T.filter(x=>x>0);
   const gs=sum(w),ls=sum(T.filter(x=>x<=0)),vt=stt/m-(st/m)**2,ve=see/m-(se/m)**2,r2=m>2&&vt>0&&ve>1e-9?((ste/m-st/m*se/m)**2)/(vt*ve):0; // R² : 1 = courbe parfaitement droite
-  EQ.push(+(1e4+sum(T)).toFixed(2));JR_.push(1e4+sum(T));const ac=AC.filter(x=>x[0]),dv=AC.filter(x=>!x[0]),res={jrs:JR_,accord:{n:AC.length,acc:ac.length,pnlAcc:sum(ac.map(x=>x[1])),pnlDiv:sum(dv.map(x=>x[1]))},ret:Rt,eqs:EQ,r2,n:T.length,pnl:sum(T),gain:gs,loss:ls,pf:ls<0?gs/-ls:null,bh:acheterGarder(F,from,to-1>from?to:from+1,c),fees,slip,wr:T.length?w.length/T.length:0,dd,conf:H.length?sum(H)/H.length:0,
+  EQ.push(+(1e4+sum(T)).toFixed(2));JR_.push(1e4+sum(T));const ac=AC.filter(x=>x[0]),dv=AC.filter(x=>!x[0]),mR=RM.length?sum(RM)/RM.length:0,sR=RM.length>1?sd(RM):0,res={expR:RM.length?mR:null,sqn:RM.length>=10&&sR>0?Math.sqrt(Math.min(RM.length,100))*mR/sR:null,jrs:JR_,accord:{n:AC.length,acc:ac.length,pnlAcc:sum(ac.map(x=>x[1])),pnlDiv:sum(dv.map(x=>x[1]))},ret:Rt,eqs:EQ,r2,n:T.length,pnl:sum(T),gain:gs,loss:ls,pf:ls<0?gs/-ls:null,bh:acheterGarder(F,from,to-1>from?to:from+1,c),fees,slip,wr:T.length?w.length/T.length:0,dd,conf:H.length?sum(H)/H.length:0,
     dur:Du.length?sum(Du)/Du.length:0,jours:Math.round((to-from)*TF.bar/864e5),du:F.T[from],au:F.T[to-1]};if(ESSAI)ESSAI(c,R,res);return res}
 // Signaux d'alerte contre la sur-interprétation d'un résultat (entraînement a, test b).
 function alertes(a,b){const o=[];
@@ -527,17 +541,17 @@ function familles(F,c,R){const W=Math.min(Math.max(TF.W,200*Math.round(H1/TF.bar
   const run={agents:(a,b,cc)=>simuler(F,a,b,cc,R),simple:(a,b,cc)=>simuler(F,a,b,cc,{ref:'ma'})};for(const k in FAMILLES)run[k]=(a,b,cc)=>portefeuille(F,a,b,cc,FAMILLES[k].regle);
   const L=[];for(const k in run){const tout=run[k](W,N,c),q4=[0,1,2,3].map(i=>run[k](W+Math.floor((N-W)*i/4),W+Math.floor((N-W)*(i+1)/4),c).pnl),rj=rendementsJours(tout.jrs);
     L.push({id:k,nom:k==='agents'?'Agents (configuration gelée)':k==='simple'?'Règle simple (croisement EMA 20/50)':FAMILLES[k].nom,txt:k==='agents'?'Les six agents, avec la couche de risque (0,5 % du capital risqué par trade).':k==='simple'?'Croisement des moyennes EMA 20 et 50 sur les bougies de décision, même couche de risque.':FAMILLES[k].txt,
-      pnl:tout.pnl,dd:tout.dd,fees:tout.fees,n:tout.n,sharpe:sharpe(rj),jours:rj.length,trimPos:q4.filter(x=>x>0).length,trim:q4,cout2:run[k](W,N,c2).pnl,test:run[k](cut,N,c).pnl,rj})}
+      pnl:tout.pnl,dd:tout.dd,fees:tout.fees,n:tout.n,sharpe:sharpe(rj),jours:rj.length,trimPos:q4.filter(x=>x>0).length,trim:q4,cout2:run[k](W,N,c2).pnl,test:run[k](cut,N,c).pnl,mc:monteCarlo(rj),rj})}
   const srs=L.map(x=>x.sharpe).filter(x=>x!==null);for(const x of L){x.dsr=x.rj.length>=30?dsr(x.rj,srs):null;delete x.rj}
   return{lignes:L,du:F.T[W],coupe:F.T[cut],au:F.T[N-1]}}
 // Pistes de régularité : chaque nouvelle source ajoutée SEULE à la configuration des agents, mêmes données, mêmes coûts.
 // Rien n'est adopté automatiquement : une piste n'est qu'une idée à suivre si elle fait mieux partout (toute la période, partie test, coûts doublés).
 function pistes(F,c,R){const W=Math.min(TF.W,Math.floor(F.N/4)),N=F.N,cut=W+Math.floor((N-W)*.7),c2={...c,fee:c.fee*2,slip:c.slip*2};
-  const un=(r,nom,id)=>{const t=simuler(F,W,N,c,r),rj=rendementsJours(t.jrs);return{id,nom,pnl:t.pnl,dd:t.dd,n:t.n,sharpe:sharpe(rj),test:simuler(F,cut,N,c,r).pnl,cout2:simuler(F,W,N,c2,r).pnl}};
+  const un=(r,nom,id)=>{const t=simuler(F,W,N,c,r),rj=rendementsJours(t.jrs);return{id,nom,pnl:t.pnl,dd:t.dd,n:t.n,expR:t.expR,sqn:t.sqn,sharpe:sharpe(rj),test:simuler(F,cut,N,c,r).pnl,cout2:simuler(F,W,N,c2,r).pnl}};
   const cnt=a=>a.filter(x=>x!==null&&x!==0).length;
-  const couv={regime:cnt(F.reg.slice(W)),macro:F.T.slice(W).filter(t=>pauseFed(t).connu).length,fund:Math.max(0,...F.Q.map(q=>cnt(F.p[q].fr.slice(W))))};
+  const couv={conf:1,serie:1,heures:1,regime:cnt(F.reg.slice(W)),macro:F.T.slice(W).filter(t=>pauseFed(t).connu).length,fund:Math.max(0,...F.Q.map(q=>cnt(F.p[q].fr.slice(W))))};
   const L=[un(R,'Configuration gelée (référence)','ref')];
-  for(const id of['regime','macro','fund']){const m=CHANGES.find(x=>x.id===id);L.push({...un({...R,[id]:1},m.nom,id),couverture:couv[id]/(N-W)})}
+  for(const id of['regime','macro','fund','conf','serie','heures']){const m=CHANGES.find(x=>x.id===id);L.push({...un({...R,[id]:1},m.nom,id),couverture:couv[id]/(N-W)})}
   return{lignes:L,du:F.T[W],coupe:F.T[cut],au:F.T[N-1]}}
 // Comparatif des durées sur la MÊME période : bougies de 5 min (D5) regroupées en 10 min et en 1 h, même découpage 70/30.
 // Compare la version de départ et la version active (règles R) ; rétablit ensuite la durée choisie dans les réglages.
@@ -548,7 +562,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 21:11';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 21:50';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({pk:10000,cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:.5,ddMax:15,hb:5,npT1:30,npJ1:30,npT2:100,npJ2:90,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
@@ -681,6 +695,7 @@ async function decider0(t,manuel){const c=S.cfg,A=[],d0=today(),R=S.rules,W=v=>v
   if(act==='open'){if(S.stop){ok=false;rr='Bloqué : arrêt d’urgence actif.'}else if(S.nToday+c.nb>c.maxTrades){ok=false;rr=`Bloqué : ${c.nb} achats dépasseraient le maximum de ${c.maxTrades} trades par jour.`}
     else if(-S.lossToday>=S.start*c.maxLoss/100){ok=false;rr='Bloqué : perte maximale du jour atteinte.'}else if(S.cash<c.size*c.nb*(1+c.fee/100)){ok=false;rr=`Bloqué : solde fictif insuffisant pour ${c.nb} achats de ${fmt(c.size)}.`}
     else if(!fresh()){ok=false;rr=`Bloqué : règle heartbeat (aucun prix frais depuis plus de ${c.hb} s).`}
+    else if(R.serie&&pauseSerie(S.trades,S.lastX,Date.now())){ok=false;rr='Bloqué : 3 pertes de suite, pause de 12 h.'}
     else{RK=risque(c,valeur(),Math.max(S.pk||S.start,valeur()),distanceStop(F,b.q,i,c,R));if(!RK.ok){ok=false;rr=`Bloqué : règle ${RK.regle}.`}
       else rr=`Validé : ${c.nb} achat${c.nb>1?'s':''}, taille de risque ${fmt(RK.taille)} (${String(c.riskPct).replace('.',',')} % du capital au stop${RK.f<1?`, réduite à ${RK.f*100} % par le barème de baisse`:''}${RK.brute>RK.max?', plafonnée à la taille maximale':''}).`}}
   A.push({n:'Risque',s:ok?'Feu vert':'Veto',t:rr+' Le Chef ne peut pas contourner ce veto.'});
@@ -977,9 +992,9 @@ function srvHTML(){const e=$('srv');if(!e)return;const r=SV.res,g=SV.cfg,L=SV.lg
 // Pistes de régularité inspirées des sources des pros, chacune ajoutée seule aux agents (rien n'est adopté automatiquement).
 function pistesHTML(L){const G=L&&L.pistes;if(!G)return'';const r0=G.lignes[0],pc=x=>`${x>=0?'+':'−'}${Math.abs(x/100).toFixed(1).replace('.',',')} %`,cl=x=>x>=0?'up':'dn';
   const mieux=x=>x.id!=='ref'&&x.pnl>r0.pnl&&x.test>r0.test&&x.cout2>r0.cout2&&x.dd<=r0.dd,B=G.lignes.filter(mieux);
-  return`<h3>Pistes pour des résultats plus réguliers</h3><div class="mut">Ce que regardent les traders professionnels, ajouté une source à la fois aux agents (configuration gelée, mêmes données, mêmes frais) : régime du bitcoin (moyenne 50 jours), calendrier des annonces de la Fed, taux de financement des contrats perpétuels. « Couverture » = part de la période où la donnée existait ; sans donnée, le filtre ne bloque rien.</div>
-  <div class="tw"><table class="st"><thead><tr><th>Version</th><th>Rendement</th><th>Pire baisse</th><th>Trades</th><th>Sharpe / jour</th><th>Coûts × 2</th><th>Partie test</th><th>Couverture</th></tr></thead><tbody>
-  ${G.lignes.map(x=>`<tr${mieux(x)?' class="cand"':''}><th>${x.nom}</th><td class="${cl(x.pnl)}">${pc(x.pnl)}</td><td>${pct(x.dd)}</td><td>${x.n}</td><td>${x.sharpe===null?'–':x.sharpe.toFixed(3).replace('.',',')}</td><td class="${cl(x.cout2)}">${pc(x.cout2)}</td><td class="${cl(x.test)}">${pc(x.test)}</td><td>${x.couverture===undefined?'–':Math.round(x.couverture*100)+' %'}</td></tr>`).join('')}</tbody></table></div>
+  return`<h3>Pistes pour des résultats plus réguliers</h3><div class="mut">Ce que regardent les traders professionnels, ajouté une source à la fois aux agents (configuration gelée, mêmes données, mêmes frais) : régime du bitcoin (moyenne 50 jours), calendrier des annonces de la Fed, taux de financement des contrats perpétuels ; et trois habitudes des traders : liste de contrôle avant d’entrer, pause après une série de pertes, heures creuses évitées. L’espérance est le gain moyen par trade en multiples du risque pris (R). « Couverture » = part de la période où la donnée existait ; sans donnée, le filtre ne bloque rien.</div>
+  <div class="tw"><table class="st"><thead><tr><th>Version</th><th>Rendement</th><th>Pire baisse</th><th>Trades</th><th title="Gain moyen par trade, en multiples du risque pris au stop (R)">Espérance par trade</th><th title="Indice de qualité du système (Van Tharp) : espérance ÷ dispersion × √trades (100 au plus)">SQN</th><th>Coûts × 2</th><th>Partie test</th><th>Couverture</th></tr></thead><tbody>
+  ${G.lignes.map(x=>`<tr${mieux(x)?' class="cand"':''}><th>${x.nom}</th><td class="${cl(x.pnl)}">${pc(x.pnl)}</td><td>${pct(x.dd)}</td><td>${x.n}</td><td class="${(x.expR||0)>=0?'up':'dn'}">${x.expR==null?'–':(x.expR>=0?'+':'−')+Math.abs(x.expR).toFixed(2).replace('.',',')+' R'}</td><td>${x.sqn==null?'–':x.sqn.toFixed(2).replace('.',',')}</td><td class="${cl(x.cout2)}">${pc(x.cout2)}</td><td class="${cl(x.test)}">${pc(x.test)}</td><td>${x.couverture===undefined?'–':Math.round(x.couverture*100)+' %'}</td></tr>`).join('')}</tbody></table></div>
   <p><b>${B.length?`Piste${B.length>1?'s':''} à suivre : ${B.map(x=>x.nom).join(', ')} (mieux que la référence sur toute la période, la partie test et avec des coûts doublés, sans baisse plus forte). Ce n’est pas une preuve ; à confirmer en forward test avant tout changement de la configuration gelée.`:'Aucune de ces sources ne rend les agents plus réguliers de façon robuste sur cette période.'}</b></p>`}
 // Forward test 24 h/24 des familles : chaque famille gère 10 000 $ fictifs depuis le même jour, règles écrites avant de voir ces prix.
 function famFwdHTML(){const f=SV.fam;if(!f||!f.lignes)return'<p class="mut">Forward test des familles : pas encore de données publiées par le serveur.</p>';const pc=x=>`${x>=0?'+':'−'}${Math.abs(x/100).toFixed(2).replace('.',',')} %`;
@@ -989,8 +1004,8 @@ function famFwdHTML(){const f=SV.fam;if(!f||!f.lignes)return'<p class="mut">Forw
 function famHTML(G,titre){if(!G)return'';const bh=G.lignes.find(x=>x.id==='bh'),pc=x=>`${x>=0?'+':'−'}${Math.abs(x/100).toFixed(1).replace('.',',')} %`,cl=x=>x>=0?'up':'dn';
   const cand=x=>x.id!=='bh'&&bh&&x.pnl>bh.pnl&&x.test>bh.test&&x.cout2>0&&x.trimPos>=3,C=G.lignes.filter(cand);
   return`<h3>${titre} (même période, mêmes frais)</h3><div class="mut">Paramètres fixés à l’avance, jamais réglés sur ces données. Du ${dt(G.du)} au ${dt(G.au)}, partie test à partir du ${dt(G.coupe)}. Les familles en panier sont investies en entier ; les agents et la règle simple ne risquent que 0,5 % du capital par trade : compare surtout le rapport rendement / pire baisse.</div>
-  <div class="tw"><table class="st"><thead><tr><th>Stratégie</th><th>Rendement</th><th>Pire baisse</th><th>Rendement ÷ baisse</th><th>Sharpe / jour</th><th>Quarts de la période positifs</th><th>Coûts × 2</th><th>Partie test</th><th>DSR</th></tr></thead><tbody>
-  ${G.lignes.map(x=>`<tr${cand(x)?' class="cand"':''}><th title="${x.txt}">${x.nom}</th><td class="${cl(x.pnl)}">${pc(x.pnl)}</td><td>${pct(x.dd)}</td><td>${x.dd>0?(x.pnl/1e4/x.dd).toFixed(2).replace('.',','):'–'}</td><td>${x.sharpe===null?'–':x.sharpe.toFixed(3).replace('.',',')}</td><td>${x.trimPos}/4</td><td class="${cl(x.cout2)}">${pc(x.cout2)}</td><td class="${cl(x.test)}">${pc(x.test)}</td><td>${x.dsr?Math.round(x.dsr.dsr*100)+' %':'–'}</td></tr>`).join('')}</tbody></table></div>
+  <div class="tw"><table class="st"><thead><tr><th>Stratégie</th><th>Rendement</th><th>Pire baisse</th><th>Rendement ÷ baisse</th><th>Sharpe / jour</th><th>Quarts de la période positifs</th><th>Coûts × 2</th><th>Partie test</th><th>DSR</th><th title="1000 trajectoires simulées en remélangeant des blocs de 5 jours">Chance de finir en perte (simulé)</th><th title="Pire baisse atteinte dans 95 % des trajectoires simulées">Pire baisse probable (95 %)</th></tr></thead><tbody>
+  ${G.lignes.map(x=>`<tr${cand(x)?' class="cand"':''}><th title="${x.txt}">${x.nom}</th><td class="${cl(x.pnl)}">${pc(x.pnl)}</td><td>${pct(x.dd)}</td><td>${x.dd>0?(x.pnl/1e4/x.dd).toFixed(2).replace('.',','):'–'}</td><td>${x.sharpe===null?'–':x.sharpe.toFixed(3).replace('.',',')}</td><td>${x.trimPos}/4</td><td class="${cl(x.cout2)}">${pc(x.cout2)}</td><td class="${cl(x.test)}">${pc(x.test)}</td><td>${x.dsr?Math.round(x.dsr.dsr*100)+' %':'–'}</td><td>${x.mc?Math.round(x.mc.pPerte*100)+' %':'–'}</td><td>${x.mc?pct(x.mc.dd95):'–'}</td></tr>`).join('')}</tbody></table></div>
   <p><b>${C.length?`Candidate${C.length>1?'s':''} à suivre : ${C.map(x=>x.nom).join(', ')}. Ce n’est pas une preuve : une seule période, et choisir la meilleure après coup est déjà un essai (le DSR en tient compte).`:'Aucune stratégie ne bat « acheter et garder » de façon robuste sur cette période (toute la période, partie test, coûts doublés et 3 quarts de la période sur 4).'}</b></p>`}
 function niveauPreuve(){const c=S.cfg,M=S.sim,L=SV.lg&&!SV.lg.faux?SV.lg:null,trL=L&&L.wf?L.wf.test.n:0,trM=M?(M.wf?M.wf.test.n:M.fin.test.n):0,useL=trL>=trM&&L;
   const tr=Math.max(trL,trM),jS=SV.res&&!SV.res.faux?(Date.now()-SV.res.debut)/864e5:0,jL=S.gel&&JR.debut?(Date.now()-Math.max(S.gel.at,JR.debut))/864e5:0,j=Math.max(jS,jL);
