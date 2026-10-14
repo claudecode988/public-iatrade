@@ -3,5 +3,39 @@
  "note": "Configuration gelée du forward test 24 h/24. La modifier archive le journal et fait repartir la preuve de zéro.",
  "tf": 5,
  "regles": [],
- "cfg": {"size":1000,"nb":3,"maxLoss":5,"maxTrades":50,"sl":2,"thr":85,"hold":6,"atrK":2,"fee":0.1,"slip":0.05,"riskPct":0.5,"ddMax":15,"rsrc":"auto","news":"neutre"}
+ "cfg": {
+  "size": 1000,
+  "nb": 3,
+  "maxLoss": 5,
+  "maxTrades": 50,
+  "sl": 2,
+  "thr": 85,
+  "hold": 6,
+  "atrK": 2,
+  "fee": 0.1,
+  "slip": 0.05,
+  "riskPct": 0.5,
+  "ddMax": 15,
+  "rsrc": "auto",
+  "news": "neutre"
+ },
+ "proposition": {
+  "strategie": "A2",
+  "gelee": "2026-10-14T21:45:11.050Z",
+  "depuis": "2026-10-15T00:00:00Z",
+  "actifs": [
+   "BTCUSDT",
+   "EURUSD"
+  ],
+  "controle": [
+   "ETHUSDT"
+  ],
+  "couts": {
+   "EURUSD": {
+    "fee": 0,
+    "slip": 0.02
+   }
+  },
+  "regleDeChoix": "Parmi les stratégies à une décision par jour (S1 à S5, version 2), meilleur rapport rendement / pire baisse sur 5 ans avec une espérance positive : version 2 (rapport 4,23, espérance +0,63 R sur 171 trades)."
+ }
 }
