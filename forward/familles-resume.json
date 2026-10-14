@@ -1,9 +1,9 @@
 {
- "maj": 1792011619136,
+ "maj": 1792015235138,
  "debut": 1791994755433,
- "heure": "2026-10-14T20:00:00.000Z",
+ "heure": "2026-10-14T21:00:00.000Z",
  "pairs": 16,
- "dernierHash": "e2694fb10fc25a6a2dea5dbd628c79e174064d6820426d5c309950a906e3b1b3",
+ "dernierHash": "01c37a9399d19a992c429b564f6282121045e4516c4f2d1c40401f46b1382d29",
  "faux": false,
  "lignes": [
   {
@@ -13,34 +13,58 @@
    "dd": 0,
    "investi": 0,
    "n": 0,
-   "frais": 0
+   "frais": 0,
+   "debut": 1791994755433,
+   "jours": 0.24,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
   },
   {
    "id": "retour",
    "nom": "Retour à la moyenne",
-   "valeur": 9993.91,
+   "valeur": 10025.54,
    "dd": 0.0077,
-   "investi": 0.751,
+   "investi": 0.752,
    "n": 12,
-   "frais": 11.25
+   "frais": 11.25,
+   "debut": 1791994755433,
+   "jours": 0.24,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
   },
   {
    "id": "reeq",
    "nom": "Rééquilibrage hebdomadaire",
-   "valeur": 10007.6,
+   "valeur": 10040.3,
    "dd": 0.0073,
    "investi": 1.001,
    "n": 16,
-   "frais": 15
+   "frais": 15,
+   "debut": 1791994755433,
+   "jours": 0.24,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
   },
   {
    "id": "bh",
    "nom": "Acheter et garder",
-   "valeur": 10007.6,
+   "valeur": 10040.3,
    "dd": 0.0073,
    "investi": 1.001,
    "n": 16,
-   "frais": 15
+   "frais": 15,
+   "debut": 1791994755433,
+   "jours": 0.24,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
   },
   {
    "id": "regime",
@@ -49,7 +73,13 @@
    "dd": 0,
    "investi": 0,
    "n": 0,
-   "frais": 0
+   "frais": 0,
+   "debut": 1791994755433,
+   "jours": 0.24,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
   },
   {
    "id": "volcible",
@@ -58,7 +88,13 @@
    "dd": 0,
    "investi": 0,
    "n": 0,
-   "frais": 0
+   "frais": 0,
+   "debut": 1791994755433,
+   "jours": 0.24,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
   },
   {
    "id": "prudente",
@@ -67,16 +103,28 @@
    "dd": 0,
    "investi": 0,
    "n": 0,
-   "frais": 0
+   "frais": 0,
+   "debut": 1791994755433,
+   "jours": 0.24,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
   },
   {
    "id": "elan",
    "nom": "Élan sur 4 semaines",
-   "valeur": 10001.35,
+   "valeur": 10022.08,
    "dd": 0.0051,
-   "investi": 0.608,
+   "investi": 0.609,
    "n": 14,
-   "frais": 9.11
+   "frais": 9.11,
+   "debut": 1791994755433,
+   "jours": 0.24,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
   },
   {
    "id": "donchian",
@@ -85,7 +133,103 @@
    "dd": 0,
    "investi": 0,
    "n": 0,
-   "frais": 0
+   "frais": 0,
+   "debut": 1791994755433,
+   "jours": 0.24,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "S1",
+   "nom": "S1 · Suivi de tendance (MM50/MM200)",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0,
+   "debut": 1792015235138,
+   "jours": 0,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "S2",
+   "nom": "S2 · Retour à la moyenne (RSI 2)",
+   "valeur": 9997.1,
+   "dd": 0.0003,
+   "investi": 0.194,
+   "n": 4,
+   "frais": 2.9,
+   "debut": 1792015235138,
+   "jours": 0,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "S3",
+   "nom": "S3 · Cassure de Donchian (20 jours, filtre volume)",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0,
+   "debut": 1792015235138,
+   "jours": 0,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "S4",
+   "nom": "S4 · Pullback dans une tendance",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0,
+   "debut": 1792015235138,
+   "jours": 0,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "A2",
+   "nom": "Agents version 2 (règles du dossier)",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0,
+   "debut": 1792015235138,
+   "jours": 0,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "S5",
+   "nom": "S5 · Rotation momentum mensuelle",
+   "valeur": 9985,
+   "dd": 0.0015,
+   "investi": 1.002,
+   "n": 2,
+   "frais": 15,
+   "debut": 1792015235138,
+   "jours": 0,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
   }
  ]
 }
