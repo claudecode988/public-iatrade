@@ -84,6 +84,10 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   await p.click('nav button[data-t="1"]');const r0=restCalls;await p.click('#simgo');
   await p.waitForFunction(()=>/Mesure terminée|Erreur|injoignable/.test(document.getElementById('simst').textContent),null,{timeout:120000});
   console.log('     ',await p.textContent('#simst'),`(${restCalls-r0} requêtes REST)`);ok(/Mesure terminée/.test(await p.textContent('#simst')),'mesure terminée');
+  await p.click('#vaggo');await p.waitForFunction(()=>/Mesure terminée|Erreur|injoignable/.test(document.getElementById('vagst').textContent),null,{timeout:120000});
+  const vg=await p.textContent('#vag');console.log('     ',await p.textContent('#vagst'));
+  ok(/règle simple/.test(vg)&&/acheter et garder/.test(vg)&&/Prisme/.test(vg)&&/Bouclier/.test(vg)&&/Se trompent-ils ensemble/.test(vg)&&/(n’apporte rien|fait mieux)/.test(vg),'valeur de chaque agent, références et accord entre agents');
+  ok(!/\bIA\b/.test((await p.textContent('body')).replace(/sans modèle d’IA|mot « IA »/g,'')),'le mot « IA » n’est plus utilisé pour les agents');
   await p.click('#robgo');await p.waitForFunction(()=>/Test terminé|Erreur|injoignable/.test(document.getElementById('robst').textContent),null,{timeout:120000});
   const rb=await p.evaluate(()=>S.robu&&S.robu.rows.map(r=>r.k+':'+r.fee.toFixed(2)));console.log('     ',await p.textContent('#robst'),rb);
   ok(rb&&rb.join()==='1:0.10,2:0.20,3:0.30'&&/× 3/.test(await p.textContent('#robres'))&&/(Stratégie fragile aux coûts|reste positif)/.test(await p.textContent('#robres')),'test de robustesse : scénarios × 1, × 2, × 3 et avertissement');
