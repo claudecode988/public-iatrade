@@ -453,11 +453,13 @@ const house=(()=>{const cv=$('house'),W=320,H=240,cx=cv.getContext('2d'),RM=matc
     if(cur){if(cur.k==='go'&&!P[cur.a].path.length)next();else if(cur.k==='say'&&(wait-=dt*1000)<=0)next()}else if(Q.length)next();
     $('hst').textContent=st||'Les agents attendent dans leur maison.';draw(now);requestAnimationFrame(loop)}
   requestAnimationFrame(loop);return{play}})();
-function renderAgents(){$('fst').textContent=timer?'AGENTS EN SERVICE':"AGENTS À L'ARRÊT";
+const prochaine=()=>{const t=Math.ceil((Date.now()+1)/H1)*H1;return{h:hr(t).slice(0,5),m:Math.max(0,Math.ceil((t-Date.now())/6e4))}};
+const attente=()=>{const n=prochaine();return timer?`En service : prochaine décision à la fermeture de ${n.h} (dans ${n.m} min).`:'À l’arrêt : touche « Démarrer les agents » ou « Évaluer maintenant ».'};
+function renderAgents(){delete PV.fst;
   $('live').textContent=timer?'Agents en service':"À l'arrêt";$('live').classList.toggle('on',!!timer);
   $('scan').innerHTML=(S.scan||[]).map(x=>`<span>${x.q.replace('USDT','')} <b class="${x.sc>0?'u':x.sc<0?'d':''}">${x.sc>0?'▲':x.sc<0?'▼':'–'} ${Math.round((.5+.5*Math.abs(x.sc))*100)} %</b></span>`).join('');
   $('exclu').textContent=LV.excl.length?`Trop calmes pour couvrir les frais (ATR 1 h sous 3 × le coût aller-retour) : ${LV.excl.map(x=>x.replace('USDT','')).join(', ')}. Le forex y est souvent : c’est normal.`:'';
-  $('reps').innerHTML=AG.map(g=>{const a=S.ags.find(x=>x.n===g.n);return `<div class="rep"><i style="background:${g.c}"></i><div><b>${g.who}</b> <em>· ${g.job}</em><p>${a?a.t:'Au repos.'}${g.n==='Journal'&&S.sim?'<br>'+simLine(S.sim):''}</p></div></div>`}).join('')}
+  $('reps').innerHTML=AG.map(g=>{const a=S.ags.find(x=>x.n===g.n);return `<div class="rep"><i style="background:${g.c}"></i><div><b>${g.who}</b> <em>· ${g.job}</em><p>${a?a.t:attente()}${g.n==='Journal'&&S.sim?'<br>'+simLine(S.sim):''}</p></div></div>`}).join('')}
 function render(){
   const pnl=S.trades.reduce((a,b)=>a+b,0),w=S.trades.filter(x=>x>0).length,L=S.trades.length,P=S.pos,eq=valeur(),H=S.hist,n=H.length;
   $('bal').textContent=fmt(eq);$('pnl').textContent=fmt(pnl);$('pnl').className=pnl>=0?'up':'dn';
@@ -485,6 +487,7 @@ function paint(){const st=LV.st,cl=st==='EN DIRECT'?'ok':st==='DONNÉES FIGÉES'
   put('cst',st);if(PV.cl!==cl){PV.cl=cl;$('cst').className=cl}put('clag',LV.lag===null?'délai –':`délai ${Math.max(0,LV.lag)} ms`);put('crate',`${LV.rate} msg/s`);
   put('cnote',st==='DONNÉES FIGÉES'?'Données figées : aucun nouveau trade.':LV.note||'');
   put('src',st==='EN DIRECT'?'Prix Binance en direct (lecture seule). Ordres seulement au testnet.':st==='DONNÉES FIGÉES'?'Données figées : aucun nouveau trade.':st==='HORS LIGNE'?'Binance injoignable : aucun prix, aucun trade.':'Connexion aux prix Binance…');
+  const n=prochaine();put('fst',timer?`EN SERVICE · décision dans ${n.m} min`:"AGENTS À L'ARRÊT");
   const v=valeur();put('bal',fmt(v));put('f1',fmt(v));
   const P=S.pos;if(P){const px=(P.side==='long'?LV.bid[P.q]:LV.ask[P.q])||P.px;put('plat',fmt((P.side==='long'?1:-1)*P.n*(px-P.fill)));put('pstop',fp(P.stop))}}
 setInterval(()=>{paint();if(S.pos)save()},250);
@@ -509,7 +512,7 @@ function stopAuto(m){clearTimeout(timer);timer=null;$('auto').textContent=$('aut
 $('auto').onclick=()=>{if(timer){stopAuto();return}
   if(S.stop){$('msg').textContent='Arrêt d\'urgence actif. Remets-le en marche avant de démarrer.';return}
   timer=setTimeout(()=>stopAuto('Durée maximale atteinte : agents arrêtés.'),S.cfg.maxRuns*60000);$('auto').textContent=$('auto2').textContent='Arrêter les agents';$('auto').classList.add('stop');
-  $('auto-st').textContent=`Agents en service : ils décident à chaque fermeture de bougie 1 h (prochaine à ${hr(Math.ceil(Date.now()/H1)*H1)}). Stops vérifiés à chaque prix reçu. Arrêt automatique après ${S.cfg.maxRuns} min.`;renderAgents()};
+  $('auto-st').textContent=`Agents en service : ils décident à chaque fermeture de bougie 1 h (prochaine à ${hr(Math.ceil(Date.now()/H1)*H1)}). Stops vérifiés à chaque prix reçu. Arrêt automatique après ${S.cfg.maxRuns} min.`;renderAgents();decider(0,false)};
 $('go').onclick=()=>decider(0,true);
 $('kill').onclick=()=>{S.stop=!S.stop;if(S.stop&&timer)stopAuto('Arrêt d\'urgence actif : agents arrêtés, aucune nouvelle entrée. Un stop ouvert reste surveillé.');save();render();$('msg').textContent=S.stop?'Tout est suspendu : aucun nouvel ordre.':'Reprise possible.'};
 const NUM={size:[10,1e6],maxLoss:[.5,100],maxTrades:[1,1000],sl:[.5,50],thr:[50,99],hold:[0,200],atrK:[.5,10],fee:[0,2],slip:[0,2],maxRuns:[1,100000]};
