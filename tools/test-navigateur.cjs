@@ -55,6 +55,7 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   ok(/Pistes pour des résultats plus réguliers/.test(sv)&&/Régime du bitcoin/.test(sv)&&/annonces de la Fed/.test(sv)&&/Taux de financement/.test(sv)&&/Volatilité cible|volatilité cible/.test(sv),'pistes de régularité (sources des pros) et familles prudentes affichées');
   ok(/Familles sur \d+ ans/.test(sv)&&/Élan sur 4 semaines/.test(sv)&&/Cassures de Donchian/.test(sv)&&/Forward test des familles/.test(sv),'familles sur 3 ans, élan, Donchian et forward test des familles affichés');
   ok(/Stratégies du dossier bot-trading/.test(sv)&&/S1 · Suivi de tendance/.test(sv)&&/S5 · Rotation momentum/.test(sv)&&/(À TESTER|VALIDÉE|SUSPENDUE)/.test(sv),'stratégies S1 à S5 du dossier, avec leur statut');
+  {const pr=await p.textContent('#prop');ok(/BTC · crypto/.test(pr)&&/EURUSD · forex/.test(pr)&&/(ACHETER|VENDRE|GARDER|RIEN)/.test(pr)&&/c’est toi qui décides/.test(pr),'proposition du jour : crypto et forex, au format de la liste de contrôle');}
   {const ab=await p.textContent('#abs');ok(/Le serveur travaille|Serveur en retard/.test(ab)&&/Gaston/.test(ab)&&/décisions depuis/.test(ab),'onglet Agents : décisions du serveur pendant l’absence, avec les prénoms des agents');}
   await p.click('nav button[data-t="2"]');await p.click('#gelgo');await p.waitForFunction(()=>!!S.gel);
   ok(await p.isDisabled('#thr')&&/Gelée le/.test(await p.textContent('#gelst')),'geler la configuration : réglages de stratégie verrouillés');

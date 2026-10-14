@@ -53,4 +53,8 @@ Ces règles sont à essayer : elles ne sont pas actives dans la configuration ge
 
 Les cinq stratégies S1 à S5 du dossier sont codées telles qu'écrites (bougies journalières, décision après la clôture du jour, stops vérifiés sur la clôture), avec la gestion du risque du dossier : 1 % risqué par trade, 5 % au total, au plus 2 positions corrélées, pause après 2 % de perte du jour ou 6 % du mois, arrêt total à 15 % de baisse. Elles sont mesurées sur 5 ans (`MOIS3=60`) et suivies en forward test ; leur statut (À TESTER, VALIDÉE, SUSPENDUE) suit `05_backtest_protocole.md`.
 
+## Proposition du jour (une crypto, une paire forex)
+
+`tools/proposition.cjs` applique la stratégie gelée (`config.json` → `proposition`) séparément à chaque actif choisi, sur bougies journalières : bitcoin (données Binance) et euro-dollar (données Stooq, taux de la BCE en secours), avec un contrôle sur l'ethereum. Il publie `proposition.json` : action du jour (ACHETER, VENDRE, GARDER, RIEN), entrée, stop, objectif, taille et risque, au format de la liste de contrôle, plus un test de chaque stratégie journalière actif par actif. Le site l'affiche ; l'utilisateur décide et passe l'ordre lui-même. Aucun ordre, aucune clé.
+
 Version en ligne : https://claudecode988.github.io/public-iatrade/
