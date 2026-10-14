@@ -7,14 +7,18 @@
 //   node tools/familles-fw.cjs <dossier>     (FAUX_PRIX=1 : prix inventés, test du programme seulement ; MAINTENANT : heure simulée)
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
-const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+';return{WL,setTF,aligner,prep,kl,FAMILLES}')();
+const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+';return{WL,setTF,aligner,prep,kl,FAMILLES,plafondRisque}')();
 const DIR=process.argv[2]||'forward',F_ETAT=path.join(DIR,'familles-etat.json'),F_J=path.join(DIR,'familles.jsonl'),F_RES=path.join(DIR,'familles-resume.json');
 const sha=t=>crypto.createHash('sha256').update(t).digest('hex'),lire=(f,d)=>{try{return JSON.parse(fs.readFileSync(f,'utf8'))}catch(e){return d}};
 const BASES=['https://data-api.binance.vision','https://api.binance.com'],H=36e5,J1=864e5,now=+process.env.MAINTENANT||Date.now();
 async function get(u){for(const B of BASES){try{const r=await fetch(B+u);if(r.status===429||r.status===418)throw new Error('Binance limite les requêtes');if(r.ok)return r.json()}catch(e){if(/limite/.test(e.message))throw e}}return null}
 (async()=>{
   const G=lire(path.join(DIR,'config.json'),null);if(!G){console.error('config.json absent : rien à faire.');return}
-  E.setTF(60);const c=G.cfg,f=(c.fee+c.slip)/100,S0=lire(F_ETAT,null),hNow=Math.floor(now/H)*H-H; // dernière heure FERMÉE (ouverture)
+  // Version 2 des règles du forward test des familles : même risque pour toutes (plafondRisque). Un ancien état est archivé et
+  // toutes les familles repartent le même jour avec les mêmes règles (sinon les comparaisons seraient faussées).
+  const VERSION=2;{const a=lire(F_ETAT,null);if(a&&a.version!==VERSION){const d=path.join(DIR,'archives'),tag=new Date(now).toISOString().replace(/[:.]/g,'-');fs.mkdirSync(d,{recursive:true});
+    for(const f of[F_ETAT,F_J,F_RES])if(fs.existsSync(f))fs.renameSync(f,path.join(d,tag+'-'+path.basename(f)));console.log('Familles : ancien forward test archivé (règles de risque changées).')}}
+  E.setTF(60);const c={...G.cfg,risqueEgal:true},f=(c.fee+c.slip)/100,S0=lire(F_ETAT,null),hNow=Math.floor(now/H)*H-H; // dernière heure FERMÉE (ouverture)
   if(S0&&S0.lastBar>=hNow){console.log('Familles : pas de nouvelle heure fermée.');return}
   const L=[...E.WL.CRYPTO,...E.WL.FOREX],D={},ext={btcJ:[],jours:{}};
   if(process.env.FAUX_PRIX){const px=(q,t)=>{const k=q.charCodeAt(0)+q.charCodeAt(1)*3;return 100*(1+.2*Math.sin(t/J1/30+k)+.05*Math.sin(t/H/9+k*2))};
@@ -24,12 +28,12 @@ async function get(u){for(const B of BASES){try{const r=await fetch(B+u);if(r.st
       if(a)D[q]=a.map(E.kl).filter(x=>x.t+H<=now);if(j)ext.jours[q]=j.map(E.kl).filter(x=>x.t+J1<=now)}ext.btcJ=ext.jours.BTCUSDT||[]}
   const al=E.aligner(D);if(!al||!Object.keys(al.D).length){console.error('Familles : Binance injoignable, aucune décision, aucun prix inventé.');return}
   const F=E.prep(al.D,null,ext),i=F.N-1,tb=F.T[i];if(!(tb>((S0&&S0.lastBar)||0))){console.log('Familles : pas de nouvelle heure fermée.');return}
-  const S=S0||{v:1,debut:now,lastBar:0,h:0,seq:0,prev:'',fams:{}},J=[],ajout=l=>{const r={...l,id:++S.seq,ts:now,prev:S.prev};r.h=sha(JSON.stringify(r));S.prev=r.h;J.push(r)};
+  const S=S0||{v:1,version:VERSION,debut:now,lastBar:0,h:0,seq:0,prev:'',fams:{}},J=[],ajout=l=>{const r={...l,id:++S.seq,ts:now,prev:S.prev};r.h=sha(JSON.stringify(r));S.prev=r.h;J.push(r)};
   if(S0)S.h+=Math.max(1,Math.round((tb-S.lastBar)/H));
   for(const id in E.FAMILLES){const fm=E.FAMILLES[id],P=S.fams[id]=S.fams[id]||{debut:now,cash:1e4,pos:{},px:{},st:{},pk:1e4,dd:0,fees:0,n:0};
     // positions : valeur mise à jour au prix de clôture ; une paire disparue des données est vendue à son dernier prix connu
     for(const q in P.pos){if(F.p[q])P.pos[q]*=F.p[q].c[i]/P.px[q];else{const co=P.pos[q]*f;P.cash+=P.pos[q]-co;P.fees+=co;P.n++;ajout({famille:id,paire:q,montant:-P.pos[q],raison:'paire absente des données : vendue au dernier prix connu'});delete P.pos[q]}}
-    const v=P.cash+Object.values(P.pos).reduce((a,b)=>a+b,0);P.st._v=v;P.st._f=f;const w=fm.regle(F,i,P.st,F.Q.length,S.h);
+    const v=P.cash+Object.values(P.pos).reduce((a,b)=>a+b,0);P.st._v=v;P.st._f=f;P.st._risque=c.riskPct/100;const w0=fm.regle(F,i,P.st,F.Q.length,S.h),w=fm.regle.pro||fm.regle.reference?w0:E.plafondRisque(F,i,w0,c,P.pos,v);
     if(w)for(const q in w){const d=v*w[q]-(P.pos[q]||0);if(Math.abs(d)>v*1e-4){const co=Math.abs(d)*f;P.cash-=d+co;P.pos[q]=(P.pos[q]||0)+d;P.fees+=co;P.n++;
       ajout({famille:id,paire:q,montant:+d.toFixed(2),part:+w[q].toFixed(4),prix:F.p[q].c[i],bougie:new Date(tb).toISOString()});if(Math.abs(P.pos[q])<1e-6)delete P.pos[q]}}
     for(const q in P.pos)P.px[q]=F.p[q].c[i];const v2=P.cash+Object.values(P.pos).reduce((a,b)=>a+b,0);P.pk=Math.max(P.pk,v2);P.dd=Math.max(P.dd,(P.pk-v2)/P.pk);P.val=v2}
