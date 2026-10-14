@@ -128,7 +128,8 @@ tr.cand th{color:var(--up)}
 <svg id="fchart" viewBox="0 0 300 80" preserveAspectRatio="none"></svg>
 <div class="scan" id="scan"></div><div class="cn" id="exclu"></div>
 <canvas id="house" role="img" aria-label="Maison des agents : chacun travaille dans sa pièce et apporte son rapport au suivant."></canvas><div id="hst">Les agents font la sieste dans leur maison.</div>
-<div class="fh"><b>ACTIVITÉ</b><span>récente</span></div><div class="fl" id="flog"></div>
+<div class="fh"><b>PENDANT TON ABSENCE</b><span>serveur 24 h/24</span></div><div class="fl" id="abs"></div>
+<div class="fh" style="margin-top:10px"><b>ACTIVITÉ</b><span>dans ce navigateur</span></div><div class="fl" id="flog"></div>
 <div class="fh" style="margin-top:10px"><b>VALEUR MESURÉE</b><span>hors échantillon</span></div><div class="fl" id="vag"></div>
 <div class="fh" style="margin-top:10px"><b>FICHES DES AGENTS</b><span>règles · entrées · décision</span></div><div class="cn2">Les six agents sont des programmes à règles fixes écrites dans le code. Aucun n’utilise de modèle d’intelligence artificielle ni d’apprentissage : ils appliquent les mêmes calculs à chaque bougie. Le site n’emploie donc pas le mot « IA » pour eux.</div><div class="fl" id="reps"></div></div>
 <button class="btn" id="auto2">Démarrer les agents</button>
@@ -539,7 +540,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 20:53';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 20:55';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({pk:10000,cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:.5,ddMax:15,hb:5,npT1:30,npJ1:30,npT2:100,npJ2:90,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
@@ -843,6 +844,14 @@ function renderAgents(){vagHTML();delete PV.fst;
     <details data-k="${g.n}"${ouv.has(g.n)?' open':''}><summary>Ce qu’il regarde</summary><p>${E[g.n]}</p>${g.n==='Journal'&&S.sim?'<p>'+simLine(S.sim)+'</p>':''}<p class="mut2">Règles fixes écrites dans le code, sans modèle d’IA.</p></details></div></div>`}).join('');
   if(hx!==REPS_){REPS_=hx;$('reps').innerHTML=hx}} // réécrit seulement si quelque chose a changé : animations sans à-coups
 let REPS_='';
+// Décisions prises par le serveur (GitHub, 24 h/24, même quand ce téléphone ou ce PC est éteint), avec les noms des animaux.
+function absHTML(){const e=$('abs');if(!e)return;const r=SV.res,L=SV.der;
+  if(!r){e.innerHTML=`<div>${SV.at?SV.err||'Pas encore de données du serveur.':'Lecture du serveur…'}</div>`;return}
+  const age=Math.round((Date.now()-r.maj)/6e4),ok=age<20,qui=a=>{const n=NOM_JOURNAL[a]||a,g=AG.find(x=>x.who===n);return g?`${g.emo} ${n}`:n};
+  const lg=(L||[]).slice(-8).reverse().map(x=>{const v=x.resultat&&typeof x.resultat.net==='number'?` → <b class="${x.resultat.net>=0?'up':'dn'}">${fmt(x.resultat.net)}</b>`:'';
+    return`<div><span class="mut">${new Date(x.ts).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span> · ${qui(x.agent)} · <b>${x.type}</b>${x.paire?' '+x.paire.replace('USDT',''):''} : ${x.raison}${v}</div>`}).join('');
+  e.innerHTML=`<div><b class="${ok?'up':'dn'}">${ok?'● Le serveur travaille':'● Serveur en retard'}</b> · dernier passage il y a ${age<1?'moins d’une minute':age+' min'} · ${r.decisions} décisions depuis le ${new Date(r.debut).toLocaleDateString('fr-FR')} · valeur fictive ${fmt(r.valeur)}${r.position?` · position ouverte ${r.position.paire.replace('USDT','')}`:''}</div>`+
+    (lg||'<div>Les dernières décisions apparaîtront ici après le prochain passage du serveur.</div>')+`<div class="mut">Les animaux de cette maison ne travaillent que lorsque la page est ouverte. Ceux du serveur ne s’arrêtent jamais.</div>`}
 function render(){
   const pnl=S.trades.reduce((a,b)=>a+b,0),w=S.trades.filter(x=>x>0).length,L=S.trades.length,P=S.pos,eq=valeur(),H=S.hist,n=H.length;
   $('bal').textContent=fmt(eq);$('pnl').textContent=fmt(pnl);$('pnl').className=pnl>=0?'up':'dn';
@@ -929,10 +938,10 @@ function cmpHTML(C){if(!C||C.v!==1||!C.rows.length)return'<span class="mut">Pas 
 // résultat sous coûts × 2 (test de robustesse) et Sharpe corrigé du nombre d'essais (SR > SR0, soit DSR > 50 %).
 // Serveur : GitHub Actions fait tourner le même moteur toutes les 5 minutes avec une configuration gelée et publie ses fichiers
 // sur la branche forward-test du dépôt public. Le site les lit en lecture seule (aucune donnée envoyée).
-const SRV='https://raw.githubusercontent.com/claudecode988/public-iatrade/forward-test/forward/',SV={res:null,lg:null,cfg:null,fam:null,err:'',at:0};
+const SRV='https://raw.githubusercontent.com/claudecode988/public-iatrade/forward-test/forward/',SV={res:null,lg:null,cfg:null,fam:null,der:null,err:'',at:0};
 async function lireServeur(){try{const g=async f=>{const r=await fetch(SRV+f+'?t='+Math.floor(Date.now()/6e4),{cache:'no-store'});return r.ok?r.json():null};
-    [SV.res,SV.cfg,SV.lg,SV.fam]=await Promise.all([g('resume.json'),g('config.json'),g('mesure-longue.json'),g('familles-resume.json')]);SV.err=SV.cfg?'':'Pas encore de données publiées par le serveur.'}
-  catch(e){SV.err='Serveur injoignable depuis ce navigateur.'}SV.at=Date.now();srvHTML();preuveHTML()}
+    [SV.res,SV.cfg,SV.lg,SV.fam,SV.der]=await Promise.all([g('resume.json'),g('config.json'),g('mesure-longue.json'),g('familles-resume.json'),g('derniers.json')]);SV.err=SV.cfg?'':'Pas encore de données publiées par le serveur.'}
+  catch(e){SV.err='Serveur injoignable depuis ce navigateur.'}SV.at=Date.now();srvHTML();preuveHTML();absHTML()}
 setTimeout(lireServeur,1500);setInterval(lireServeur,5*6e4);
 function srvHTML(){const e=$('srv');if(!e)return;const r=SV.res,g=SV.cfg,L=SV.lg;
   if(!g&&!r){e.innerHTML=`<span class="mut">${SV.at?SV.err:'Lecture des données du serveur…'} Le serveur décide toutes les 5 minutes, même quand cette page est fermée.</span>`;return}

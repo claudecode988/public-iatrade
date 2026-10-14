@@ -62,6 +62,10 @@ const BASES=['https://data-api.binance.vision','https://api.binance.com'],FNG='h
     else{const N=E.ouvrir(F,b.q,i,b.dir,b.pr,c,R,F.p[b.q].c[i],rk.taille);N.jid=jid;S.pos=N;S.cash-=N.size+N.fe;S.nToday+=N.nb}}
   S.lastBar=tb;const val=S.cash+(S.pos?S.pos.size+(S.pos.side==='long'?1:-1)*S.pos.n*(F.p[S.pos.q].c[i]-S.pos.fill):0);S.pk=Math.max(S.pk,val);
   fs.mkdirSync(DIR,{recursive:true});fs.appendFileSync(F_J,J.map(x=>JSON.stringify(x)).join('\n')+'\n');fs.writeFileSync(F_ETAT,JSON.stringify(S));
+  // derniers.json : les 30 dernières décisions en court, pour l'onglet Agents du site (le journal complet devient trop gros à lire sur un téléphone).
+  {const F_D=path.join(DIR,'derniers.json'),old=lire(F_D,[]),res=Object.fromEntries(J.filter(x=>x.k==='resultat').map(x=>[x.cible,x.resultat]));
+    const nv=J.filter(x=>x.k==='decision').map(x=>({id:x.id,ts:x.ts,agent:x.agent,type:x.type,paire:x.paire,sens:x.sens,raison:x.raison,confiance:x.confiance,resultat:res[x.id]||null}));
+    fs.writeFileSync(F_D,JSON.stringify(old.concat(nv).slice(-30)))}
   const T=S.trades,gs=T.filter(x=>x>0).reduce((a,b)=>a+b,0),ls=T.filter(x=>x<=0).reduce((a,b)=>a+b,0),rs=S.retards.slice().sort((a,b)=>a-b);
   fs.writeFileSync(F_RES,JSON.stringify({maj:now,debut:S.debut,geleeLe:G.geleeLe,tf:TF.lab,vAgents,vReglages,regles:G.regles||[],decisions:S.seq-0,passages:S.passages,
     trades:T.length,gagnants:T.filter(x=>x>0).length,bilan:+(gs+ls).toFixed(2),gagne:+gs.toFixed(2),perdu:+ls.toFixed(2),pf:ls<0?+(gs/-ls).toFixed(3):null,valeur:+val.toFixed(2),
