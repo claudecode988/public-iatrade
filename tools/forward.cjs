@@ -37,6 +37,8 @@ const BASES=['https://data-api.binance.vision','https://api.binance.com'],FNG='h
   let news='neutre',radar='pas d’information';
   if(c.rsrc!=='manuel'&&!process.env.FAUX_PRIX){try{const x=(await (await fetch(FNG)).json()).data[0],f=E.fngNews({value:+x.value,cls:x.value_classification,ts:+x.timestamp*1000},now);if(f.ok){news=f.news;radar=`${x.value}/100 (${x.value_classification})`}}catch(e){}}
   const F=E.prep(al.D,q=>E.WL.FOREX.includes(q)?'neutre':news),i=F.N-1,tb=F.T[i];
+  console.log(`${F.Q.length} paires, ${F.N} bougies communes, dernière ${isFinite(tb)?new Date(tb).toISOString():tb}, écartées : ${al.ecartees.join(',')||'aucune'}`);
+  if(!(F.N>=TF.W)||!isFinite(tb)){console.error('Historique commun insuffisant : aucune décision, aucun prix inventé.',JSON.stringify(Object.fromEntries(Object.entries(D).map(([q,a])=>[q,[a.length,a[0]&&a[0].t,a.length&&a[a.length-1].t]]))));return}
   if(tb<=S.lastBar){console.log('Pas de nouvelle bougie fermée.');return}
   S.passages++;S.retards=[...S.retards,Math.round((now-(tb+TF.bar))/1e3)].slice(-288);
   const J=[],ajout=l=>{const r={...l,id:++S.seq,ts:now,vAgents,vReglages,prev:S.prev};r.h=sha(JSON.stringify(r));S.prev=r.h;J.push(r);return r.id};
