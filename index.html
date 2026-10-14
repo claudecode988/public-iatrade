@@ -621,7 +621,7 @@ function Fjour(J,btcJ){setTF(60);const Q=Object.keys(J).filter(q=>J[q].length);i
   F.reg=regimeBTC(F.T,btcJ);return F}
 // Proposition du jour (format de 03_checklist_trade.md) pour la stratégie gelée, en rejouant depuis la date de gel (pas avant : un arrêt
 // à 15 % survenu des années plus tôt ne doit pas bloquer aujourd'hui). La dernière journée fermée donne l'action à faire maintenant.
-function proposition(F,id,depuis,c){const from=Math.max(0,F.T.findIndex(t=>t>=depuis));if(from<0||from>=F.N)return null;const r=portefeuille(F,from,F.N,c,FAMILLES[id].regle),st=r.st,i=F.N-1,P0=st._pos||{};
+function proposition(F,id,depuis,c){const from=F.T.findIndex(t=>t>=depuis);if(from<0||from>=F.N)return{attente:true};const r=portefeuille(F,from,F.N,c,FAMILLES[id].regle),st=r.st,i=F.N-1,P0=st._pos||{};
   return{jour:F.T[i]+TF.bar-864e5,papier:!!st._arret,valeur:1e4+r.pnl,baisse:r.dd,arret:st._arret||null,bloque:st._bloque||'',L:F.Q.map(q=>{const P=F.p[q],p=P0[q],x=P.jc[i],sortie=(st._T||[]).filter(z=>z.q===q&&z.j===i).pop();
     const a=sortie?{action:'VENDRE',raison:sortie.raison,prix:x,resultatR:sortie.r}:p&&p.j===i?{action:'ACHETER',prix:x,stop:p.stop,objectif:p.objectif||null,part:p.w,risque:p.w*(x-p.stop)/x,gr:p.objectif?(p.objectif-x)/(x-p.stop):null}
       :p?{action:'GARDER',prix:x,entree:p.e,stop:p.stop,objectif:p.objectif||null,part:p.w,risque:Math.max(0,p.w*(x-p.stop)/x)}:{action:'RIEN',prix:x,raison:st._bloque||'aucun signal aujourd’hui'};
@@ -657,7 +657,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 23:28';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 23:45';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;

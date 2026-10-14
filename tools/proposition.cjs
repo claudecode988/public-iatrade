@@ -31,7 +31,7 @@ function faux(q,n=1900){const k=q.charCodeAt(0)+q.charCodeAt(3)*3,f=t=>(q.includ
   const cout=q=>({...G.cfg,...((PR.couts||{})[q]||{})}),btcJ=D.BTCUSDT||[],sorties={},tests={};
   for(const q of actifs){if(!D[q]||D[q].length<260){sorties[q]={paire:q,erreur:`données insuffisantes (${(D[q]||[]).length} journées) : aucune proposition`,source:sources[q]};continue}
     const F=E.Fjour({[q]:D[q]},/USDT$/.test(q)?btcJ:null),c=cout(q),p=E.proposition(F,PR.strategie,Date.parse(PR.depuis),c);
-    sorties[q]={...(p?{...p,...p.L[0]}:{erreur:'date de gel hors des données'}),L:undefined,source:sources[q],couts:{fee:c.fee,slip:c.slip},controle:(PR.controle||[]).includes(q)};
+    sorties[q]={...(p&&p.L?{...p,...p.L[0]}:{erreur:`première proposition après la clôture du ${new Date(Date.parse(PR.depuis)).toISOString().slice(0,10)} (journée UTC)`}),L:undefined,source:sources[q],couts:{fee:c.fee,slip:c.slip},controle:(PR.controle||[]).includes(q)};
     // test sur toute la période disponible (au plus environ 5 ans), mêmes règles pour chaque actif, partie de vérification = 30 % finaux
     const W=Math.max(0,F.N-5*365),cut=W+Math.floor((F.N-W)*.7);tests[q]={du:F.T[W],au:F.T[F.N-1],lignes:Object.keys(E.FAMILLES).filter(id=>E.FAMILLES[id].pro).map(id=>{
       const r=E.portefeuille(F,W,F.N,c,E.FAMILLES[id].regle),rj=E.rendementsJours(r.jrs),mc=E.monteCarlo(rj);
