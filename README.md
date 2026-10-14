@@ -1,4 +1,4 @@
-# TradeInsight IA
+# TradeInsight
 
 Simulateur de trading avec argent fictif, en un seul fichier : `index.html` (ouvrir dans un navigateur).
 

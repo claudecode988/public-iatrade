@@ -2,7 +2,7 @@
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
-<title>TradeInsight IA</title>
+<title>TradeInsight</title>
 <style>
 /* Tableau de bord sobre : fond gris-bleu, une seule couleur d'accent bleu nuit, chiffres alignés */
 :root{--bg:#f2f4f8;--card:#fff;--ink:#0f1b2d;--mut:#5b6879;--line:#e1e6ee;--up:#0d7a53;--dn:#c0362c;--warn:#fff4dc;--acc:#173f78;--acc2:#e8eef8;--chip:#eef2f7;--shadow:0 1px 2px rgba(15,27,45,.06),0 4px 16px rgba(15,27,45,.05);color-scheme:light}
@@ -75,7 +75,7 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 </style></head><body>
 <div class="warn">Simulation avec argent fictif uniquement. Aucun conseil financier. Le trading réel comporte un risque de perte.</div>
 <main>
-<header class="top"><div class="brand"><span class="logo" aria-hidden="true">TI</span><div><b>TradeInsight IA</b><span class="mut" id="src">Entraînement avec un portefeuille fictif.</span></div></div><span class="live" id="live">À l'arrêt</span></header>
+<header class="top"><div class="brand"><span class="logo" aria-hidden="true">TI</span><div><b>TradeInsight</b><span class="mut" id="src">Entraînement avec un portefeuille fictif.</span></div></div><span class="live" id="live">À l'arrêt</span></header>
 
 <section class="sec on" id="t0">
 <div class="card hero"><span class="lbl">Valeur du portefeuille fictif (frais et glissement inclus)</span><span class="hv" id="bal">–</span><span class="delta" id="ret">–</span>
@@ -111,20 +111,23 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 <div class="scan" id="scan"></div><div class="cn" id="exclu"></div>
 <canvas id="house" role="img" aria-label="Maison des agents : chacun travaille dans sa pièce et apporte son rapport au suivant."></canvas><div id="hst">Les agents attendent dans leur maison.</div>
 <div class="fh"><b>ACTIVITÉ</b><span>récente</span></div><div class="fl" id="flog"></div>
-<div class="fh" style="margin-top:10px"><b>FICHES DES AGENTS</b><span>règles · entrées · décision</span></div><div class="cn2">Les six « agents IA » sont des programmes à règles fixes écrites dans le code. Aucun n’utilise de modèle d’intelligence artificielle ni d’apprentissage : ils appliquent les mêmes calculs à chaque bougie.</div><div class="fl" id="reps"></div></div>
+<div class="fh" style="margin-top:10px"><b>VALEUR MESURÉE</b><span>hors échantillon</span></div><div class="fl" id="vag"></div>
+<div class="fh" style="margin-top:10px"><b>FICHES DES AGENTS</b><span>règles · entrées · décision</span></div><div class="cn2">Les six agents sont des programmes à règles fixes écrites dans le code. Aucun n’utilise de modèle d’intelligence artificielle ni d’apprentissage : ils appliquent les mêmes calculs à chaque bougie. Le site n’emploie donc pas le mot « IA » pour eux.</div><div class="fl" id="reps"></div></div>
 <button class="btn" id="auto2">Démarrer les agents</button>
 <div class="mut" id="mkts">Les prix arrivent en continu. Les agents décident d'une entrée seulement à la fermeture de chaque bougie (5 min, 10 min ou 1 h, à choisir dans Réglages), avec de l'argent fictif. Le stop est vérifié à chaque prix reçu.</div>
 <button class="btn" id="simgo" style="background:var(--card);color:var(--ink);border:1px solid var(--line)">Mesurer sur l'historique réel</button>
 <div class="mut" id="simst"></div>
 <button class="btn ghost" id="cmpgo">Comparer 5 min, 10 min et 1 h (même période)</button>
 <div class="mut" id="cmpst"></div>
+<button class="btn ghost" id="vaggo">Mesurer la valeur de chaque agent</button>
+<div class="mut" id="vagst"></div>
 <button class="btn ghost" id="robgo">Test de robustesse (coûts × 2 et × 3)</button>
 <div class="mut" id="robst"></div>
 </section>
 
 <section class="sec" id="t2">
 <h2>Limites de risque</h2>
-<div class="mut">Appliquées par le code. L'IA ne peut pas les modifier.</div>
+<div class="mut">Appliquées par le code. Les agents ne peuvent pas les modifier.</div>
 <div class="mut" style="margin-top:8px">Marchés : toutes les paires crypto et forex sont analysées en permanence. Une paire que Binance ne propose pas est ignorée automatiquement.</div>
 <label>Taille d'un achat (USDT)<input id="size" type="number" min="10"></label>
 <label>Achats par décision<input id="nb" type="number" min="1" max="10" step="1"></label>
@@ -239,7 +242,7 @@ function aligner(D){let Q=Object.keys(D).filter(q=>D[q].length);if(!Q.length)ret
 // (alignées sur 00 h, 04 h, 08 h… UTC, comme chez Binance) : seule la dernière bougie 4 h FERMÉE est utilisée.
 function prep(D,newsOf){const Q=Object.keys(D),N=Math.min(...Q.map(q=>D[q].length)),F={Q,N,T:D[Q[0]].slice(-N).map(x=>x.t),p:{}};
   for(const q of Q){const C=D[q].slice(-N),c=C.map(x=>x.c),nw=newsOf?newsOf(q):'neutre',nv={haussier:1,neutre:0,baissier:-1}[nw]||0;
-    const A=[],atr=[],atrP=[],vr=[],brk=[],rr=[],tr4=[],ns=[],c4=[];let e20=null,e50=null,n4=0,trA=null;
+    const A=[],atr=[],atrP=[],vr=[],brk=[],rr=[],tr4=[],ns=[],c4=[],ma=[],mt=[];let e20=null,e50=null,n4=0,trA=null,m20=null,m50=null;
     for(let t=0;t<N;t++){const x=C[t];
       A.push(t>=20?analyse(c.slice(Math.max(0,t-59),t+1),1,nw):null);
       const tr=t?Math.max(x.h-x.l,Math.abs(x.h-C[t-1].c),Math.abs(x.l-C[t-1].c)):x.h-x.l;trA=trA===null?tr:(trA*13+tr)/14;atr.push(trA);atrP.push(trA/x.c);
@@ -248,10 +251,13 @@ function prep(D,newsOf){const Q=Object.keys(D),N=Math.min(...Q.map(q=>D[q].lengt
       const r=t>=14?RSI(c.slice(t-14,t+1)):50;rr.push(r>50&&r<75?1:r<50&&r>25?-1:0);
       if((x.t+TF.bar)%TF.conf===0&&t>=TF.kc-1&&C[t-TF.kc+1].t===x.t-(TF.kc-1)*TF.bar){const cl=x.c;c4.push(cl);n4++;e20=e20===null?cl:cl*2/21+e20*19/21;e50=e50===null?cl:cl*2/51+e50*49/51}
       tr4.push(n4>=50?(e20>e50*1.0005?1:e20<e50*.9995?-1:0):0);
-      ns.push(.35*tr4[t]+.35*brk[t]+.15*rr[t]+.15*nv)}
-    F.p[q]={C,c,A,atr,atrP,vr,brk,rr,tr4,ns}}
+      ns.push(.35*tr4[t]+.35*brk[t]+.15*rr[t]+.15*nv);
+      // référence : croisement des moyennes EMA 20 et 50 sur les bougies de décision (+1 croisement haussier, −1 baissier)
+      const p20=m20,p50=m50;m20=m20===null?x.c:x.c*2/21+m20*19/21;m50=m50===null?x.c:x.c*2/51+m50*49/51;mt.push(t>=50?Math.sign(m20-m50):0);
+      ma.push(t>=50&&p20!==null?(m20>m50&&p20<=p50?1:m20<m50&&p20>=p50?-1:0):0)}
+    F.p[q]={C,c,A,atr,atrP,vr,brk,rr,tr4,ns,ma,mt}}
   return F}
-function sigAt(P,t,R){const sc=R.sig?P.ns[t]:(P.A[t]?P.A[t].sc:0);return{sc,dir:sgn(sc),pr:.5+.5*Math.abs(sc)}}
+function sigAt(P,t,R){const sc=R.ref==='ma'?P.ma[t]:R.sig?P.ns[t]:(P.A[t]?P.A[t].sc:0);return{sc,dir:sgn(sc),pr:.5+.5*Math.abs(sc)}}
 function refusEntree(P,t,dir,c,R){const k=rt(c);
   if(R.excl&&P.atrP[t]<3*k)return'marché trop calme (ATR sous 3 × le coût aller-retour)';
   if(R.mtf&&P.tr4[t]!==(dir==='long'?1:-1))return`tendance ${TF.clab} pas dans le même sens`;
@@ -294,17 +300,17 @@ function fermer(P,price,c){const s=c.slip/100,f=c.fee/100,fx=P.side==='long'?pri
 function acheterGarder(F,from,to,c){const s=c.slip/100,f=c.fee/100,a=1e4/F.Q.length;let v=0;
   for(const q of F.Q){const P=F.p[q],fill=P.c[from]*(1+s),n=a*(1-f)/fill,fx=P.c[to-1]*(1-s);v+=n*fx*(1-f)}return v-1e4}
 // Rejoue les règles heure par heure entre from et to (exclu) avec 10 000 $ fictifs. Stop vérifié dans chaque bougie (plus bas / plus haut).
-function simuler(F,from,to,c,R){let cash=1e4,P=null,nT=0,lossD=0,pk=1e4,dd=0,day='',fees=0,slip=0,lastX=-1e15,m=0,st=0,se=0,stt=0,see=0,ste=0;const T=[],Du=[],H=[],Rt=[],EQ=[],ech=Math.max(1,Math.floor((to-from)/150)),sum=a=>a.reduce((x,y)=>x+y,0);
-  const sortir=(t,price)=>{const r=fermer(P,price,c);cash+=P.size+r.g-r.xf;fees+=P.fe+r.xf;slip+=r.slip;T.push(r.pnl);Rt.push(r.pnl/P.size);Du.push((F.T[t]-P.t0)/H1);H.push(P.p);lossD+=r.pnl;nT+=P.nb;lastX=F.T[t];P=null};
+function simuler(F,from,to,c,R){let cash=1e4,P=null,nT=0,lossD=0,pk=1e4,dd=0,day='',fees=0,slip=0,lastX=-1e15,m=0,st=0,se=0,stt=0,see=0,ste=0;const T=[],Du=[],H=[],Rt=[],AC=[],EQ=[],ech=Math.max(1,Math.floor((to-from)/150)),sum=a=>a.reduce((x,y)=>x+y,0);
+  const sortir=(t,price)=>{const r=fermer(P,price,c);cash+=P.size+r.g-r.xf;fees+=P.fe+r.xf;slip+=r.slip;T.push(r.pnl);Rt.push(r.pnl/P.size);AC.push([P.acc,r.pnl]);Du.push((F.T[t]-P.t0)/H1);H.push(P.p);lossD+=r.pnl;nT+=P.nb;lastX=F.T[t];P=null};
   for(let t=from;t<to;t++){const dj=new Date(F.T[t]).toISOString().slice(0,10);if(dj!==day){day=dj;nT=0;lossD=0}
     if(P){const x=F.p[P.q].C[t],hit=stopTick(P,x.l,x.h,R,x.o);if(hit!==null)sortir(t,hit);else if(sortieCloture(F,P,t,c,R))sortir(t,x.c)}
     else if(nT+(c.nb||1)<=c.maxTrades&&-lossD<1e4*c.maxLoss/100&&cash>=c.size*(c.nb||1)*(1+c.fee/100)&&(!R.cool||(F.T[t]-lastX)/TF.bar>=4)){const{b}=choisir(F,t,c,R);
-      if(b){const rk=risque(c,cash,pk,distanceStop(F,b.q,t,c,R));if(rk.ok){P=ouvrir(F,b.q,t,b.dir,b.pr,c,R,undefined,rk.taille);cash-=P.size+P.fe;nT+=P.nb}}}
+      if(b){const rk=risque(c,cash,pk,distanceStop(F,b.q,t,c,R));if(rk.ok){P=ouvrir(F,b.q,t,b.dir,b.pr,c,R,undefined,rk.taille);{const d=b.dir==='long'?1:-1,Pq=F.p[b.q];P.acc=Pq.mt[t]===d&&Pq.tr4[t]===d}cash-=P.size+P.fe;nT+=P.nb}}}
     const un=P?(P.side==='long'?1:-1)*P.n*(F.p[P.q].c[t]-P.fill):0,eq=cash+(P?P.size+un:0);pk=Math.max(pk,eq);dd=Math.max(dd,(pk-eq)/pk);m++;st+=m;se+=eq;stt+=m*m;see+=eq*eq;ste+=m*eq;if(m%ech===0)EQ.push(+eq.toFixed(2))}
   if(P)sortir(to-1,F.p[P.q].c[to-1]); // une position encore ouverte est clôturée au dernier prix pour être comptée
   const w=T.filter(x=>x>0);
   const gs=sum(w),ls=sum(T.filter(x=>x<=0)),vt=stt/m-(st/m)**2,ve=see/m-(se/m)**2,r2=m>2&&vt>0&&ve>1e-9?((ste/m-st/m*se/m)**2)/(vt*ve):0; // R² : 1 = courbe parfaitement droite
-  EQ.push(+(1e4+sum(T)).toFixed(2));const res={ret:Rt,eqs:EQ,r2,n:T.length,pnl:sum(T),gain:gs,loss:ls,pf:ls<0?gs/-ls:null,bh:acheterGarder(F,from,to-1>from?to:from+1,c),fees,slip,wr:T.length?w.length/T.length:0,dd,conf:H.length?sum(H)/H.length:0,
+  EQ.push(+(1e4+sum(T)).toFixed(2));const ac=AC.filter(x=>x[0]),dv=AC.filter(x=>!x[0]),res={accord:{n:AC.length,acc:ac.length,pnlAcc:sum(ac.map(x=>x[1])),pnlDiv:sum(dv.map(x=>x[1]))},ret:Rt,eqs:EQ,r2,n:T.length,pnl:sum(T),gain:gs,loss:ls,pf:ls<0?gs/-ls:null,bh:acheterGarder(F,from,to-1>from?to:from+1,c),fees,slip,wr:T.length?w.length/T.length:0,dd,conf:H.length?sum(H)/H.length:0,
     dur:Du.length?sum(Du)/Du.length:0,jours:Math.round((to-from)*TF.bar/864e5),du:F.T[from],au:F.T[to-1]};if(ESSAI)ESSAI(c,R,res);return res}
 // Signaux d'alerte contre la sur-interprétation d'un résultat (entraînement a, test b).
 function alertes(a,b){const o=[];
@@ -382,6 +388,10 @@ function fiabilite(wf,d,nModifs){if(!wf)return{niveau:'faible',raison:'Historiqu
 function robustesse(F,c,R){const W=Math.min(TF.W,Math.floor(F.N/4)),cut=W+Math.floor((F.N-W)*.7);
   return[1,2,3].map(k=>{const cc={...c,fee:c.fee*k,slip:c.slip*k},t=simuler(F,cut,F.N,cc,R),w=walkForward(F,cc);
     return{k,fee:cc.fee,slip:cc.slip,test:t,wf:w?w.test:null}})}
+// Valeur de chaque agent sur la partie test (30 % finaux), mêmes frais, même glissement, même couche de risque :
+// on compare le système actif à la même chose avec un agent retiré ou remplacé par une règle simple.
+function valeurAgents(F,c,R){const W=Math.min(TF.W,Math.floor(F.N/4)),a=W+Math.floor((F.N-W)*.7),b=F.N,sm=(cc,r)=>simuler(F,a,b,cc,r);
+  return{act:sm(c,R),ref:sm(c,{ref:'ma'}),sansSeuil:sm({...c,thr:50},R),sansRisque:sm({...c,riskPct:100,ddMax:100},R),sansCouts:sm({...c,fee:0,slip:0},R),du:F.T[a],au:F.T[b-1]}}
 // Comparatif des durées sur la MÊME période : bougies de 5 min (D5) regroupées en 10 min et en 1 h, même découpage 70/30.
 // Compare la version de départ et la version active (règles R) ; rétablit ensuite la durée choisie dans les réglages.
 function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF(m);const D={};for(const q in D5)D[q]=agreger(D5[q],3e5);
@@ -391,7 +401,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 16:05';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 16:09';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({pk:10000,cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:.5,ddMax:15,hb:5,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
@@ -641,7 +651,19 @@ const house=(()=>{const cv=$('house'),W=320,H=240,cx=cv.getContext('2d'),RM=matc
   requestAnimationFrame(loop);return{play}})();
 const prochaine=()=>{const t=Math.ceil((Date.now()+1)/TF.bar)*TF.bar;return{h:hr(t).slice(0,5),m:Math.max(0,Math.ceil((t-Date.now())/6e4))}};
 const attente=()=>{const n=prochaine();return timer?`En service : prochaine décision à la fermeture de ${n.h} (dans ${n.m} min).`:'À l’arrêt : touche « Démarrer les agents » ou « Évaluer maintenant ».'};
-function renderAgents(){delete PV.fst;
+function vagHTML(){const V=S.vag,e=$('vag');if(!e)return;if(!V||V.v!==1){e.innerHTML='<div>Pas encore mesuré : touche « Mesurer la valeur de chaque agent » plus bas.</div>';return}
+  const pf=r=>!r.n?'–':r.pf===null?(r.gain>0?'∞':'–'):r.pf.toFixed(2).replace('.',','),m=r=>`${fmt(r.pnl)} · PF ${pf(r)} · baisse ${pct(r.dd)} · ${r.n} trades${r.n<30?' (trop peu)':''}`;
+  const A=V.act,ec=x=>`${x>=0?'+':'−'}${fmt(Math.abs(x)).replace('−','')}`,acc=A.accord,J=V.journal;
+  const L=[['Radar','Non mesurable sur l’historique : il n’existe pas d’historique de l’indice peur et avidité, la simulation le garde neutre.'+(J&&J.n?` En direct (journal) : Radar et Prisme vont dans le même sens dans ${Math.round(J.acc/J.n*100)} % des ${J.n} décisions notées.`:''),null],
+    ['Prisme',`Système actif : ${m(A)}. Même système avec la règle simple (croisement EMA 20/50) à la place de Prisme : ${m(V.ref)}. Écart : ${ec(A.pnl-V.ref.pnl)}.`,A.pnl>V.ref.pnl+.005&&A.n>=30?`Prisme fait mieux que la règle simple de ${fmt(A.pnl-V.ref.pnl)} sur cette période.`:'Prisme n’apporte rien de plus que la règle simple sur cette période.'],
+    ['Boussole',`Avec son seuil de ${S.cfg.thr} % : ${m(A)}. Sans seuil (toute note acceptée) : ${m(V.sansSeuil)}. Écart : ${ec(A.pnl-V.sansSeuil.pnl)}.`,A.pnl>V.sansSeuil.pnl+.005?'Le filtre de Boussole améliore le résultat sur cette période.':'Le filtre de Boussole n’apporte rien de plus sur cette période.'],
+    ['Bouclier',`Avec la couche de risque : ${m(A)}. Sans elle (taille maximale, sans coupe-circuit) : ${m(V.sansRisque)}.`,A.dd<V.sansRisque.dd-.0005?`Bouclier réduit la pire baisse de ${((V.sansRisque.dd-A.dd)*100).toFixed(1).replace('.',',')} points (son rôle est de limiter les pertes, pas d’augmenter les gains).`:'Bouclier ne réduit pas la pire baisse sur cette période.'],
+    ['Éclair',`Avec frais et glissement : ${fmt(A.pnl)}. Sans aucun coût : ${fmt(V.sansCouts.pnl)}. Coût d’exécution : ${fmt(A.pnl-V.sansCouts.pnl)}.`,'Éclair exécute seulement : il ne peut pas apporter de gain, il coûte des frais.'],
+    ['Carnet','Ne prend aucune décision de trading : rien à mesurer.',null]];
+  e.innerHTML=`<div>Partie test (30 % finaux), du ${dt(V.du)} au ${dt(V.au)}, bougies de ${V.tfLab}, mêmes frais, glissement et couche de risque. Références : règle simple ${fmt(V.ref.pnl)} (${V.ref.n} trades) · acheter et garder ${fmt(A.bh)}.</div>`+
+    L.map(([n,t,v])=>`<div class="rep"><i style="background:${AG.find(g=>g.who===n).c}"></i><div><b>${n}</b><p>${t}${v?`<br><b class="${/n’apporte rien|ne réduit pas|coûte/.test(v)?'dn':'up'}">${v}</b>`:''}</p></div></div>`).join('')+
+    `<div class="rep"><i style="background:#9fb3cc"></i><div><b>Se trompent-ils ensemble ?</b><p>${acc.n?`Sur ${acc.n} trades du système actif, Prisme, la règle simple et la tendance longue étaient tous d’accord à l’entrée ${acc.acc} fois (${Math.round(acc.acc/acc.n*100)} %). Résultat quand ils sont d’accord : ${fmt(acc.pnlAcc)} (${acc.acc} trades) ; quand ils divergent : ${fmt(acc.pnlDiv)} (${acc.n-acc.acc} trades).${acc.acc<30||acc.n-acc.acc<30?' Trop peu de trades dans un des deux groupes pour conclure.':''}`:'Aucun trade sur la partie test.'}${J&&J.nr?` En direct : accord Radar/Prisme ${fmt(J.pnlAcc)} sur ${J.nrAcc} trades clos, désaccord ${fmt(J.pnlDiv)} sur ${J.nr-J.nrAcc}.`:''}</p></div></div>`}
+function renderAgents(){vagHTML();delete PV.fst;
   $('live').textContent=timer?'Agents en service':"À l'arrêt";$('live').classList.toggle('on',!!timer);
   $('scan').innerHTML=(S.scan||[]).map(x=>`<span>${x.q.replace('USDT','')} <b class="${x.sc>0?'u':x.sc<0?'d':''}">${x.sc>0?'▲':x.sc<0?'▼':'–'} ${Math.round((.5+.5*Math.abs(x.sc))*100)} %</b></span>`).join('');
   $('exclu').textContent=LV.excl.length?`Trop calmes pour couvrir les frais (ATR sous 3 × le coût aller-retour) : ${LV.excl.map(x=>x.replace('USDT','')).join(', ')}. Le forex y est souvent : c’est normal.`:'';
@@ -767,7 +789,7 @@ $('jcsv').onclick=async()=>{await JR.file;const L=await jrTout(),n=x=>x===undefi
   const rows=L.map(r=>{const p=r.entrees&&r.entrees.prisme||{},x=r.resultat||{};return[r.id,new Date(r.ts).toLocaleString('fr-FR'),r.agent,r.type,r.paire||'',r.sens==='long'?'hausse':r.sens==='short'?'baisse':'',t(r.raison),n(r.confiance),n(r.prix&&r.prix.achat),n(r.prix&&r.prix.vente),n(p.note),n(p.tendance),n(p.cassure),n(p.regimeRSI),n(p.volume),n(p.atr),t(r.entrees&&r.entrees.radar&&r.entrees.radar.actualite),r.vAgents,r.vReglages,t(x.statut||'en attente'),n(x.net),n(x.frais),n(x.glissement),n(x.variation1h),r.h,r.prev].join(';')});
   telecharger(`tradeinsight-journal-${jour()}.csv`,'text/csv;charset=utf-8','﻿'+[H.join(';'),...rows].join('\r\n'));$('setmsg').textContent=`${L.length} décisions exportées.`};
 $('jjson').onclick=async()=>{await JR.file;const L=await jrTout(),A=JR.db?await idb('archives','readonly',tx=>tx.objectStore('archives').getAll()):[];
-  telecharger(`tradeinsight-journal-${jour()}.json`,'application/json',JSON.stringify({app:'TradeInsight IA',argentFictif:true,exporte:new Date().toISOString(),versionAgents:JR.vAg,chaine:JR.integre||'intacte',journal:L,archives:A},null,1));$('setmsg').textContent=`${L.length} décisions et ${A.length} archive(s) exportées.`};
+  telecharger(`tradeinsight-journal-${jour()}.json`,'application/json',JSON.stringify({app:'TradeInsight',argentFictif:true,exporte:new Date().toISOString(),versionAgents:JR.vAg,chaine:JR.integre||'intacte',journal:L,archives:A},null,1));$('setmsg').textContent=`${L.length} décisions et ${A.length} archive(s) exportées.`};
 let JZ=0;$('jreset').onclick=async()=>{const b=$('jreset');if(!JZ){JZ=setTimeout(()=>{JZ=0;b.textContent='Remettre le journal à zéro (archivé)'},4000);b.textContent='Touche encore : le journal sera archivé puis vidé';return}
   clearTimeout(JZ);JZ=0;b.textContent='Remettre le journal à zéro (archivé)';try{const n=await jrArchiver();$('setmsg').textContent=`Journal archivé (${n} décisions) puis remis à zéro. Les archives restent dans l’export JSON.`;render()}catch(e){$('setmsg').textContent='Archivage impossible : '+(e&&e.message||e)}};
 // Export : un fichier téléchargé par le navigateur. CSV au format français (séparateur ;, virgule décimale) pour Excel ou Numbers.
@@ -777,13 +799,23 @@ $('excsv').onclick=()=>{const n=x=>x===undefined||x===null||!isFinite(x)?'':Stri
   const L=[['entree','sortie','paire','sens','achats','montant_usdt','prix_entree','prix_sortie','frais_usdt','resultat_usdt','duree_h','raison_sortie','indice_confiance','bougies_min'].join(';')];
   for(const h of S.hist)L.push([d(h.te),d(h.ts),h.q||'',h.side==='long'?'hausse':'baisse',h.nb||'',n(h.size),n(h.pin),n(h.pout),n(h.fees),n(h.pnl),n(h.dur),(h.why||'').replace(/;/g,','),n(h.p),h.tf||''].join(';'));
   telecharger(`tradeinsight-trades-${jour()}.csv`,'text/csv;charset=utf-8','﻿'+L.join('\r\n'));$('setmsg').textContent=`${S.hist.length} trades exportés.${S.hist.some(h=>!h.q)?' Les trades d’avant cette version n’ont que le résultat et la durée.':''}`};
-$('exjson').onclick=()=>{telecharger(`tradeinsight-sauvegarde-${jour()}.json`,'application/json',JSON.stringify({app:'TradeInsight IA',version:VERSION,exporte:new Date().toISOString(),argentFictif:true,etat:S},null,1));$('setmsg').textContent='Sauvegarde JSON exportée (sans clés testnet).'};
+$('exjson').onclick=()=>{telecharger(`tradeinsight-sauvegarde-${jour()}.json`,'application/json',JSON.stringify({app:'TradeInsight',version:VERSION,exporte:new Date().toISOString(),argentFictif:true,etat:S},null,1));$('setmsg').textContent='Sauvegarde JSON exportée (sans clés testnet).'};
 $('imjson').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text()),e2=j&&j.etat;
     if(!e2||typeof e2.cash!=='number'||!e2.cfg)throw new Error('ce fichier n’est pas une sauvegarde TradeInsight');
     if(timer)stopAuto();S=Object.assign(D(),e2);S.cfg=Object.assign(D().cfg,e2.cfg);save();$('setmsg').textContent='Sauvegarde restaurée : rechargement…';setTimeout(()=>location.reload(),600)}
   catch(err){$('setmsg').textContent='Restauration impossible : '+(err.message||err)}e.target.value=''};
 let HIST=null;const noterEssai=(c,R,r)=>{const k=cleEssai(c,R);if(!ESS[k]&&r.n>=2){const v=sharpe(r.ret);if(v!==null)ESS[k]={sr:v,n:r.n,at:Date.now()}}};
 const nModifs=()=>{const d=D().cfg,c=S.cfg;return['thr','hold','atrK','sl','tf'].filter(k=>+c[k]!==+d[k]).length+Object.keys(S.rules).filter(k=>S.rules[k]).length};
+async function jrAccord(){const L=(await jrTout()).filter(r=>r.agent==='Boussole'&&r.entrees&&r.entrees.prisme&&r.entrees.radar),nv={haussier:1,neutre:0,baissier:-1};
+  const ag=r=>{const a=nv[r.entrees.radar.actualite]||0,p=Math.sign(r.entrees.prisme.note);return a!==0&&a===p},X=L.filter(r=>(nv[r.entrees.radar.actualite]||0)!==0),T=L.filter(r=>r.type==='entrée'&&r.resultat&&typeof r.resultat.net==='number');
+  return{n:X.length,acc:X.filter(ag).length,nr:T.length,nrAcc:T.filter(ag).length,pnlAcc:T.filter(ag).reduce((x,r)=>x+r.resultat.net,0),pnlDiv:T.filter(r=>!ag(r)).reduce((x,r)=>x+r.resultat.net,0)}}
+async function donnees(st){if(HIST&&HIST.tf===TF.min)return HIST.F;st(TF.min<60?'Téléchargement d’environ 2 mois de bougies de 5 min…':'Téléchargement d’environ 12 mois de bougies d’1 h…');
+  const{D:H}=await historique(fetch,PUB,pairs(),TF.pages,st),al=aligner(H);if(!al||!Object.keys(al.D).length)return null;HIST={tf:TF.min,F:prep(al.D)};return HIST.F}
+$('vaggo').onclick=async()=>{const b=$('vaggo');b.disabled=true;const st=m=>$('vagst').textContent=m;
+  try{const F=await donnees(st);if(!F){st('Binance injoignable : mesure impossible. Aucun résultat inventé.');return}st('Mesure des agents…');await sleep(30);
+    ESSAI=noterEssai;const V=valeurAgents(F,S.cfg,S.rules);ESSAI=null;enregistrerEssais();
+    S.vag={v:1,...JSON.parse(JSON.stringify(V,(k,v)=>k==='ret'||k==='eqs'?undefined:v)),tfLab:TF.lab,journal:await jrAccord(),quand:Date.now()};save();render();st('Mesure terminée : résultats en haut du plateau, section « Valeur mesurée ».')}
+  catch(e){st('Erreur pendant la mesure : '+(e&&e.message||e))}finally{b.disabled=false}};
 $('robgo').onclick=async()=>{const b=$('robgo');b.disabled=true;const st=m=>$('robst').textContent=m;
   try{let F=HIST&&HIST.tf===TF.min?HIST.F:null;
     if(!F){st(TF.min<60?'Téléchargement d’environ 2 mois de bougies de 5 min…':'Téléchargement d’environ 12 mois de bougies d’1 h…');const{D:H}=await historique(fetch,PUB,pairs(),TF.pages,st);const al=aligner(H);
