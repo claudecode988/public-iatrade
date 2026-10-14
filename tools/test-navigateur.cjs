@@ -59,7 +59,8 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   await p.waitForFunction(()=>/Mesure terminée|Erreur|injoignable/.test(document.getElementById('simst').textContent),null,{timeout:120000});
   console.log('     ',await p.textContent('#simst'),`(${restCalls-r0} requêtes REST)`);ok(/Mesure terminée/.test(await p.textContent('#simst')),'mesure terminée');
   await p.click('nav button[data-t="0"]');const sr=await p.textContent('#simres');
-  ok(/Départ · test/.test(sr)&&/Durée moy/.test(sr)&&/Glissement/.test(sr)&&/actualité neutre/.test(sr),'résultats départ/après, calibrage/test, durée, frais, glissement');
+  ok(/Départ · entraînement/.test(sr)&&/Départ · test/.test(sr)&&/Durée moy/.test(sr)&&/Glissement/.test(sr)&&/actualité neutre/.test(sr),'résultats départ/après, calibrage/test, durée, frais, glissement');
+  ok(/Entraînement \(70 %\)/.test(sr)&&/test \(30 %\)/.test(sr)&&/côte à côte/.test(sr)&&(/⚠/.test(sr)||/Aucun signal d’alerte/.test(sr)),'entraînement 70 % / test 30 % côte à côte, avec alertes');
   ok(/Profit factor/.test(sr)&&/Acheter et garder/.test(sr)&&/contre .* pour « acheter et garder »/.test(sr),'profit factor et comparaison « acheter et garder »');
   await p.screenshot({path:path.join(process.env.SORTIE||'.','accueil.png'),fullPage:true});await p.click('nav button[data-t="1"]');await p.screenshot({path:path.join(process.env.SORTIE||'.','agents.png'),fullPage:true});
   ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'pas de défilement horizontal à 400 px');
