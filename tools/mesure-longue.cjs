@@ -6,7 +6,7 @@
 const fs=require('fs'),path=require('path'),zlib=require('zlib');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+
-  ';return{WL,setTF,agreger,aligner,prep,mesurer,walkForward,robustesse,valeurAgents,dsr,fiabilite,sharpe,cleEssai,setEssai:f=>{ESSAI=f}}')();
+  ';return{WL,setTF,agreger,aligner,prep,mesurer,walkForward,robustesse,valeurAgents,familles,dsr,fiabilite,sharpe,cleEssai,setEssai:f=>{ESSAI=f}}')();
 const DIR=process.argv[2]||'forward',G=JSON.parse(fs.readFileSync(path.join(DIR,'config.json'),'utf8')),MOIS=+process.env.MOIS||12;
 const TF=E.setTF(G.tf),c={...G.cfg,tf:G.tf},R=Object.fromEntries((G.regles||[]).map(k=>[k,1]));
 // Lecteur ZIP minimal : premier fichier de l'archive, méthode « deflate » (celle des fichiers Binance).
@@ -28,8 +28,9 @@ async function charger(q){const out=[],d=new Date();for(let m=MOIS;m>=1;m--){con
   const ESS={};E.setEssai((cc,r,res)=>{const k=E.cleEssai(cc,r),v=E.sharpe(res.ret);if(!ESS[k]&&v!==null)ESS[k]=v});
   const F=E.prep(al.D);console.log('Indicateurs prêts',((Date.now()-t0)/1e3).toFixed(0),'s');
   const M=E.mesurer(F,c),wf=E.walkForward(F,c),rob=E.robustesse(F,c,R),va=E.valeurAgents(F,c,R),srs=Object.values(ESS),d=wf?E.dsr(wf.test.ret,srs):null;
+  const fam=E.familles(F,c,R);console.log('Familles :',fam.lignes.map(x=>`${x.nom} ${x.pnl.toFixed(0)} $`).join(' | '));
   const net=o=>JSON.parse(JSON.stringify(o,(k,v)=>k==='ret'||k==='eqs'?undefined:v));
   fs.writeFileSync(path.join(DIR,'mesure-longue.json'),JSON.stringify({maj:Date.now(),tf:TF.lab,mois:MOIS,pairs:F.Q.length,ecartees:al.ecartees,du:F.T[0],au:F.T[F.N-1],config:G,
-    simple:{base:net(M.base),active:net(M.fin),regles:Object.keys(M.R)},wf:net(wf),robustesse:net(rob),agents:net(va),nEssais:srs.length,dsr:d,fiabilite:E.fiabilite(wf,d,(G.regles||[]).length),faux:!!process.env.FAUX_PRIX},null,1));
+    simple:{base:net(M.base),active:net(M.fin),regles:Object.keys(M.R)},wf:net(wf),robustesse:net(rob),agents:net(va),familles:net(fam),nEssais:srs.length,dsr:d,fiabilite:E.fiabilite(wf,d,(G.regles||[]).length),faux:!!process.env.FAUX_PRIX},null,1));
   console.log('Mesure longue terminée en',((Date.now()-t0)/1e3).toFixed(0),'s :',wf?`${wf.test.n} trades hors échantillon, bilan ${wf.test.pnl.toFixed(2)} $`:'walk-forward impossible')
 })().catch(e=>{console.error(e);process.exit(1)});
