@@ -5,9 +5,10 @@
 <title>TradeInsight</title>
 <style>
 /* Tableau de bord sobre : fond gris-bleu, une seule couleur d'accent bleu nuit, chiffres alignés */
-:root{--bg:#f2f4f8;--card:#fff;--ink:#0f1b2d;--mut:#5b6879;--line:#e1e6ee;--up:#0d7a53;--dn:#c0362c;--warn:#fff4dc;--acc:#173f78;--acc2:#e8eef8;--chip:#eef2f7;--shadow:0 1px 2px rgba(15,27,45,.06),0 4px 16px rgba(15,27,45,.05);color-scheme:light}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1018;--card:#111a26;--ink:#e7edf5;--mut:#8a98ab;--line:#1f2c3d;--up:#3fcf99;--dn:#ff7b72;--warn:#2b2414;--acc:#86b2ff;--acc2:#15233a;--chip:#18222f;--shadow:none;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0a1018;--card:#111a26;--ink:#e7edf5;--mut:#8a98ab;--line:#1f2c3d;--up:#3fcf99;--dn:#ff7b72;--warn:#2b2414;--acc:#86b2ff;--acc2:#15233a;--chip:#18222f;--shadow:none;color-scheme:dark}
+/* Refonte : fond clair bleuté, accent bleu vif en dégradé, cartes arrondies ; thème sombre profond */
+:root{--bg:#f3f6fb;--card:#fff;--ink:#0d1726;--mut:#5c6b80;--line:#e2e8f1;--up:#0e9467;--dn:#d23f3f;--warn:#fff3d6;--acc:#2f5bea;--acc3:#7a4cf0;--acc2:#e9efff;--chip:#eef2f8;--shadow:0 1px 2px rgba(13,23,38,.05),0 8px 24px rgba(13,23,38,.07);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#070b12;--card:#0f1622;--ink:#e8eef7;--mut:#8b9ab0;--line:#1c2737;--up:#37d39a;--dn:#ff7a72;--warn:#2a2213;--acc:#7aa2ff;--acc3:#a98bff;--acc2:#16213a;--chip:#162030;--shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(0,0,0,.35);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#070b12;--card:#0f1622;--ink:#e8eef7;--mut:#8b9ab0;--line:#1c2737;--up:#37d39a;--dn:#ff7a72;--warn:#2a2213;--acc:#7aa2ff;--acc3:#a98bff;--acc2:#16213a;--chip:#162030;--shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(0,0,0,.35);color-scheme:dark}
 [hidden]{display:none!important}*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 body{padding:env(safe-area-inset-top) 0 calc(124px + env(safe-area-inset-bottom))}
 .rbar{position:fixed;left:0;right:0;bottom:calc(50px + env(safe-area-inset-bottom));display:flex;gap:8px;align-items:center;justify-content:space-between;padding:6px max(12px,env(safe-area-inset-left,0px)) 6px max(12px,env(safe-area-inset-left,0px));background:var(--card);border-top:1px solid var(--line);font-size:12px;z-index:5}
@@ -91,6 +92,26 @@ details.plus>summary{cursor:pointer;color:var(--mut);font-size:14px;font-weight:
 details.plus>summary:before{content:'▸ '}details.plus[open]>summary:before{content:'▾ '}.fdet>summary{color:#9fb3cc;margin-top:6px}
 details.sect>summary{margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
 .ess{padding:6px 0;border-top:1px solid var(--line)}.pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:12px;font-weight:700}.pill.ok{background:var(--up);color:var(--card)}.pill.no{background:var(--line);color:var(--ink)}
+
+/* ---- Refonte de l'interface ---- */
+.card{border-radius:18px;padding:16px}.kpi{border-radius:14px;box-shadow:var(--shadow)}.btn{border-radius:14px;background:linear-gradient(135deg,var(--acc),var(--acc3));box-shadow:0 6px 18px rgba(47,91,234,.25)}
+.btn.ghost{background:var(--card);box-shadow:none}.btn.stop{background:var(--dn);box-shadow:none}
+.logo{background:linear-gradient(135deg,var(--acc),var(--acc3));border-radius:12px}
+h2{font-size:12.5px;letter-spacing:.06em;margin:24px 2px 10px}
+.hero{background:linear-gradient(160deg,var(--card) 55%,var(--acc2));}
+nav{padding-top:4px;backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);background:color-mix(in srgb,var(--card) 88%,transparent)}
+nav button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px 8px;font-size:10.5px;font-weight:650;box-shadow:none!important;border-radius:12px;margin:0 1px;min-width:0}
+nav button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{color:var(--acc);background:var(--acc2)}
+body{padding-bottom:calc(132px + env(safe-area-inset-bottom))}.rbar{bottom:calc(58px + env(safe-area-inset-bottom))}
+.strat .sth{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.spark{display:block;width:100%;height:76px;margin-top:8px}.spark polyline{fill:none;stroke:var(--acc);stroke-width:2.2;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.kpis.k4{grid-template-columns:repeat(4,minmax(0,1fr));margin:0 0 6px}@media(max-width:420px){.kpis.k4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tr{padding:12px 0;border-top:1px solid var(--line)}.tr:first-child{border-top:0;padding-top:2px}
+.trh{display:flex;align-items:center;gap:8px}.trh b{font-size:15px}.trh .res{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums}
+.sens{font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;background:color-mix(in srgb,var(--up) 14%,transparent);color:var(--up)}.sens.b{background:color-mix(in srgb,var(--dn) 14%,transparent);color:var(--dn)}
+.trm{font-size:12px;color:var(--mut);margin-top:2px;font-variant-numeric:tabular-nums}.tr p{margin:6px 0 0;font-size:13.5px;line-height:1.45}
+.tr.g{box-shadow:inset 3px 0 0 var(--up);padding-left:10px}.tr.p{box-shadow:inset 3px 0 0 var(--dn);padding-left:10px}
 </style></head><body>
 <div class="warn">Simulation avec argent fictif uniquement. Aucun conseil financier. Le trading réel comporte un risque de perte.</div>
 <main>
@@ -209,9 +230,12 @@ details.sect>summary{margin-top:14px;padding:12px;border:1px solid var(--line);b
 <button class="btn stop" id="reset">Remettre la simulation à zéro</button>
 <div class="mut" id="setmsg" role="status"></div>
 </section>
+<section class="sec" id="t3"><div id="st3"></div></section>
+<section class="sec" id="t4"><div id="st4"></div></section>
+<section class="sec" id="t5"><div id="st5"></div></section>
 </main>
 <div class="rbar" id="rbar"><span id="rbst">Entrées : vérification…</span><button id="kill2" type="button">Arrêt d'urgence</button></div>
-<nav><button class="on" data-t="0">Accueil</button><button data-t="1">Agents</button><button data-t="2">Réglages</button></nav>
+<nav><button class="on" data-t="0"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg>Accueil</button><button data-t="1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7"/></svg>Agents</button><button data-t="3"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Version 2</button><button data-t="4"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg>Prudente</button><button data-t="5"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M5 16l4-5 3 3 5-7 2 2"/></svg>Tendance</button><button data-t="2"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>Réglages</button></nav>
 
 <script>
 /* MOTEUR-DEBUT : fonctions pures (aucun accès à la page), relues telles quelles par tools/mesure.cjs */
@@ -534,14 +558,33 @@ function poidsCible(F,t,st,n,h,prud){const o={},jour=h%24===0,pz=prud&&pauseFed(
     let w=in_?(P.vj[t]?Math.min(1,VOL_CIBLE/P.vj[t]):1)/n:0;if(pz&&!w0)w=0;
     if(!w&&!w0)continue;if(!w!==!w0||jour&&Math.abs(w-w0)>.2/n){st[q]=w;o[q]=w}}
   return o}
-function portefeuille(F,from,to,c,regle){const Q=F.Q,n=Q.length,k=Math.max(1,Math.round(H1/TF.bar)),f=(c.fee+c.slip)/100,pos={},st={},J=[];
+// ---------- Journal des trades d'un portefeuille ----------
+// Un trade = une paire achetée (position 0 → positive) puis revendue entièrement (→ 0) ; les renforts et allègements entre les deux en font
+// partie. Résultat = argent récupéré − argent mis − frais et glissement. Long seulement (achat à la hausse).
+function noteEchange(TR,F,id,t,q,d,co,avant,apres,st,fin){const x=F.p[q].c[t];
+  if(avant<=1e-9&&apres>1e-9)TR.ouv[q]={paire:q,debut:F.T[t]+TF.bar,prixEntree:x,mis:0,rendu:0,frais:0,max:0};
+  const o=TR.ouv[q];if(!o)return;if(d>0)o.mis+=d;else o.rendu-=d;o.frais+=co;o.max=Math.max(o.max,apres);
+  if(apres<=1e-9){const pnl=o.rendu-o.mis-o.frais,tr={paire:q,sens:'hausse',debut:o.debut,fin:F.T[t]+TF.bar,prixEntree:o.prixEntree,prixSortie:x,mis:o.max,pnl,frais:o.frais,variation:x/o.prixEntree-1};
+    tr.pourquoi=pourquoi(id,F,q,t,tr,st,fin);TR.clos.push(tr);delete TR.ouv[q]}}
+// Petite analyse d'un trade terminé, d'après ce que l'on sait au moment de la sortie (raison de la règle, mouvement du prix, frais, marché).
+function pourquoi(id,F,q,t,tr,st,fin){const P=F.p[q],j=Math.max(1,Math.round((tr.fin-tr.debut)/864e5)),v=tr.variation,pc=x=>`${x>=0?'+':'−'}${Math.abs(x*100).toFixed(1).replace('.',',')} %`;
+  let sortie=fin?'fin de la période mesurée':'';
+  if(!sortie&&st&&st._T){const z=st._T.filter(y=>y.q===q).pop();if(z&&P.ji&&z.j===P.ji[t]-1)sortie=z.raison}
+  if(!sortie)sortie=F.reg&&F.reg[t]===-1?'le bitcoin est passé sous sa moyenne 50 jours : sortie par prudence':P.ef&&P.ef[t]<=P.es[t]?'la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)':'rééquilibrage de la stratégie';
+  const marche=F.reg&&F.reg[t]===-1?' Le marché du bitcoin était baissier.':'';
+  const pourq=tr.pnl>0?`Gain : le prix a monté de ${pc(v)} en ${j} jour${j>1?'s':''} pendant que la tendance tenait, et la sortie a gardé une partie de la hausse.`
+    :v>0?`Perte malgré une hausse de ${pc(v)} : la hausse n’a pas couvert les frais et le glissement (${(tr.frais/(tr.mis||1)*100).toFixed(2).replace('.',',')} % de la mise).`
+    :/stop/.test(sortie)?`Perte : le prix a baissé de ${pc(v)} juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu.`
+    :`Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de ${pc(v)} en ${j} jour${j>1?'s':''} avant la sortie.`;
+  return`${pourq} Sortie : ${sortie}.${marche}`}
+function portefeuille(F,from,to,c,regle){const Q=F.Q,n=Q.length,k=Math.max(1,Math.round(H1/TF.bar)),f=(c.fee+c.slip)/100,pos={},st={},J=[],TRS=c.trades?{ouv:{},clos:[]}:null;
   let cash=1e4,pk=1e4,dd=0,fees=0,nTr=0,day='';for(const q of Q)pos[q]=0;const val=()=>cash+Q.reduce((a,q)=>a+pos[q],0);
   for(let t=from;t<to;t++){if(t>from)for(const q of Q)pos[q]*=F.p[q].c[t]/F.p[q].c[t-1];
     const dj=new Date(F.T[t]).toISOString().slice(0,10);if(dj!==day){if(day)J.push(val());day=dj}
-    if((t-from)%k===0){const v=val();st._v=v;st._f=f;st._risque=c.riskPct/100;const w0=regle(F,t,st,n,(t-from)/k),w=regle.pro||regle.reference?w0:plafondRisque(F,t,w0,c,pos,v);if(w)for(const q in w){const d=v*w[q]-pos[q];if(Math.abs(d)>v*1e-4){const co=Math.abs(d)*f;cash-=d+co;pos[q]+=d;fees+=co;nTr++}}}
+    if((t-from)%k===0){const v=val();st._v=v;st._f=f;st._risque=c.riskPct/100;const w0=regle(F,t,st,n,(t-from)/k),w=regle.pro||regle.reference?w0:plafondRisque(F,t,w0,c,pos,v);if(w)for(const q in w){const d=v*w[q]-pos[q];if(Math.abs(d)>v*1e-4){const co=Math.abs(d)*f,av=pos[q];cash-=d+co;pos[q]+=d;fees+=co;nTr++;if(TRS)noteEchange(TRS,F,c.idStrat,t,q,d,co,av,pos[q],st)}}}
     const v=val();pk=Math.max(pk,v);dd=Math.max(dd,(pk-v)/pk)}
-  for(const q of Q)if(pos[q]){const co=pos[q]*f;cash+=pos[q]-co;fees+=co;pos[q]=0;nTr++}J.push(cash);
-  const TR=st._T||[];return{pnl:cash-1e4,dd,fees,n:nTr,jrs:J,nT:TR.length,expR:TR.length?TR.reduce((a,x)=>a+x.r,0)/TR.length:null,wrT:TR.length?TR.filter(x=>x.r>0).length/TR.length:null,arret:st._arret||null,st}}
+  for(const q of Q)if(pos[q]){const co=pos[q]*f,av=pos[q],d=-pos[q];cash+=pos[q]-co;fees+=co;pos[q]=0;nTr++;if(TRS)noteEchange(TRS,F,c.idStrat,to-1,q,d,co,av,0,st,true)}J.push(cash);
+  const TR=st._T||[];return{pnl:cash-1e4,dd,fees,n:nTr,jrs:J,nT:TR.length,expR:TR.length?TR.reduce((a,x)=>a+x.r,0)/TR.length:null,wrT:TR.length?TR.filter(x=>x.r>0).length/TR.length:null,arret:st._arret||null,st,trades:TRS?TRS.clos:undefined}}
 // ---------- Stratégies du dossier « bot-trading » (S1 à S5), règles écrites par l'utilisateur, appliquées telles quelles ----------
 // Bougies journalières (UTC) reconstruites ; décision une fois par jour, juste après la clôture journalière, au prix de ce moment.
 // Les stops sont vérifiés sur la clôture journalière (pas en cours de journée) : c'est plus simple et un peu moins favorable.
@@ -648,6 +691,13 @@ function pistes(F,c,R){const W=Math.min(TF.W,Math.floor(F.N/4)),N=F.N,cut=W+Math
   const L=[un(R,'Configuration gelée (référence)','ref')];
   for(const id of['regime','macro','fund','conf','serie','heures']){const m=CHANGES.find(x=>x.id===id);L.push({...un({...R,[id]:1},m.nom,id),couverture:couv[id]/(N-W)})}
   return{lignes:L,du:F.T[W],coupe:F.T[cut],au:F.T[N-1]}}
+// Les trois stratégies suivies en détail (onglets du site) : journal de tous les trades sur la longue période, avec la petite analyse.
+const TROIS=['A2','prudente','regime'];
+function journalTrois(F,c0){const c={...c0,risqueEgal:true},W=Math.min(Math.max(TF.W,200*Math.round(H1/TF.bar)+20),Math.floor(F.N/4)),o={};
+  for(const id of TROIS){const r=portefeuille(F,W,F.N,{...c,trades:1,idStrat:id},FAMILLES[id].regle),T=r.trades||[],g=T.filter(x=>x.pnl>0);
+    o[id]={nom:FAMILLES[id].nom,du:F.T[W],au:F.T[F.N-1],pnl:r.pnl,dd:r.dd,n:T.length,gagnants:g.length,gains:g.reduce((a,x)=>a+x.pnl,0),pertes:T.filter(x=>x.pnl<=0).reduce((a,x)=>a+x.pnl,0),frais:r.fees,
+      dernier:T.slice(-40).reverse()}}
+  return o}
 // Comparatif des durées sur la MÊME période : bougies de 5 min (D5) regroupées en 10 min et en 1 h, même découpage 70/30.
 // Compare la version de départ et la version active (règles R) ; rétablit ensuite la durée choisie dans les réglages.
 function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF(m);const D={};for(const q in D5)D[q]=agreger(D5[q],3e5);
@@ -657,7 +707,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 23:45';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-15 00:07';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;
@@ -972,6 +1022,27 @@ function renderAgents(){vagHTML();delete PV.fst;
     <details data-k="${g.n}"${ouv.has(g.n)?' open':''}><summary>Ce qu’il regarde</summary>${a&&court(a.t)!==a.t?`<p><b>Détail :</b> ${a.t}</p>`:''}<p>${E[g.n]}</p>${g.n==='Journal'&&S.sim?'<p>'+simLine(S.sim)+'</p>':''}<p class="mut2">Règles fixes écrites dans le code, sans modèle d’IA.</p></details></div></div>`}).join('');
   if(hx!==REPS_){REPS_=hx;$('reps').innerHTML=hx}} // réécrit seulement si quelque chose a changé : animations sans à-coups
 let REPS_='';
+// ---------- Onglets des trois stratégies suivies : portefeuille fictif de 100 €, gains, pertes, trades, et petite analyse de chaque trade ----------
+const ONGLETS={3:'A2',4:'prudente',5:'regime'};
+function courbe(H){if(!H||H.length<2)return'<div class="hempty">La courbe apparaît après deux jours de test.</div>';const v=H.map(x=>x[1]),mn=Math.min(...v),mx=Math.max(...v),r=mx-mn||1,
+  pts=v.map((y,i)=>`${(i/(v.length-1)*300).toFixed(1)},${(70-(y-mn)/r*62).toFixed(1)}`).join(' ');return`<svg class="spark" viewBox="0 0 300 76" preserveAspectRatio="none" role="img" aria-label="Évolution du portefeuille fictif"><polyline points="${pts}"/></svg>`}
+function ligneTrade(x){const d=t=>new Date(t).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'}),g=x.pnl>0,pc=y=>`${y>=0?'+':'−'}${Math.abs(y*100).toFixed(1).replace('.',',')} %`;
+  return`<div class="tr ${g?'g':'p'}"><div class="trh"><b>${x.paire.replace('USDT','')}</b><span class="sens ${x.sens==='baisse'?'b':''}">${x.sens==='baisse'?'▼ Baisse':'▲ Hausse'}</span><span class="res ${g?'up':'dn'}">${fmt(x.pnl)}</span></div>
+    <div class="trm">${d(x.debut)} → ${d(x.fin)} · prix ${pc(x.variation)} · mise ${fmt(x.mis)}</div><p>${x.pourquoi||''}</p></div>`}
+function stratHTML(){for(const k in ONGLETS){const e=$('st'+k);if(!e)continue;const id=ONGLETS[k],F=FAMILLES[id],fw=SV.fam&&SV.fam.lignes?SV.fam.lignes.find(x=>x.id===id):null,
+    bt=SV.lg&&SV.lg.familles3&&SV.lg.familles3.trois?SV.lg.familles3.trois[id]:null,T=fw&&fw.trades||[],G=T.filter(x=>x.pnl>0),gain=G.reduce((a,x)=>a+x.pnl,0),perte=T.filter(x=>x.pnl<=0).reduce((a,x)=>a+x.pnl,0),
+    v=fw?fw.valeur:1e4,r=(v-1e4)/1e4,j=fw&&fw.jours!=null?fw.jours:0,pc=y=>`${y>=0?'+':'−'}${Math.abs(y*100).toFixed(2).replace('.',',')} %`;
+  const h=`<div class="card hero strat"><div class="sth"><span class="lbl">${F?F.nom:id}</span><span class="chip">Test fictif · ${j<1?Math.round(j*24)+' h':Math.floor(j)+' j'}</span></div>
+    <span class="hv">${fmt(v)}</span><span class="delta ${r>=0?'up':'dn'}">${pc(r)} depuis le départ (${fmt(1e4)})</span>${courbe(fw&&fw.hist)}
+    <p class="mut">${F?F.txt:''}</p></div>
+  <div class="kpis"><div class="kpi"><span>Gains</span><b class="up">${fmt(gain)}</b></div><div class="kpi"><span>Pertes</span><b class="dn">${fmt(perte)}</b></div><div class="kpi"><span>Trades</span><b>${T.length}</b></div>
+    <div class="kpi"><span>Réussite</span><b>${T.length?Math.round(G.length/T.length*100)+' %':'–'}</b></div><div class="kpi"><span>Pire baisse</span><b>${fw?pct(fw.dd):'–'}</b></div><div class="kpi"><span>Frais payés</span><b>${fw?fmt(fw.frais||0):'–'}</b></div></div>
+  <h2>Positions ouvertes</h2><div class="card">${fw&&fw.ouvertes&&fw.ouvertes.length?fw.ouvertes.map(o=>`<div class="row"><span><b>${o.paire.replace('USDT','')}</b> ▲ hausse${o.depuis?` · depuis le ${new Date(o.depuis).toLocaleDateString('fr-FR')}`:''}</span><span>${fmt(o.valeur)}</span></div>`).join(''):'<span class="mut">Aucune position ouverte : la stratégie attend son signal.</span>'}</div>
+  <h2>Trades en direct</h2><div class="card">${T.length?T.map(ligneTrade).join(''):'<span class="mut">Aucun trade terminé pour l’instant. Chaque trade s’affichera ici avec son résultat et une petite analyse.</span>'}</div>
+  <h2>Historique sur ${bt?((bt.au-bt.du)/864e5>=365?Math.round((bt.au-bt.du)/864e5/365)+' ans':Math.max(1,Math.round((bt.au-bt.du)/864e5/30))+' mois'):'5 ans'} (test sur le passé)</h2><div class="card">${bt?`<div class="kpis k4"><div class="kpi"><span>Résultat</span><b class="${bt.pnl>=0?'up':'dn'}">${pc(bt.pnl/1e4)}</b></div><div class="kpi"><span>Trades</span><b>${bt.n}</b></div><div class="kpi"><span>Gagnants</span><b>${bt.n?Math.round(bt.gagnants/bt.n*100)+' %':'–'}</b></div><div class="kpi"><span>Pire baisse</span><b>${pct(bt.dd)}</b></div></div>
+    <p class="mut">Gains ${fmt(bt.gains)} · pertes ${fmt(bt.pertes)} · frais ${fmt(bt.frais)}, du ${dt(bt.du)} au ${dt(bt.au)}. Le passé ne garantit rien.</p>
+    <details class="plus"><summary>Voir les ${bt.dernier.length} derniers trades et leur analyse</summary>${bt.dernier.map(ligneTrade).join('')}</details>`:'<span class="mut">Pas encore publié par le serveur (mesure longue).</span>'}</div>
+  <p class="foot">Argent fictif. Les gains passés ne garantissent rien.</p>`;if(e.dataset.h!==h){e.dataset.h=h;e.innerHTML=h}}}
 // Proposition du jour (serveur) : stratégie gelée appliquée à la crypto et à la paire forex choisies, format de la liste de contrôle.
 // Ce n'est qu'une proposition du bot : l'utilisateur décide et passe l'ordre lui-même, chez son courtier.
 function propHTML(){const e=$('prop');if(!e)return;const P=SV.prop;if(!P||!P.propositions){e.innerHTML=`<span class="mut">${SV.at?'Pas encore de proposition publiée par le serveur.':'Lecture du serveur…'}</span>`;return}
@@ -1083,7 +1154,7 @@ function cmpHTML(C){if(!C||C.v!==1||!C.rows.length)return'<span class="mut">Pas 
 const SRV='https://raw.githubusercontent.com/claudecode988/public-iatrade/forward-test/forward/',SV={res:null,lg:null,cfg:null,fam:null,der:null,prop:null,err:'',at:0};
 async function lireServeur(){try{const g=async f=>{const r=await fetch(SRV+f+'?t='+Math.floor(Date.now()/6e4),{cache:'no-store'});return r.ok?r.json():null};
     [SV.res,SV.cfg,SV.lg,SV.fam,SV.der,SV.prop]=await Promise.all([g('resume.json'),g('config.json'),g('mesure-longue.json'),g('familles-resume.json'),g('derniers.json'),g('proposition.json')]);SV.err=SV.cfg?'':'Pas encore de données publiées par le serveur.'}
-  catch(e){SV.err='Serveur injoignable depuis ce navigateur.'}SV.at=Date.now();srvHTML();preuveHTML();absHTML();propHTML()}
+  catch(e){SV.err='Serveur injoignable depuis ce navigateur.'}SV.at=Date.now();srvHTML();preuveHTML();absHTML();propHTML();stratHTML()}
 setTimeout(lireServeur,1500);setInterval(lireServeur,5*6e4);
 function srvHTML(){const e=$('srv');if(!e)return;const r=SV.res,g=SV.cfg,L=SV.lg,ouv=!!(e.querySelector('details')||{}).open;
   if(!g&&!r){e.innerHTML=`<span class="mut">${SV.at?SV.err:'Lecture des données du serveur…'} Le serveur décide toutes les 5 minutes, même quand cette page est fermée.</span>`;return}
@@ -1162,7 +1233,7 @@ let RZ=0;$('reset').onclick=()=>{const b=$('reset');
   if(!RZ){RZ=setTimeout(()=>{RZ=0;b.textContent='Remettre la simulation à zéro'},4000);b.textContent='Touche encore pour confirmer';return}
   clearTimeout(RZ);RZ=0;b.textContent='Remettre la simulation à zéro';if(timer)stopAuto();S=D();save();fillCfg();render();$('setmsg').textContent='Simulation remise à zéro.'};
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
-  document.querySelectorAll('.sec').forEach((s,i)=>s.classList.toggle('on',i==b.dataset.t))});
+  document.querySelectorAll('.sec').forEach(s=>s.classList.toggle('on',s.id==='t'+b.dataset.t));window.scrollTo(0,0);if(+b.dataset.t>=3)stratHTML()});
 $('auto2').onclick=()=>$('auto').onclick();
 function gelHTML(){const g=S.gel,e=$('gelst');if(!e)return;e.textContent=g?`Gelée le ${new Date(g.at).toLocaleString('fr-FR')} (empreinte ${g.h}). Réglages de stratégie et règles actives figés : seuls les jours passés avec cette configuration comptent dans le niveau de preuve.`:'Non gelée : tant que tu peux changer les réglages, le forward test de ce navigateur ne compte pas dans le niveau de preuve.';
   $('gelgo').textContent=g?'Dégeler (la preuve de ce navigateur repart de zéro)':'Geler la configuration';STRAT.forEach(k=>{if($(k))$(k).disabled=!!g})}

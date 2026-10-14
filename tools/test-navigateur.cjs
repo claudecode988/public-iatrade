@@ -56,6 +56,11 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   ok(/Familles sur \d+ ans/.test(sv)&&/Élan sur 4 semaines/.test(sv)&&/Cassures de Donchian/.test(sv)&&/Forward test des familles/.test(sv),'familles sur 3 ans, élan, Donchian et forward test des familles affichés');
   ok(/Stratégies du dossier bot-trading/.test(sv)&&/S1 · Suivi de tendance/.test(sv)&&/S5 · Rotation momentum/.test(sv)&&/(À TESTER|VALIDÉE|SUSPENDUE)/.test(sv),'stratégies S1 à S5 du dossier, avec leur statut');
   {const pr=await p.textContent('#prop');ok(/BTC · crypto/.test(pr)&&/EURUSD · forex/.test(pr)&&/(ACHETER|VENDRE|GARDER|RIEN)/.test(pr)&&/c’est toi qui décides/.test(pr),'proposition du jour : crypto et forex, au format de la liste de contrôle');}
+  for(const[k,nom]of[['3','Agents version 2'],['4','Prudente'],['5','Tendance lente']]){await p.click(`nav button[data-t="${k}"]`);await p.waitForTimeout(300);const tx=await p.textContent('#st'+k),lg=await p.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1);
+    if(!(tx.includes(nom)&&/100[.,]00 €/.test(tx)&&lg))console.log('     DEBUG',k,lg,JSON.stringify(tx.slice(0,300)));ok(await p.isVisible('#t'+k)&&tx.includes(nom)&&/Gains/.test(tx)&&/Pertes/.test(tx)&&/Trades en direct/.test(tx)&&/Historique sur/.test(tx)&&/100[.,]00 €/.test(tx)&&lg,`onglet ${nom} : portefeuille de 100 €, gains, pertes, trades, historique, sans débordement`);
+    if(k==='4')await p.screenshot({path:path.join(process.env.SORTIE||'.','strat.png'),fullPage:true})}
+  {await p.click('nav button[data-t="4"]');const tx=await p.innerHTML('#st4');ok(/class="tr /.test(tx)&&/Sortie :/.test(tx),'trades avec sens, résultat et petite analyse');}
+  await p.click('nav button[data-t="0"]');
   {const ab=await p.textContent('#abs');ok(/Le serveur travaille|Serveur en retard/.test(ab)&&/Gaston/.test(ab)&&/décisions depuis/.test(ab),'onglet Agents : décisions du serveur pendant l’absence, avec les prénoms des agents');}
   await p.click('nav button[data-t="2"]');await p.click('#gelgo');await p.waitForFunction(()=>!!S.gel);
   ok(await p.isDisabled('#thr')&&/Gelée le/.test(await p.textContent('#gelst')),'geler la configuration : réglages de stratégie verrouillés');

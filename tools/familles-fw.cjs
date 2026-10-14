@@ -7,7 +7,7 @@
 //   node tools/familles-fw.cjs <dossier>     (FAUX_PRIX=1 : prix inventés, test du programme seulement ; MAINTENANT : heure simulée)
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
-const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+';return{WL,setTF,aligner,prep,kl,FAMILLES,plafondRisque}')();
+const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+';return{WL,setTF,aligner,prep,kl,FAMILLES,plafondRisque,noteEchange,TROIS}')();
 const DIR=process.argv[2]||'forward',F_ETAT=path.join(DIR,'familles-etat.json'),F_J=path.join(DIR,'familles.jsonl'),F_RES=path.join(DIR,'familles-resume.json');
 const sha=t=>crypto.createHash('sha256').update(t).digest('hex'),lire=(f,d)=>{try{return JSON.parse(fs.readFileSync(f,'utf8'))}catch(e){return d}};
 const BASES=['https://data-api.binance.vision','https://api.binance.com'],H=36e5,J1=864e5,now=+process.env.MAINTENANT||Date.now();
@@ -34,11 +34,12 @@ async function get(u){for(const B of BASES){try{const r=await fetch(B+u);if(r.st
     // positions : valeur mise à jour au prix de clôture ; une paire disparue des données est vendue à son dernier prix connu
     for(const q in P.pos){if(F.p[q])P.pos[q]*=F.p[q].c[i]/P.px[q];else{const co=P.pos[q]*f;P.cash+=P.pos[q]-co;P.fees+=co;P.n++;ajout({famille:id,paire:q,montant:-P.pos[q],raison:'paire absente des données : vendue au dernier prix connu'});delete P.pos[q]}}
     const v=P.cash+Object.values(P.pos).reduce((a,b)=>a+b,0);P.st._v=v;P.st._f=f;P.st._risque=c.riskPct/100;const w0=fm.regle(F,i,P.st,F.Q.length,S.h),w=fm.regle.pro||fm.regle.reference?w0:E.plafondRisque(F,i,w0,c,P.pos,v);
-    if(w)for(const q in w){const d=v*w[q]-(P.pos[q]||0);if(Math.abs(d)>v*1e-4){const co=Math.abs(d)*f;P.cash-=d+co;P.pos[q]=(P.pos[q]||0)+d;P.fees+=co;P.n++;
+    if(w)for(const q in w){const d=v*w[q]-(P.pos[q]||0);if(Math.abs(d)>v*1e-4){const co=Math.abs(d)*f,av=P.pos[q]||0;P.cash-=d+co;P.pos[q]=av+d;P.fees+=co;P.n++;P.tr=P.tr||{ouv:{},clos:[]};E.noteEchange(P.tr,F,id,i,q,d,co,av,P.pos[q],P.st);P.tr.clos=P.tr.clos.slice(-200);
       ajout({famille:id,paire:q,montant:+d.toFixed(2),part:+w[q].toFixed(4),prix:F.p[q].c[i],bougie:new Date(tb).toISOString()});if(Math.abs(P.pos[q])<1e-6)delete P.pos[q]}}
-    for(const q in P.pos)P.px[q]=F.p[q].c[i];const v2=P.cash+Object.values(P.pos).reduce((a,b)=>a+b,0);P.pk=Math.max(P.pk,v2);P.dd=Math.max(P.dd,(P.pk-v2)/P.pk);P.val=v2}
+    for(const q in P.pos)P.px[q]=F.p[q].c[i];const v2=P.cash+Object.values(P.pos).reduce((a,b)=>a+b,0);P.pk=Math.max(P.pk,v2);P.dd=Math.max(P.dd,(P.pk-v2)/P.pk);P.val=v2;
+    {const jr=new Date(tb).toISOString().slice(0,10);P.hist=P.hist||[];if(!P.hist.length||P.hist[P.hist.length-1][0]!==jr)P.hist.push([jr,+v2.toFixed(2)]);else P.hist[P.hist.length-1][1]=+v2.toFixed(2);P.hist=P.hist.slice(-400)}}
   S.lastBar=tb;fs.mkdirSync(DIR,{recursive:true});if(J.length)fs.appendFileSync(F_J,J.map(x=>JSON.stringify(x)).join('\n')+'\n');fs.writeFileSync(F_ETAT,JSON.stringify(S));
   fs.writeFileSync(F_RES,JSON.stringify({maj:now,debut:S.debut,heure:new Date(tb).toISOString(),pairs:F.Q.length,dernierHash:S.prev,faux:!!process.env.FAUX_PRIX,
-    lignes:Object.keys(E.FAMILLES).map(id=>{const P=S.fams[id],inv=Object.values(P.pos).reduce((a,b)=>a+b,0);const T=(P.st._T||[]).slice(-30);return{id,nom:E.FAMILLES[id].nom,valeur:+P.val.toFixed(2),dd:+P.dd.toFixed(4),investi:P.val>0?+(inv/P.val).toFixed(3):0,n:P.n,frais:+P.fees.toFixed(2),debut:P.debut||S.debut,jours:+((now-(P.debut||S.debut))/864e5).toFixed(2),nT:(P.st._T||[]).length,n30:T.length,esp30:T.length?+(T.reduce((a,x)=>a+x.r,0)/T.length).toFixed(4):null,arret:P.st._arret||null}})},null,1));
+    lignes:Object.keys(E.FAMILLES).map(id=>{const P=S.fams[id],inv=Object.values(P.pos).reduce((a,b)=>a+b,0);const T=(P.st._T||[]).slice(-30);return{id,nom:E.FAMILLES[id].nom,valeur:+P.val.toFixed(2),dd:+P.dd.toFixed(4),investi:P.val>0?+(inv/P.val).toFixed(3):0,n:P.n,frais:+P.fees.toFixed(2),debut:P.debut||S.debut,jours:+((now-(P.debut||S.debut))/864e5).toFixed(2),nT:(P.st._T||[]).length,n30:T.length,esp30:T.length?+(T.reduce((a,x)=>a+x.r,0)/T.length).toFixed(4):null,arret:P.st._arret||null,...(E.TROIS.includes(id)?{hist:P.hist||[],ouvertes:Object.keys(P.pos).map(q=>({paire:q,valeur:+P.pos[q].toFixed(2),entree:P.tr&&P.tr.ouv[q]?P.tr.ouv[q].prixEntree:null,depuis:P.tr&&P.tr.ouv[q]?P.tr.ouv[q].debut:null})),trades:(P.tr?P.tr.clos:[]).slice(-60).reverse(),nTrades:P.tr?P.tr.clos.length:0}:{})}})},null,1));
   console.log(`Familles : heure ${new Date(tb).toISOString()}, ${J.length} échange(s), ${Object.keys(E.FAMILLES).map(id=>id+' '+S.fams[id].val.toFixed(0)).join(' | ')}`)
 })().catch(e=>{console.error(e);process.exit(1)});
