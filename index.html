@@ -90,6 +90,7 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 <h2>Mesure sur l'historique réel</h2><div class="card" id="simres"></div>
 <h2>Journal</h2><div class="card" id="log"><span class="mut">Le journal est vide.</span></div>
 <p class="foot">La confiance affichée est un indice du bot, pas une probabilité. Les résultats passés ne garantissent rien.</p>
+<p class="foot" id="ver"></p>
 </section>
 
 <section class="sec" id="t1">
@@ -258,7 +259,7 @@ function mesurer(F,c){const W=Math.min(220,Math.floor(F.N/4)),cut=W+Math.floor((
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 12:50';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
@@ -532,7 +533,7 @@ $('simgo').onclick=async()=>{const b=$('simgo');b.disabled=true;const st=m=>$('s
     const M=mesurer(prep(al.D),S.cfg);S.sim=M;S.rules=M.R;save();render();
     st(`Mesure terminée. Changements gardés pour les agents : ${RULES().join(', ')||'aucun (version de départ)'}.${al.ecartees.length||bad.length?' Paires écartées (historique trop court ou inexistantes) : '+[...new Set([...al.ecartees,...bad])].join(', ')+'.':''}`)}
   catch(e){st('Erreur pendant la mesure : '+(e&&e.message||e))}b.disabled=false};
-fillCfg();render();
+fillCfg();render();$('ver').textContent=`Version du ${VERSION} (heure de Paris)`;
 (async()=>{try{await chargerInitial();await radar().then(r=>RA=r);connecter()}catch(e){LV.note=(e&&e.message)||'Binance injoignable';
   LV.st='HORS LIGNE';setTimeout(function re(){chargerInitial().then(connecter).catch(()=>setTimeout(re,30000))},30000)}})();
 </script></body></html>
