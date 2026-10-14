@@ -36,7 +36,7 @@ function faux(q,n=1900){const k=q.charCodeAt(0)+q.charCodeAt(3)*3,f=t=>(q.includ
     const W=Math.max(0,F.N-5*365),cut=W+Math.floor((F.N-W)*.7);tests[q]={du:F.T[W],au:F.T[F.N-1],lignes:Object.keys(E.FAMILLES).filter(id=>E.FAMILLES[id].pro).map(id=>{
       const r=E.portefeuille(F,W,F.N,c,E.FAMILLES[id].regle),rj=E.rendementsJours(r.jrs),mc=E.monteCarlo(rj);
       return{id,nom:E.FAMILLES[id].nom,pnl:r.pnl,dd:r.dd,nT:r.nT,expR:r.expR,wrT:r.wrT,arret:r.arret,ent:E.portefeuille(F,W,cut,c,E.FAMILLES[id].regle).pnl,test:E.portefeuille(F,cut,F.N,c,E.FAMILLES[id].regle).pnl,
-        cout2:E.portefeuille(F,W,F.N,{...c,fee:c.fee*2,slip:c.slip*2},E.FAMILLES[id].regle).pnl,sharpe:E.sharpe(rj),chanceGain:mc?1-mc.pPerte:null,dd95:mc?mc.dd95:null}})}}
+        cout2:E.portefeuille(F,W,F.N,{...c,fee:c.fee*2,slip:c.slip*2},E.FAMILLES[id].regle).pnl,sansFrais:E.portefeuille(F,W,F.N,{...c,fee:0,slip:0},E.FAMILLES[id].regle).pnl,sharpe:E.sharpe(rj),chanceGain:mc?1-mc.pPerte:null,dd95:mc?mc.dd95:null}})}}
   fs.writeFileSync(F_OUT,JSON.stringify({maj:now,jourCalcul:jour,strategie:PR.strategie,nom:E.FAMILLES[PR.strategie]&&E.FAMILLES[PR.strategie].nom,depuis:PR.depuis,actifs:PR.actifs,controle:PR.controle||[],
     propositions:sorties,tests,faux:!!process.env.FAUX_PRIX},null,1));
   console.log('Proposition du jour :',Object.values(sorties).map(x=>`${x.paire} ${x.action||x.erreur}`).join(' | '))

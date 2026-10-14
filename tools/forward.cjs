@@ -44,7 +44,7 @@ const BASES=['https://data-api.binance.vision','https://api.binance.com'],FNG='h
   const J=[],ajout=l=>{const r={...l,id:++S.seq,ts:now,vAgents,vReglages,prev:S.prev};r.h=sha(JSON.stringify(r));S.prev=r.h;J.push(r);return r.id};
   const resultat=(cible,res)=>ajout({k:'resultat',cible,resultat:res});
   const d0=new Date(now).toISOString().slice(0,10);if(S.day!==d0){S.day=d0;S.nToday=0;S.lossToday=0}
-  const cloturer=(price,raison,jid,t)=>{const P=S.pos,r=E.fermer(P,price,c);S.cash+=P.size+r.g-r.xf;S.trades.push(+r.pnl.toFixed(4));S.lossToday+=r.pnl;S.nToday+=P.nb;S.lastX=t;
+  const cloturer=(price,raison,jid,t)=>{const P=S.pos,r=E.fermer(P,price,c);S.frais=(S.frais||0)+P.fe+r.xf;S.gliss=(S.gliss||0)+r.slip;S.cash+=P.size+r.g-r.xf;S.trades.push(+r.pnl.toFixed(4));S.lossToday+=r.pnl;S.nToday+=P.nb;S.lastX=t;
     const res={statut:'trade clos',net:+r.pnl.toFixed(4),frais:+(P.fe+r.xf).toFixed(4),glissement:+r.slip.toFixed(4),prixSortie:r.fx,raison};resultat(P.jid,res);resultat(jid,res);S.pos=null};
   // 1. Stops sur chaque bougie écoulée depuis le passage précédent (plus bas / plus haut), dans l'ordre.
   if(S.pos){const k0=F.T.findIndex(t=>t>Math.max(S.lastBar,S.pos.t0));for(let k=k0<0?i+1:k0;k<=i&&S.pos;k++){const x=F.p[S.pos.q]&&F.p[S.pos.q].C[k];if(!x)continue;
@@ -68,7 +68,7 @@ const BASES=['https://data-api.binance.vision','https://api.binance.com'],FNG='h
     fs.writeFileSync(F_D,JSON.stringify(old.concat(nv).slice(-30)))}
   const T=S.trades,gs=T.filter(x=>x>0).reduce((a,b)=>a+b,0),ls=T.filter(x=>x<=0).reduce((a,b)=>a+b,0),rs=S.retards.slice().sort((a,b)=>a-b);
   fs.writeFileSync(F_RES,JSON.stringify({maj:now,debut:S.debut,geleeLe:G.geleeLe,tf:TF.lab,vAgents,vReglages,regles:G.regles||[],decisions:S.seq-0,passages:S.passages,
-    trades:T.length,gagnants:T.filter(x=>x>0).length,bilan:+(gs+ls).toFixed(2),gagne:+gs.toFixed(2),perdu:+ls.toFixed(2),pf:ls<0?+(gs/-ls).toFixed(3):null,valeur:+val.toFixed(2),
+    trades:T.length,frais:+(S.frais||0).toFixed(2),glissement:+(S.gliss||0).toFixed(2),bilanSansFrais:+(gs+ls+(S.frais||0)+(S.gliss||0)).toFixed(2),gagnants:T.filter(x=>x>0).length,bilan:+(gs+ls).toFixed(2),gagne:+gs.toFixed(2),perdu:+ls.toFixed(2),pf:ls<0?+(gs/-ls).toFixed(3):null,valeur:+val.toFixed(2),
     plusHaut:+S.pk.toFixed(2),baisse:+((S.pk-val)/S.pk).toFixed(4),position:S.pos?{paire:S.pos.q,sens:S.pos.side,taille:+S.pos.size.toFixed(2),entree:S.pos.fill,stop:S.pos.stop}:null,
     retardMedianS:rs.length?rs[Math.floor(rs.length/2)]:null,retardMaxS:rs.length?rs[rs.length-1]:null,dernierHash:S.prev,faux:!!process.env.FAUX_PRIX},null,1));
   console.log(`${J.length} ligne(s) ajoutée(s) au journal, bougie ${new Date(tb).toISOString()}, valeur ${val.toFixed(2)} $.`)
