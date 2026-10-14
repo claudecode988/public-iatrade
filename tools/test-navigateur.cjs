@@ -54,7 +54,7 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   ok(/Familles sur 12 mois/.test(sv)&&/Suivi de tendance lent/.test(sv)&&/Acheter et garder/.test(sv)&&/(Candidate|Aucune stratégie ne bat)/.test(sv),'comparatif des familles de stratégies affiché');
   ok(/Pistes pour des résultats plus réguliers/.test(sv)&&/Régime du bitcoin/.test(sv)&&/annonces de la Fed/.test(sv)&&/Taux de financement/.test(sv)&&/Volatilité cible|volatilité cible/.test(sv),'pistes de régularité (sources des pros) et familles prudentes affichées');
   ok(/Familles sur 3 ans/.test(sv)&&/Élan sur 4 semaines/.test(sv)&&/Cassures de Donchian/.test(sv)&&/Forward test des familles/.test(sv),'familles sur 3 ans, élan, Donchian et forward test des familles affichés');
-  {const ab=await p.textContent('#abs');ok(/Le serveur travaille|Serveur en retard/.test(ab)&&/Gaston/.test(ab)&&/décisions depuis/.test(ab),'onglet Agents : décisions du serveur pendant l’absence, avec les noms des animaux');}
+  {const ab=await p.textContent('#abs');ok(/Le serveur travaille|Serveur en retard/.test(ab)&&/Gaston/.test(ab)&&/décisions depuis/.test(ab),'onglet Agents : décisions du serveur pendant l’absence, avec les prénoms des agents');}
   await p.click('nav button[data-t="2"]');await p.click('#gelgo');await p.waitForFunction(()=>!!S.gel);
   ok(await p.isDisabled('#thr')&&/Gelée le/.test(await p.textContent('#gelst')),'geler la configuration : réglages de stratégie verrouillés');
   await p.click('#gelgo');await p.click('#gelgo');ok(await p.evaluate(()=>!S.gel)&&!(await p.isDisabled('#thr')),'dégeler avec confirmation');
@@ -124,7 +124,7 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   ok(/Pour chaque seuil, entraînement → test/.test(sr),'aucun gain d’entraînement seul (seuils avec résultat de test)');
   ok(/Profit factor/.test(sr)&&/Acheter et garder/.test(sr)&&/contre .* pour « acheter et garder »/.test(sr),'profit factor et comparaison « acheter et garder »');
   await p.screenshot({path:path.join(process.env.SORTIE||'.','accueil.png'),fullPage:true});await p.click('nav button[data-t="1"]');await p.screenshot({path:path.join(process.env.SORTIE||'.','agents.png'),fullPage:true});
-  const fi=await p.textContent('#reps');ok((fi.match(/sans modèle d’IA/g)||[]).length===6&&(fi.match(/Ce qu’il regarde/g)||[]).length===6&&['Pistache','Filou','Gaston','Rocky','Caramel','Gribouille'].every(n=>fi.includes(n))&&/l’écureuil/.test(fi),'fiche de chaque agent (noms d’animaux) : type, entrées, dernière décision');
+  const fi=await p.textContent('#reps');ok((fi.match(/sans modèle d’IA/g)||[]).length===6&&(fi.match(/Ce qu’il regarde/g)||[]).length===6&&['Pistache','Filou','Gaston','Rocky','Caramel','Gribouille'].every(n=>fi.includes(n))&&/<svg/.test(await p.innerHTML('#reps')),'fiche de chaque agent (personnage de couleur) : type, entrées, dernière décision');
   await p.click('nav button[data-t="0"]');const pv=await p.textContent('#preuve');
   ok(/Niveau de preuve : insuffisant/.test(pv)&&await p.evaluate(()=>document.body.classList.contains('pi'))&&/non concluant/.test(pv),'niveau de preuve insuffisant : gains grisés, « non concluant »');
   const pv2=await p.evaluate(()=>{S.cfg.npT1=0;S.cfg.npJ1=0;S.cfg.npT2=0;S.cfg.npJ2=0;preuveHTML();return document.getElementById('preuve').textContent});

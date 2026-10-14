@@ -61,7 +61,7 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 #house{width:100%;max-width:100%;aspect-ratio:4/3;display:block;margin:10px 0 4px;background:#0a121c;border:1px solid #1d2a3a;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
 .agc{display:flex;gap:10px;padding:10px;margin-top:8px;border:1px solid #1d2a3a;border-radius:14px;background:linear-gradient(135deg,#111b29,#0c141f);font:13px/1.45 system-ui,-apple-system,sans-serif;transition:border-color .5s,box-shadow .5s}
 .agc.on{border-color:var(--c);box-shadow:0 0 0 1px var(--cf),0 6px 18px var(--cf)}
-.agc .av{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:27px;background:radial-gradient(circle at 35% 30%,var(--cf),#0b1018 75%);border:1px solid var(--cf)}
+.agc .av{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 35% 30%,var(--cf),#0b1018 75%);border:1px solid var(--cf)}
 .agc.on .av{animation:respire 2.6s ease-in-out infinite}@keyframes respire{50%{transform:scale(1.07)}}
 .agb{min-width:0;flex:1}.agt{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline}.agt b{color:#fff;font-size:15px}.agt span{color:var(--c);font-size:12px}
 .agt em{margin-left:auto;font-style:normal;font-size:11px;color:#9fb3cc;border:1px solid #24364b;border-radius:99px;padding:1px 8px}
@@ -540,7 +540,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 20:55';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 20:59';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({pk:10000,cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:.5,ddMax:15,hb:5,npT1:30,npJ1:30,npT2:100,npJ2:90,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
@@ -693,15 +693,17 @@ async function decider0(t,manuel){const c=S.cfg,A=[],d0=today(),R=S.rules,W=v=>v
   const at=Date.now();S.ags=A.map(a=>({...a,at}));house.play(A,q);S.dec={d,why,conf:pc+' %',rr};S.eq=(S.eq||[]).concat(valeur()).slice(-300);save();render();$('msg').textContent=manuel?'Évaluation terminée.':`Décision prise à la fermeture de ${hr(tb+TF.bar)}.`}
 const valeur=()=>{const P=S.pos;if(!P)return S.cash;const px=(P.side==='long'?LV.bid[P.q]:LV.ask[P.q])||LV.px[P.q]||P.px;return S.cash+P.size+(P.side==='long'?1:-1)*P.n*(px-P.fill)};
 
-// Les six agents portent des noms d'animaux (affichage seulement : le journal garde ses identifiants d'origine « Boussole » et « Bouclier »
+// Les six agents sont de petits personnages de couleur, avec des prénoms (affichage seulement : le journal garde ses identifiants d'origine « Boussole » et « Bouclier »
 // pour ne pas casser la chaîne d'empreintes ni le forward test).
-const AG=[{n:'Actualités',who:'Pistache',emo:'🐿️',esp:'l’écureuil',job:'Surveille les nouvelles du marché',c:'#d9902f'},
-{n:'Analyste technique',who:'Filou',emo:'🦊',esp:'le renard',job:'Lit les graphiques et les tendances',c:'#3b82c4'},
-{n:'Chef',who:'Gaston',emo:'🦉',esp:'le hibou',job:'Décide : entrer, attendre ou sortir',c:'#7a5cc4'},
-{n:'Risque',who:'Rocky',emo:'🐕',esp:'le chien de garde',job:'Vérifie les limites et peut tout bloquer',c:'#c44848'},
-{n:'Exécuteur fictif',who:'Caramel',emo:'🐇',esp:'le lapin',job:'Passe les ordres dans le portefeuille fictif',c:'#2f9e75'},
-{n:'Journal',who:'Gribouille',emo:'🐢',esp:'la tortue',job:'Note chaque trade et mesure les résultats',c:'#8a8f98'}];
+const AG=[{n:'Actualités',who:'Pistache',job:'Surveille les nouvelles du marché',c:'#d9902f'},
+{n:'Analyste technique',who:'Filou',job:'Lit les graphiques et les tendances',c:'#3b82c4'},
+{n:'Chef',who:'Gaston',job:'Décide : entrer, attendre ou sortir',c:'#7a5cc4'},
+{n:'Risque',who:'Rocky',job:'Vérifie les limites et peut tout bloquer',c:'#c44848'},
+{n:'Exécuteur fictif',who:'Caramel',job:'Passe les ordres dans le portefeuille fictif',c:'#2f9e75'},
+{n:'Journal',who:'Gribouille',job:'Note chaque trade et mesure les résultats',c:'#8a8f98'}];
 const NOM_JOURNAL={Boussole:'Gaston',Bouclier:'Rocky'};
+// Avatar des fiches : le même petit personnage que dans la maison, en SVG.
+const perso=c=>`<svg viewBox="-12 -18 24 32" width="34" height="44"><rect x="-5" y="5" width="3.8" height="7.5" rx="1.8" fill="${c}" opacity=".6"/><rect x="1.2" y="5" width="3.8" height="7.5" rx="1.8" fill="${c}" opacity=".6"/><rect x="-7.5" y="-4" width="15" height="12" rx="5" fill="${c}" opacity=".82"/><circle cy="-9" r="7.8" fill="${c}"/><rect x="-3.6" y="-11.5" width="2.4" height="3.2" rx="1.1" fill="#fff"/><rect x="1.4" y="-11.5" width="2.4" height="3.2" rx="1.1" fill="#fff"/></svg>`;
 
 const FNG='https://api.alternative.me/fng/?limit=1',RD={d:null,at:0,err:''};
 async function radar0(){const c=S.cfg;
@@ -744,7 +746,6 @@ const house=(()=>{const cv=$('house'),W=320,H=240,cx=cv.getContext('2d'),RM=matc
   let sc=1;const taille=()=>{const d=Math.min(3,devicePixelRatio||1),w=cv.clientWidth||W,s=w/W*d;if(Math.abs(s-sc)<.01&&cv.width)return;sc=s;cv.width=Math.round(W*sc);cv.height=Math.round(H*sc)};
   taille();if(window.ResizeObserver)new ResizeObserver(taille).observe(cv);else addEventListener('resize',taille);
   const FL=['#1b2433','#182231','#1d2230','#221c25','#16242a','#1f2128'],ROLE=['Actualités','Analyse','Décision','Risque','Ordres','Archives'];
-  const EMO='"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
   const room=i=>({x:(i%3)*W/3,y:i<3?0:144,w:W/3,h:96}),door=i=>{const r=room(i);return{x:r.x+r.w/2,y:i<3?96:144}};
   const home=i=>{const r=room(i);return{x:r.x+r.w/2,y:r.y+(i<3?62:44)}},spot=i=>{const r=room(i);return{x:r.x+26,y:r.y+(i<3?32:72)}};
   const roomOf=p=>p.y<96?Math.min(2,Math.floor(p.x/(W/3))):p.y>144?3+Math.min(2,Math.floor(p.x/(W/3))):-1;
@@ -754,16 +755,16 @@ const house=(()=>{const cv=$('house'),W=320,H=240,cx=cv.getContext('2d'),RM=matc
   function play(A){if(Q.length||cur)return; // un seul circuit à la fois : en mode rapide on montre le dernier tour complet
     const S_=A.map(x=>x.s||'');
     for(let i=0;i<6;i++){
-      Q.push({k:'go',a:i,to:spot(i),st:`${AG[i].emo} ${AG[i].who} fait ses recherches…`},{k:'say',a:i,txt:S_[i],ms:900});
-      if(i<5){const h=home(i+1);Q.push({k:'carry',a:i,v:1},{k:'go',a:i,to:{x:h.x-18,y:h.y},st:`${AG[i].emo} ${AG[i].who} apporte son rapport à ${AG[i+1].who}`},
+      Q.push({k:'go',a:i,to:spot(i),st:`${AG[i].who} fait ses recherches…`},{k:'say',a:i,txt:S_[i],ms:900});
+      if(i<5){const h=home(i+1);Q.push({k:'carry',a:i,v:1},{k:'go',a:i,to:{x:h.x-18,y:h.y},st:`${AG[i].who} apporte son rapport à ${AG[i+1].who}`},
         {k:'give',a:i,b:i+1},{k:'say',a:i+1,txt:'Merci !',ms:420},{k:'go',a:i,to:home(i),st:'',bg:1})}
-      else Q.push({k:'go',a:i,to:home(i),st:`${AG[i].emo} ${AG[i].who} range le rapport dans les archives`})}}
+      else Q.push({k:'go',a:i,to:home(i),st:`${AG[i].who} range le rapport dans les archives`})}}
   // Page cachée ou autre onglet : le circuit en cours est terminé d'un coup (rien ne s'accumule), chacun rentre chez lui.
   function finir(){Q=[];cur=null;P.forEach((p,i)=>{const h=home(i);Object.assign(p,{x:h.x,y:h.y,rx:h.x,ry:h.y,path:[],carry:0,say:''})});st='Circuit terminé. Les agents attendent le prochain tour.'}
   function next(){cur=Q.shift()||null;if(!cur){st='Circuit terminé. Les agents attendent le prochain tour.';return}
     const c=cur,p=P[c.a];if(c.st!==undefined&&c.st)st=c.st;
     if(c.k==='go'){p.path=route(c.a,c.to);if(c.bg){cur=null;next()}}
-    else if(c.k==='say'){p.say=c.txt;st=`${AG[c.a].emo} ${AG[c.a].who} : « ${c.txt} »`;p.sayT=performance.now();p.sayU=p.sayT+c.ms+250;wait=c.ms}
+    else if(c.k==='say'){p.say=c.txt;st=`${AG[c.a].who} : « ${c.txt} »`;p.sayT=performance.now();p.sayU=p.sayT+c.ms+250;wait=c.ms}
     else if(c.k==='carry'){p.carry=c.v;cur=null;next()}
     else if(c.k==='give'){p.carry=0;P[c.b].glow=1;cur=null;next()}}
   function step(p,dt){if(!p.path.length)return true;const t=p.path[0],dx=t.x-p.x,dy=t.y-p.y,d=Math.hypot(dx,dy),v=RM.matches?1e9:190*dt;if(Math.abs(dx)>.5)p.fx=dx>0?1:-1;
@@ -782,7 +783,7 @@ const house=(()=>{const cv=$('house'),W=320,H=240,cx=cv.getContext('2d'),RM=matc
       const px_=r.x+r.w-14,py_=top?r.y+r.h-20:r.y+r.h-22;cx.fillStyle='#5b4636';cx.fillRect(px_-4,py_+4,8,7);cx.fillStyle='#2f8f63';[[0,0,5],[-4,2,4],[4,2,4]].forEach(([a,b,c])=>{cx.beginPath();cx.arc(px_+a,py_+b+(anim?Math.sin(now/900+i)*.4:0),c,0,7);cx.fill()});
       cx.fillStyle=AG[i].c+'26';cx.beginPath();cx.ellipse(h.x,h.y+10,24,9,0,0,7);cx.fill();
       cx.strokeStyle='#33496a';cx.lineWidth=1.5;rr(r.x+2,r.y+2,r.w-4,r.h-4,6);cx.stroke();cx.lineWidth=1;cx.fillStyle='#121c2a';cx.fillRect(d.x-12,d.y-3,24,6);
-      // étiquette : nom de l'animal et son rôle
+      // étiquette : prénom de l'agent et son rôle
       const ly=r.y+(top?14:91);cx.font='700 9px system-ui,-apple-system,sans-serif';cx.fillStyle=AG[i].c;cx.fillText(AG[i].who,r.x+8,ly);
       const nw=cx.measureText(AG[i].who).width;cx.font='500 8px system-ui,-apple-system,sans-serif';cx.fillStyle='#8ea3bd';cx.fillText('· '+ROLE[i],r.x+11+nw,ly);
       cx.fillStyle=cx.strokeStyle=AG[i].c;const t=now/400;
@@ -793,11 +794,17 @@ const house=(()=>{const cv=$('house'),W=320,H=240,cx=cv.getContext('2d'),RM=matc
       else if(i===4){cx.fillStyle='#0a121c';cx.fillRect(sp.x-10,sp.y-14,20,12);cx.strokeStyle='#4cc9a0';cx.beginPath();cx.moveTo(sp.x-8,sp.y-5);cx.lineTo(sp.x-3,sp.y-9);cx.lineTo(sp.x+2,sp.y-6);cx.lineTo(sp.x+8,sp.y-12);cx.stroke()}
       else{for(let k=0;k<3;k++){cx.fillStyle=['#8a8f98','#6b7280','#a3a8b0'][k];cx.fillRect(sp.x-10+k*7,sp.y-14,5,14)}}}
     if(cur&&cur.k==='go'){const p=P[cur.a];if(p.path.length){cx.strokeStyle=AG[cur.a].c+'70';cx.setLineDash([2,4]);cx.beginPath();cx.moveTo(p.rx,p.ry+9);p.path.forEach(q=>cx.lineTo(q.x,q.y+9));cx.stroke();cx.setLineDash([])}}
-    // les animaux : petits sauts quand ils marchent, respiration au repos, « z » quand tout le monde dort
+    // les personnages : petits sauts quand ils marchent, respiration au repos, « z » quand tout le monde dort
     P.forEach((p,i)=>{const mv=p.path.length>0&&anim,hop=mv?-Math.abs(Math.sin(now/105+p.ph))*4.5:0,br=anim&&!mv?1+.04*Math.sin(now/650+p.ph):1;
       cx.fillStyle='rgba(0,0,0,.42)';cx.beginPath();cx.ellipse(p.rx,p.ry+11,8+hop*.5,2.6,0,0,7);cx.fill();
       if(p.glow>0){cx.strokeStyle=`rgba(76,201,160,${p.glow})`;cx.lineWidth=2;cx.beginPath();cx.arc(p.rx,p.ry,14+(1-p.glow)*6,0,7);cx.stroke();cx.lineWidth=1}
-      cx.save();cx.translate(p.rx,p.ry+hop);cx.scale((p.fx>0?-1:1)*br,br*(mv?1+hop*.012:1));cx.font=`24px ${EMO}`;cx.textAlign='center';cx.textBaseline='middle';cx.fillText(AG[i].emo,0,0);cx.restore();
+      // petit personnage de couleur : jambes qui alternent en marchant, corps, tête, yeux qui regardent vers où il va et clignent de temps en temps
+      {const g=AG[i],x=p.rx,y=p.ry+hop,lg=mv?Math.sin(now/90+p.ph)*2.8:0,cl=anim&&((now/1000+p.ph*.7)%4.2)<.12;cx.save();cx.translate(x,y);cx.scale(1.2*br,1.2*br);
+        cx.fillStyle=shade(g.c,.55);rr(-4.2+lg,4.5,3.2,6.5,1.5);cx.fill();rr(1+-lg,4.5,3.2,6.5,1.5);cx.fill();
+        rr(-6.5,-3.5,13,10.5,4.5);cx.fillStyle=shade(g.c,.82);cx.fill();
+        const hg=cx.createRadialGradient(-2,-10.5,1,0,-8,7.5);hg.addColorStop(0,shade(g.c,1.35));hg.addColorStop(1,g.c);cx.fillStyle=hg;cx.beginPath();cx.arc(0,-8,6.8,0,7);cx.fill();
+        const ex=(p.fx>0?1:-1)*1.3;cx.fillStyle='#fff';if(cl){cx.fillRect(-3.6+ex,-9,2.2,.9);cx.fillRect(1.4+ex,-9,2.2,.9)}else{rr(-3.6+ex,-10.3,2.2,2.8,1);cx.fill();rr(1.4+ex,-10.3,2.2,2.8,1);cx.fill()}
+        cx.restore()}
       if(p.carry){cx.save();cx.translate(p.rx+p.fx*11,p.ry-2+hop);cx.rotate(p.fx*.18);cx.fillStyle='#f4f1e8';rr(-3.5,-4.5,7,9,1);cx.fill();cx.fillStyle='#8a8f98';cx.fillRect(-2.5,-2,5,1);cx.fillRect(-2.5,0,4,1);cx.restore()}
       if(!run&&anim){cx.font='700 8px system-ui,sans-serif';cx.textAlign='left';for(let k=0;k<2;k++){const u=((now/1600+k*.5+i*.13)%1);cx.fillStyle=`rgba(207,227,255,${(1-u)*.7})`;cx.fillText('z',p.rx+7+u*6,p.ry-9-u*12)}}
       cx.textAlign='left';cx.textBaseline='alphabetic';
@@ -838,20 +845,20 @@ function renderAgents(){vagHTML();delete PV.fst;
     'Exécuteur fictif':`Prix d’achat et de vente en direct de Binance, frais ${String(c.fee).replace('.',',')} % et glissement ${String(c.slip).replace('.',',')} % par côté, ${c.nb} achat${c.nb>1?'s':''} de ${fmt(c.size)} par décision, stop ${R.atr?'ATR suiveur ':''}plafonné à ${String(c.sl).replace('.',',')} %.`,
     'Journal':'Trades clôturés (résultat, durée, indice annoncé) et résultats de la mesure sur l’historique.'};
   const ouv=new Set([...document.querySelectorAll('#reps details[open]')].map(d=>d.dataset.k));
-  const hx=AG.map(g=>{const a=S.ags.find(x=>x.n===g.n);return `<div class="agc${timer?' on':''}" style="--c:${g.c};--cf:${g.c}2e"><div class="av" aria-hidden="true">${g.emo}</div><div class="agb">
-    <div class="agt"><b>${g.who}</b><span>${g.esp}</span><em>${g.n}</em></div><p>${g.job}</p>
+  const hx=AG.map(g=>{const a=S.ags.find(x=>x.n===g.n);return `<div class="agc${timer?' on':''}" style="--c:${g.c};--cf:${g.c}2e"><div class="av" aria-hidden="true">${perso(g.c)}</div><div class="agb">
+    <div class="agt"><b>${g.who}</b><em>${g.n}</em></div><p>${g.job}</p>
     <div class="agd"><span class="dot"></span>${a?`${a.at?hr(a.at).slice(0,5)+' · ':''}${a.t}`:attente()}</div>
     <details data-k="${g.n}"${ouv.has(g.n)?' open':''}><summary>Ce qu’il regarde</summary><p>${E[g.n]}</p>${g.n==='Journal'&&S.sim?'<p>'+simLine(S.sim)+'</p>':''}<p class="mut2">Règles fixes écrites dans le code, sans modèle d’IA.</p></details></div></div>`}).join('');
   if(hx!==REPS_){REPS_=hx;$('reps').innerHTML=hx}} // réécrit seulement si quelque chose a changé : animations sans à-coups
 let REPS_='';
-// Décisions prises par le serveur (GitHub, 24 h/24, même quand ce téléphone ou ce PC est éteint), avec les noms des animaux.
+// Décisions prises par le serveur (GitHub, 24 h/24, même quand ce téléphone ou ce PC est éteint), avec les prénoms des agents.
 function absHTML(){const e=$('abs');if(!e)return;const r=SV.res,L=SV.der;
   if(!r){e.innerHTML=`<div>${SV.at?SV.err||'Pas encore de données du serveur.':'Lecture du serveur…'}</div>`;return}
-  const age=Math.round((Date.now()-r.maj)/6e4),ok=age<20,qui=a=>{const n=NOM_JOURNAL[a]||a,g=AG.find(x=>x.who===n);return g?`${g.emo} ${n}`:n};
+  const age=Math.round((Date.now()-r.maj)/6e4),ok=age<20,qui=a=>{const n=NOM_JOURNAL[a]||a,g=AG.find(x=>x.who===n);return g?`<b style="color:${g.c}">● ${n}</b>`:n};
   const lg=(L||[]).slice(-8).reverse().map(x=>{const v=x.resultat&&typeof x.resultat.net==='number'?` → <b class="${x.resultat.net>=0?'up':'dn'}">${fmt(x.resultat.net)}</b>`:'';
     return`<div><span class="mut">${new Date(x.ts).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span> · ${qui(x.agent)} · <b>${x.type}</b>${x.paire?' '+x.paire.replace('USDT',''):''} : ${x.raison}${v}</div>`}).join('');
   e.innerHTML=`<div><b class="${ok?'up':'dn'}">${ok?'● Le serveur travaille':'● Serveur en retard'}</b> · dernier passage il y a ${age<1?'moins d’une minute':age+' min'} · ${r.decisions} décisions depuis le ${new Date(r.debut).toLocaleDateString('fr-FR')} · valeur fictive ${fmt(r.valeur)}${r.position?` · position ouverte ${r.position.paire.replace('USDT','')}`:''}</div>`+
-    (lg||'<div>Les dernières décisions apparaîtront ici après le prochain passage du serveur.</div>')+`<div class="mut">Les animaux de cette maison ne travaillent que lorsque la page est ouverte. Ceux du serveur ne s’arrêtent jamais.</div>`}
+    (lg||'<div>Les dernières décisions apparaîtront ici après le prochain passage du serveur.</div>')+`<div class="mut">Les personnages de cette maison ne travaillent que lorsque la page est ouverte. Ceux du serveur ne s’arrêtent jamais.</div>`}
 function render(){
   const pnl=S.trades.reduce((a,b)=>a+b,0),w=S.trades.filter(x=>x>0).length,L=S.trades.length,P=S.pos,eq=valeur(),H=S.hist,n=H.length;
   $('bal').textContent=fmt(eq);$('pnl').textContent=fmt(pnl);$('pnl').className=pnl>=0?'up':'dn';
