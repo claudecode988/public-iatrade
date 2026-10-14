@@ -1,7 +1,7 @@
 {
- "maj": 1792004448959,
+ "maj": 1792008010907,
  "debut": 1791994755433,
- "heure": "2026-10-14T18:00:00.000Z",
+ "heure": "2026-10-14T19:00:00.000Z",
  "pairs": 16,
  "dernierHash": "e2694fb10fc25a6a2dea5dbd628c79e174064d6820426d5c309950a906e3b1b3",
  "faux": false,
@@ -18,7 +18,7 @@
   {
    "id": "retour",
    "nom": "Retour à la moyenne",
-   "valeur": 10008.84,
+   "valeur": 10010.79,
    "dd": 0.0062,
    "investi": 0.751,
    "n": 12,
@@ -27,7 +27,7 @@
   {
    "id": "reeq",
    "nom": "Rééquilibrage hebdomadaire",
-   "valeur": 10018.37,
+   "valeur": 10018.65,
    "dd": 0.0063,
    "investi": 1.001,
    "n": 16,
@@ -36,7 +36,7 @@
   {
    "id": "bh",
    "nom": "Acheter et garder",
-   "valeur": 10018.37,
+   "valeur": 10018.65,
    "dd": 0.0063,
    "investi": 1.001,
    "n": 16,
@@ -72,7 +72,7 @@
   {
    "id": "elan",
    "nom": "Élan sur 4 semaines",
-   "valeur": 10010.48,
+   "valeur": 10012.18,
    "dd": 0.0042,
    "investi": 0.609,
    "n": 14,
