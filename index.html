@@ -89,6 +89,7 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 <div class="act2"><button class="btn ghost" id="go">Évaluer maintenant</button><button class="btn stop" id="kill">Arrêt d'urgence</button></div>
 <div class="mut status" id="auto-st">Les agents sont à l'arrêt : aucune nouvelle entrée. Ils ne tournent que quand tu les démarres.</div>
 <div class="mut" id="msg"></div>
+<h2>Forward test (journal de décisions)</h2><div class="card" id="fwd"></div>
 <h2>Dernière décision du Chef</h2><div class="card" id="dec">Aucune décision pour l'instant. Touche « Démarrer les agents » ou « Évaluer maintenant ».</div>
 <h2>Position et fiabilité</h2><div class="card" id="cal"></div>
 <h2>Mesure sur l'historique réel</h2><div class="card" id="simres"></div>
@@ -147,6 +148,10 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 <div class="mut" id="stock"></div>
 <div class="act2"><button class="btn ghost" id="excsv">Trades (CSV)</button><button class="btn ghost" id="exjson">Tout (JSON)</button></div>
 <label>Restaurer une sauvegarde JSON<input id="imjson" type="file" accept="application/json,.json"></label>
+<h3>Journal de décisions</h3>
+<div class="mut">Chaque décision des agents (entrée, sortie, abstention) est enregistrée avant son résultat, avec l'heure, les prix vus, les données d'entrée et l'empreinte de la version des agents et des réglages. Aucune ligne ne peut être modifiée ou supprimée ici.</div>
+<div class="act2"><button class="btn ghost" id="jcsv">Journal (CSV)</button><button class="btn ghost" id="jjson">Journal et archives (JSON)</button></div>
+<button class="btn ghost" id="jreset">Remettre le journal à zéro (archivé)</button>
 <button class="btn stop" id="reset">Remettre la simulation à zéro</button>
 <div class="mut" id="setmsg" role="status"></div>
 </section>
@@ -304,7 +309,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 15:02';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 15:53';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
@@ -365,18 +370,60 @@ setInterval(()=>{LV.rate=LV.cnt;LV.cnt=0;const o=LV.ws&&LV.ws.readyState===1,age
 function marche(){const C={};for(const q of Object.keys(LV.C1))if(LV.C1[q].length>=TF.W)C[q]=LV.C1[q];const al=aligner(C);
   return al&&Object.keys(al.D).length?prep(al.D,q=>newsFor(q,RA.news)):null}
 function verifierStop(){const P=S.pos;if(!P||!fresh())return;const px=P.side==='long'?LV.bid[P.q]:LV.ask[P.q];if(!px)return;
-  const hit=stopTick(P,px,px,S.rules,px);if(hit!==null)cloturer(hit,'stop touché au tick',false)}
+  const hit=stopTick(P,px,px,S.rules,px);if(hit!==null){jrAjouter({agent:'Bouclier',type:'sortie',paire:P.q,sens:P.side,raison:`stop touché au tick (stop ${fp(P.stop)})`,confiance:null,prix:jrPrix(P.q),entrees:{stop:P.stop,entree:P.fill},trade:P.jid||null}).then(id=>{P.jsx=id});cloturer(hit,'stop touché au tick',false)}}
 async function cloturer(price,raison,manuel){const P=S.pos,c=S.cfg,r=fermer(P,price,c);
-  S.cash+=P.size+r.g-r.xf;S.trades.push(r.pnl);S.hist.push({p:P.p,side:P.side,pnl:r.pnl,dur:(Date.now()-(P.te||P.t0+TF.bar))/H1,q:P.q,nb:P.nb||1,size:P.size,te:P.te||P.t0+TF.bar,ts:Date.now(),pin:P.fill,pout:r.fx,fees:P.fe+r.xf,why:raison,tf:TF.min});S.hist=S.hist.slice(-5000);S.lossToday+=r.pnl;S.nToday+=P.nb||1;S.lastX=Math.floor(Date.now()/TF.bar)*TF.bar;
+  {const res={statut:'trade clos',net:+r.pnl.toFixed(4),frais:+(P.fe+r.xf).toFixed(4),glissement:+r.slip.toFixed(4),prixSortie:r.fx};jrResultat(P.jid,res);JR.file.then(()=>jrResultat(P.jsx,res))}
+  S.cash+=P.size+r.g-r.xf;S.trades.push(r.pnl);S.hist.push({jid:P.jid,p:P.p,side:P.side,pnl:r.pnl,dur:(Date.now()-(P.te||P.t0+TF.bar))/H1,q:P.q,nb:P.nb||1,size:P.size,te:P.te||P.t0+TF.bar,ts:Date.now(),pin:P.fill,pout:r.fx,fees:P.fe+r.xf,why:raison,tf:TF.min});S.hist=S.hist.slice(-5000);S.lossToday+=r.pnl;S.nToday+=P.nb||1;S.lastX=Math.floor(Date.now()/TF.bar)*TF.bar;
   let ex=`${P.q} : sortie fictive à ${fp(r.fx)} (${raison}) : ${fmt(r.pnl)} frais et glissement compris.`;
   if(c.tn==='1'&&manuel&&P.side==='long'&&TNP.includes(P.q))ex+=' '+await testnetOrder('SELL',(Math.floor(P.n*1e4)/1e4).toFixed(4),0,P.q);
   logA(`${P.q} : sortie à ${fp(r.fx)} : ${fmt(r.pnl)} (${raison})`);S.pos=null;S.ags=S.ags.map(a=>a.n==='Exécuteur fictif'?{...a,t:ex,s:'Position fermée',at:Date.now()}:a);save();render();return ex}
+/* ---------- Journal de décisions : IndexedDB, ajout seulement, chaîné par empreintes ---------- */
+// Chaque décision est écrite AVANT que son issue soit connue. Seul le champ « resultat » est complété plus tard.
+// Chaque ligne contient l'empreinte SHA-256 de la précédente (prev) et la sienne (h) : modifier une ligne après coup
+// casse la chaîne, ce que la vérification au chargement signale. Pas d'édition ni de suppression dans l'interface.
+const JR={db:null,seq:0,debut:0,prev:'',n:0,err:'',integre:null,file:Promise.resolve(),vAg:'',vCfg:''};
+async function sha(txt){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(txt));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+  catch(e){let h=0x811c9dc5;for(let i=0;i<txt.length;i++){h^=txt.charCodeAt(i);h=Math.imul(h,16777619)>>>0}return'fnv1a-'+h.toString(16)}} // repli si crypto.subtle est absent
+const idb=(st,mode,fn)=>new Promise((ok,ko)=>{const tx=JR.db.transaction(st,mode),r=fn(tx);tx.oncomplete=()=>ok(r&&r.result!==undefined?r.result:r);tx.onerror=tx.onabort=()=>ko(tx.error)});
+const req=r=>new Promise((ok,ko)=>{r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error)});
+async function jrOuvrir(){try{JR.db=await new Promise((ok,ko)=>{const o=indexedDB.open('tradeinsight-journal',1);
+      o.onupgradeneeded=()=>{const d=o.result;d.createObjectStore('journal',{keyPath:'id'});d.createObjectStore('archives',{keyPath:'aid',autoIncrement:true});d.createObjectStore('meta',{keyPath:'k'})};
+      o.onsuccess=()=>ok(o.result);o.onerror=()=>ko(o.error)});
+    const tx=JR.db.transaction(['meta','journal'],'readonly'),m=await req(tx.objectStore('meta').get('etat'));JR.n=await req(tx.objectStore('journal').count());
+    if(m){JR.seq=m.seq;JR.debut=m.debut;JR.prev=m.prev}
+    // Empreinte de la version des agents : le code des fonctions de décision (pas la date de version du site).
+    JR.vAg=(await sha([analyse,prep,sigAt,refusEntree,choisir,ouvrir,stopTick,sortieCloture,fermer].map(f=>f.toString()).join('\n'))).slice(0,16);
+    jrVerifier()}
+  catch(e){JR.db=null;JR.err='Journal indisponible dans ce navigateur (mode privé ou stockage bloqué) : les décisions ne sont pas enregistrées.'}}
+const coeur=r=>JSON.stringify({id:r.id,ts:r.ts,agent:r.agent,type:r.type,paire:r.paire,sens:r.sens,raison:r.raison,confiance:r.confiance,prix:r.prix,entrees:r.entrees,vAgents:r.vAgents,vReglages:r.vReglages,prev:r.prev,trade:r.trade});
+async function vReglages(){const c=S.cfg;return(await sha(JSON.stringify({tf:c.tf,nb:c.nb,size:c.size,maxLoss:c.maxLoss,maxTrades:c.maxTrades,sl:c.sl,thr:c.thr,hold:c.hold,atrK:c.atrK,fee:c.fee,slip:c.slip,rsrc:c.rsrc,news:c.news,regles:Object.keys(S.rules).filter(k=>S.rules[k]).sort()}))).slice(0,16)}
+// Ajoute une ligne (les écritures passent une par une dans une file pour garder la chaîne dans l'ordre). Renvoie son numéro.
+function jrAjouter(l){const p=JR.file.then(async()=>{if(!JR.db)return 0;const r={...l,id:JR.seq+1,ts:l.ts||Date.now(),vAgents:JR.vAg,vReglages:await vReglages(),prev:JR.prev,resultat:null};
+    r.h=await sha(coeur(r));await idb(['journal','meta'],'readwrite',tx=>{tx.objectStore('journal').add(r);tx.objectStore('meta').put({k:'etat',seq:r.id,debut:JR.debut||r.ts,prev:r.h})});
+    JR.seq=r.id;JR.prev=r.h;JR.debut=JR.debut||r.ts;JR.n++;return r.id}).catch(e=>{JR.err='Écriture du journal impossible : '+(e&&e.message||e);return 0});JR.file=p;return p}
+// Complète le résultat d'une ligne existante (seul champ modifiable).
+function jrResultat(id,res){if(!id)return;JR.file=JR.file.then(()=>idb('journal','readwrite',tx=>{const st=tx.objectStore('journal'),g=st.get(id);g.onsuccess=()=>{const r=g.result;if(r&&!r.resultat){r.resultat={...res,complete:Date.now()};st.put(r)}}})).catch(()=>{})}
+const jrTout=()=>JR.db?idb('journal','readonly',tx=>tx.objectStore('journal').getAll()):Promise.resolve([]);
+async function jrVerifier(){const L=await jrTout();let prev='',bad=0;for(const r of L){if(r.prev!==prev||await sha(coeur(r))!==r.h){bad=r.id;break}prev=r.h}JR.integre=bad?`Chaîne rompue à la décision n° ${bad} : le journal a été modifié en dehors de l’appli.`:'';return bad}
+// Pour une abstention ou une entrée non exécutée, il n'y a pas de gain : on note seulement la variation du prix 1 h plus tard (information).
+async function jrCompleter(maintenant=Date.now()){if(!JR.db||!fresh())return;const ouverts=new Set([S.pos&&S.pos.jid,...(S.hist||[]).map(h=>h.jid)].filter(Boolean)),L=(await jrTout()).filter(r=>!r.resultat&&!r.trade&&!ouverts.has(r.id)&&r.paire&&r.prix&&r.prix.mid&&r.ts+H1<=maintenant).slice(0,20);
+  for(const r of L){let p=null;try{if(maintenant-(r.ts+H1)<6e5)p=LV.px[r.paire]||null;
+      else{const x=await rest(`/api/v3/klines?symbol=${r.paire}&interval=1m&startTime=${r.ts+H1}&limit=1`);if(x.ok){const j=await x.json();if(j.length)p=+j[0][4]}}}catch(e){}
+    jrResultat(r.id,p?{statut:r.type==='entrée'?'non exécutée : pas de trade':'pas de trade',variation1h:p/r.prix.mid-1}:{statut:'pas de trade',variation1h:null})}}
+setInterval(()=>jrCompleter(),6e4);
+// Archive le journal en cours (copie intégrale) puis repart d'un journal vide. Aucune ligne n'est perdue.
+async function jrArchiver(){await JR.file;const L=await jrTout();await idb(['journal','archives','meta'],'readwrite',tx=>{if(L.length)tx.objectStore('archives').add({archive:Date.now(),debut:JR.debut,n:L.length,dernierHash:JR.prev,lignes:L});
+    tx.objectStore('journal').clear();tx.objectStore('meta').put({k:'etat',seq:0,debut:0,prev:''})});JR.seq=0;JR.debut=0;JR.prev='';JR.n=0;JR.integre='';return L.length}
+const jrEntrees=(F,i,q,RA)=>{if(!F||!F.p[q])return null;const P=F.p[q],s=sigAt(P,i,S.rules);
+  return{bougie:`${TF.lab} fermée à ${new Date(F.T[i]+TF.bar).toISOString()}`,prisme:{note:+s.sc.toFixed(4),tendance:P.tr4[i],cassure:P.brk[i],regimeRSI:P.rr[i],volume:+P.vr[i].toFixed(3),atr:+P.atrP[i].toFixed(5),signaux:S.rules.sig?'nouveaux':'départ'},
+    radar:{actualite:RA.news,source:S.cfg.rsrc},bouclier:{tradesJour:S.nToday,maxTrades:S.cfg.maxTrades,perteJour:+S.lossToday.toFixed(2),perteMaxPct:S.cfg.maxLoss,solde:+S.cash.toFixed(2),arret:S.stop}}};
+const jrPrix=q=>q&&LV.bid[q]?{achat:LV.ask[q],vente:LV.bid[q],mid:(LV.ask[q]+LV.bid[q])/2}:null;
 let RA={news:'neutre',s:'Pas d’information',t:'Pas encore consulté.'};
 async function decider(t,manuel){if(LV.busy)return;LV.busy=1;try{await decider0(t,manuel)}finally{LV.busy=0}}
 async function decider0(t,manuel){const c=S.cfg,A=[],d0=today(),R=S.rules,W=v=>v>0?'hausse':v<0?'baisse':'neutre';if(S.day!==d0){S.day=d0;S.nToday=0;S.lossToday=0}
   if(!manuel&&!timer)return; // agents à l'arrêt : seules les sorties sur stop restent surveillées
-  if(!fresh()){$('msg').textContent='Données figées : aucun nouveau trade tant que les prix ne sont pas frais.';return}
-  RA=await radar();const F=marche();if(!F){$('msg').textContent='Historique insuffisant pour décider.';return}
+  if(!fresh()){jrAjouter({agent:'Bouclier',type:'abstention',paire:null,raison:'données figées : aucun nouveau trade',confiance:null,prix:null,entrees:{etatFlux:LV.st}});$('msg').textContent='Données figées : aucun nouveau trade tant que les prix ne sont pas frais.';return}
+  RA=await radar();const F=marche();if(!F){jrAjouter({agent:'Bouclier',type:'abstention',paire:null,raison:'historique insuffisant pour décider',confiance:null,prix:null,entrees:null});$('msg').textContent='Historique insuffisant pour décider.';return}
   const i=F.N-1,tb=F.T[i];LV.excl=F.Q.filter(q=>F.p[q].atrP[i]<3*rt(c));
   A.push({n:'Actualités',s:RA.s,t:RA.t});
   const ord=F.Q.slice().sort((x,y)=>Math.abs(sigAt(F.p[y],i,R).sc)-Math.abs(sigAt(F.p[x],i,R).sc));S.scan=ord.slice(0,8).map(q=>({q,sc:sigAt(F.p[q],i,R).sc}));
@@ -394,9 +441,13 @@ async function decider0(t,manuel){const c=S.cfg,A=[],d0=today(),R=S.rules,W=v=>v
     else if(-S.lossToday>=S.start*c.maxLoss/100){ok=false;rr='Bloqué : perte maximale du jour atteinte.'}else if(S.cash<c.size*c.nb*(1+c.fee/100)){ok=false;rr=`Bloqué : solde fictif insuffisant pour ${c.nb} achats de ${fmt(c.size)}.`}
     else if(!fresh()){ok=false;rr='Bloqué : données figées.'}}
   A.push({n:'Risque',s:ok?'Feu vert':'Veto',t:rr+' Le Chef ne peut pas contourner ce veto.'});
+  // Journal : la décision de Boussole (et le veto éventuel de Bouclier) est écrite ici, avant tout ordre et tout résultat.
+  const jq=act==='open'?b.q:q,jid=await jrAjouter({agent:'Boussole',type:act==='open'?'entrée':act==='close'?'sortie':'abstention',paire:jq,sens:act==='open'?b.dir:P?P.side:s.dir,raison:why,confiance:act==='open'?Math.round(b.pr*100):pc,prix:jrPrix(jq),entrees:jrEntrees(F,i,jq,RA),trade:act==='close'?P.jid||null:null});
+  if(act==='open'&&!ok)jrAjouter({agent:'Bouclier',type:'abstention',paire:jq,sens:b.dir,raison:'veto : '+rr.replace(/^Bloqué : /,''),confiance:Math.round(b.pr*100),prix:jrPrix(jq),entrees:jrEntrees(F,i,jq,RA)});
+  if(act==='close'&&P)P.jsx=jid;
   let ex='Aucun ordre.';
   if(act==='open'&&ok){const px=b.dir==='long'?LV.ask[b.q]:LV.bid[b.q];if(!px)ex='Aucun prix d’achat/vente reçu : ordre annulé.';else{
-    const N=ouvrir(F,b.q,i,b.dir,b.pr,c,R,px);N.t0=tb;N.te=Date.now();S.pos=N;S.cash-=N.size+N.fe;S.nToday+=N.nb;
+    const N=ouvrir(F,b.q,i,b.dir,b.pr,c,R,px);N.t0=tb;N.te=Date.now();N.jid=jid;S.pos=N;S.cash-=N.size+N.fe;S.nToday+=N.nb;
     ex=`${b.q} : ${N.nb} achat${N.nb>1?'s':''} fictif${N.nb>1?'s':''} de ${fmt(c.size)} (${fmt(N.size)} au total), en ${b.dir==='long'?'hausse':'baisse'} à ${fp(N.fill)} (prix ${b.dir==='long'?'vendeur':'acheteur'} + glissement), stop ${fp(N.stop)}${R.atr?' suiveur':''}.`;
     if(c.tn==='1'&&manuel&&b.dir==='long'&&TNP.includes(b.q))for(let k=0;k<N.nb;k++)ex+=' '+await testnetOrder('BUY',0,c.size,b.q);
     logA(`${b.q} : ${N.nb} × ${fmt(c.size)} en ${b.dir==='long'?'hausse':'baisse'} à ${fp(N.fill)} (indice ${Math.round(b.pr*100)} %)`)}}
@@ -537,7 +588,7 @@ function render(){
   $('hchart').innerHTML=E.length>1?`<line class="gr" x1="0" x2="300" y1="70" y2="70"/><path class="ar" d="M0,76 L${hp.map(x=>x.join(',')).join(' L')} L300,76 Z"/><polyline class="ln" points="${hp.map(x=>x.join(',')).join(' ')}"/>`:'';
   $('hchart').toggleAttribute('hidden',E.length<2);$('hemp').hidden=E.length>1;
   $('fchart').innerHTML=E.length>1?`<polyline fill="none" stroke="#4cc9a0" stroke-width="1.5" vector-effect="non-scaling-stroke" points="${E.map((v,i)=>(i/(E.length-1)*300).toFixed(1)+','+(76-(v-mn)/(mx-mn||1)*72).toFixed(1)).join(' ')}"/>`:'';
-  $('simres').innerHTML=simHTML(S.sim);$('cmpres').innerHTML=cmpHTML(S.cmp);renderAgents();paint()}
+  fwdHTML();$('simres').innerHTML=simHTML(S.sim);$('cmpres').innerHTML=cmpHTML(S.cmp);renderAgents();paint()}
 // Rafraîchissement léger 4 fois par seconde : seulement les textes qui changent (état, délai, débit, valeur, stop).
 const PV={};const put=(id,v)=>{if(PV[id]!==v){PV[id]=v;const e=$(id);if(e)e.textContent=v}};
 function paint(){const st=LV.st,cl=st==='EN DIRECT'?'ok':st==='DONNÉES FIGÉES'||st==='HORS LIGNE'?'ko':'wait';
@@ -545,6 +596,7 @@ function paint(){const st=LV.st,cl=st==='EN DIRECT'?'ok':st==='DONNÉES FIGÉES'
   put('cnote',st==='DONNÉES FIGÉES'?'Données figées : aucun nouveau trade.':LV.note||'');
   put('src',st==='EN DIRECT'?'Prix Binance en direct (lecture seule). Ordres seulement au testnet.':st==='DONNÉES FIGÉES'?'Données figées : aucun nouveau trade.':st==='HORS LIGNE'?'Binance injoignable : aucun prix, aucun trade.':'Connexion aux prix Binance…');
   put('stock',SAVEERR||(SAVED?`Dernière sauvegarde automatique : ${hr(SAVED)} · ${S.hist.length} trades enregistrés.`:'Aucune sauvegarde pour l’instant.'));
+  if(JR.db&&PV.jn!==JR.n+'|'+JR.integre){PV.jn=JR.n+'|'+JR.integre;fwdHTML()}
   const n=prochaine();put('fst',timer?`EN SERVICE · décision dans ${n.m} min`:"AGENTS À L'ARRÊT");
   const v=valeur();put('bal',fmt(v));put('f1',fmt(v));
   const P=S.pos;if(P){const px=(P.side==='long'?LV.bid[P.q]:LV.ask[P.q])||P.px;put('plat',fmt((P.side==='long'?1:-1)*P.n*(px-P.fill)));put('pstop',fp(P.stop))}}
@@ -578,6 +630,10 @@ function cmpHTML(C){if(!C||C.v!==1||!C.rows.length)return'<span class="mut">Pas 
   <div class="tw"><table class="st"><thead><tr><th></th><th>Trades test</th><th>Bilan test</th><th>PF test</th><th>Pire baisse test</th><th>Acheter et garder (test)</th><th>Bilan entraînement</th><th>Alertes</th></tr></thead><tbody>
   ${C.rows.map(x=>ln(x,'base','départ')+ln(x,'act','active')).join('')}</tbody></table></div>
   <p class="mut">* moins de 30 trades : trop peu pour conclure. Les règles actives ont été choisies avec la durée « ${C.tfLab} » : sur les autres durées, elles n’ont pas été sélectionnées pour elles. Sur environ 2 mois, la durée 1 h donne peu de trades. Le passé ne garantit pas l’avenir.</p>`}
+function fwdHTML(){const e=$('fwd');if(!e)return;if(!JR.db){e.innerHTML=`<span class="mut">${JR.err||'Ouverture du journal…'}</span>`;return}
+  const d=JR.debut?Date.now()-JR.debut:0,j=Math.floor(d/864e5),h=Math.floor(d%864e5/H1),m=Math.floor(d%H1/6e4);
+  e.innerHTML=`<b id="fwdn">${JR.n}</b> décision${JR.n>1?'s':''} enregistrée${JR.n>1?'s':''}. ${JR.debut?`Forward test en cours depuis <b>${j} j ${h} h ${m} min</b> (début le ${new Date(JR.debut).toLocaleString('fr-FR')}).`:'Le forward test commencera à la première décision.'}
+  <br><span class="mut">Version des agents ${JR.vAg||'–'}. ${JR.integre===null?'Vérification de la chaîne en cours…':JR.integre?'⚠ '+JR.integre:'Chaîne d’empreintes intacte : aucune ligne modifiée.'} Un forward test se juge sur des semaines de décisions, pas sur quelques heures.</span>`}
 function fillCfg(){for(const k in S.cfg)if($(k))$(k).value=S.cfg[k]}
 let timer=null;
 function stopAuto(m){clearTimeout(timer);timer=null;$('auto').textContent=$('auto2').textContent='Démarrer les agents';$('auto').classList.remove('stop');
@@ -599,6 +655,14 @@ let RZ=0;$('reset').onclick=()=>{const b=$('reset');
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
   document.querySelectorAll('.sec').forEach((s,i)=>s.classList.toggle('on',i==b.dataset.t))});
 $('auto2').onclick=()=>$('auto').onclick();
+$('jcsv').onclick=async()=>{await JR.file;const L=await jrTout(),n=x=>x===undefined||x===null||!isFinite(x)?'':String(+(+x).toFixed(8)).replace('.',','),t=x=>(x==null?'':String(x)).replace(/[;\r\n]/g,',');
+  const H=['numero','horodatage','agent','decision','paire','sens','raison','indice_confiance','prix_achat','prix_vente','note_prisme','tendance_longue','cassure','regime_rsi','volume','atr','actualite','version_agents','version_reglages','resultat','gain_net_usdt','frais_usdt','glissement_usdt','variation_prix_1h','empreinte','empreinte_precedente'];
+  const rows=L.map(r=>{const p=r.entrees&&r.entrees.prisme||{},x=r.resultat||{};return[r.id,new Date(r.ts).toLocaleString('fr-FR'),r.agent,r.type,r.paire||'',r.sens==='long'?'hausse':r.sens==='short'?'baisse':'',t(r.raison),n(r.confiance),n(r.prix&&r.prix.achat),n(r.prix&&r.prix.vente),n(p.note),n(p.tendance),n(p.cassure),n(p.regimeRSI),n(p.volume),n(p.atr),t(r.entrees&&r.entrees.radar&&r.entrees.radar.actualite),r.vAgents,r.vReglages,t(x.statut||'en attente'),n(x.net),n(x.frais),n(x.glissement),n(x.variation1h),r.h,r.prev].join(';')});
+  telecharger(`tradeinsight-journal-${jour()}.csv`,'text/csv;charset=utf-8','﻿'+[H.join(';'),...rows].join('\r\n'));$('setmsg').textContent=`${L.length} décisions exportées.`};
+$('jjson').onclick=async()=>{await JR.file;const L=await jrTout(),A=JR.db?await idb('archives','readonly',tx=>tx.objectStore('archives').getAll()):[];
+  telecharger(`tradeinsight-journal-${jour()}.json`,'application/json',JSON.stringify({app:'TradeInsight IA',argentFictif:true,exporte:new Date().toISOString(),versionAgents:JR.vAg,chaine:JR.integre||'intacte',journal:L,archives:A},null,1));$('setmsg').textContent=`${L.length} décisions et ${A.length} archive(s) exportées.`};
+let JZ=0;$('jreset').onclick=async()=>{const b=$('jreset');if(!JZ){JZ=setTimeout(()=>{JZ=0;b.textContent='Remettre le journal à zéro (archivé)'},4000);b.textContent='Touche encore : le journal sera archivé puis vidé';return}
+  clearTimeout(JZ);JZ=0;b.textContent='Remettre le journal à zéro (archivé)';try{const n=await jrArchiver();$('setmsg').textContent=`Journal archivé (${n} décisions) puis remis à zéro. Les archives restent dans l’export JSON.`;render()}catch(e){$('setmsg').textContent='Archivage impossible : '+(e&&e.message||e)}};
 // Export : un fichier téléchargé par le navigateur. CSV au format français (séparateur ;, virgule décimale) pour Excel ou Numbers.
 function telecharger(nom,type,txt){const u=URL.createObjectURL(new Blob([txt],{type}));const a=document.createElement('a');a.href=u;a.download=nom;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}
 const jour=()=>new Date().toISOString().slice(0,16).replace(/[-:T]/g,'');
@@ -624,7 +688,7 @@ $('simgo').onclick=async()=>{const b=$('simgo');b.disabled=true;const st=m=>$('s
     const M=mesurer(prep(al.D),S.cfg);S.sim=M;S.rules=M.R;save();render();
     st(`Mesure terminée. Changements gardés pour les agents : ${RULES().join(', ')||'aucun (version de départ)'}.${al.ecartees.length||bad.length?' Paires écartées (historique trop court ou inexistantes) : '+[...new Set([...al.ecartees,...bad])].join(', ')+'.':''}`)}
   catch(e){st('Erreur pendant la mesure : '+(e&&e.message||e))}b.disabled=false};
-fillCfg();render();$('ver').textContent=`Version du ${VERSION} (heure de Paris)`;
+jrOuvrir().then(render);fillCfg();render();$('ver').textContent=`Version du ${VERSION} (heure de Paris)`;
 (async()=>{try{await chargerInitial();await radar().then(r=>RA=r);connecter()}catch(e){LV.note=(e&&e.message)||'Binance injoignable';
   LV.st='HORS LIGNE';setTimeout(function re(){chargerInitial().then(connecter).catch(()=>setTimeout(re,30000))},30000)}})();
 </script></body></html>
