@@ -111,6 +111,7 @@ details.sect>summary{margin-top:14px;padding:12px;border:1px solid var(--line);b
 <div class="act2"><button class="btn ghost" id="go">Évaluer maintenant</button><button class="btn stop" id="kill">Arrêt d'urgence</button></div>
 <div class="mut status" id="auto-st">Agents à l’arrêt.</div>
 <div class="mut" id="msg"></div>
+<h2>Proposition du jour</h2><div class="card" id="prop"><span class="mut">Lecture du serveur…</span></div>
 <h2>Niveau de preuve</h2><div class="card" id="preuve"></div>
 <h2>Serveur 24 h/24</h2><div class="card" id="srv"></div>
 <h2>Dernière décision</h2><div class="card" id="dec">Aucune décision pour l'instant.</div>
@@ -156,6 +157,7 @@ details.sect>summary{margin-top:14px;padding:12px;border:1px solid var(--line);b
 <h2>Limites de risque</h2>
 <div class="mut">Appliquées par le code. Les agents ne peuvent pas les modifier.</div>
 <div class="mut" style="margin-top:8px">Marchés : toutes les paires crypto et forex sont analysées en permanence. Une paire que Binance ne propose pas est ignorée automatiquement.</div>
+<label>Capital réel prévu, pour calculer les montants de la proposition du jour (€)<input id="capReel" type="number" min="0"></label>
 <label>Taille d'un achat (USDT)<input id="size" type="number" min="10"></label>
 <label>Achats par décision<input id="nb" type="number" min="1" max="10" step="1"></label>
 <div class="mut">Quand tous les agents sont d'accord, Caramel passe ce nombre d'achats d'un coup : la position vaut ce nombre × la taille d'un achat. Les gains et les pertes sont multipliés d'autant, et chaque achat compte dans le maximum de trades par jour.</div>
@@ -539,7 +541,7 @@ function portefeuille(F,from,to,c,regle){const Q=F.Q,n=Q.length,k=Math.max(1,Mat
     if((t-from)%k===0){const v=val();st._v=v;st._f=f;const w=regle(F,t,st,n,(t-from)/k);if(w)for(const q in w){const d=v*w[q]-pos[q];if(Math.abs(d)>v*1e-4){const co=Math.abs(d)*f;cash-=d+co;pos[q]+=d;fees+=co;nTr++}}}
     const v=val();pk=Math.max(pk,v);dd=Math.max(dd,(pk-v)/pk)}
   for(const q of Q)if(pos[q]){const co=pos[q]*f;cash+=pos[q]-co;fees+=co;pos[q]=0;nTr++}J.push(cash);
-  const TR=st._T||[];return{pnl:cash-1e4,dd,fees,n:nTr,jrs:J,nT:TR.length,expR:TR.length?TR.reduce((a,x)=>a+x.r,0)/TR.length:null,wrT:TR.length?TR.filter(x=>x.r>0).length/TR.length:null,arret:st._arret||null}}
+  const TR=st._T||[];return{pnl:cash-1e4,dd,fees,n:nTr,jrs:J,nT:TR.length,expR:TR.length?TR.reduce((a,x)=>a+x.r,0)/TR.length:null,wrT:TR.length?TR.filter(x=>x.r>0).length/TR.length:null,arret:st._arret||null,st}}
 // ---------- Stratégies du dossier « bot-trading » (S1 à S5), règles écrites par l'utilisateur, appliquées telles quelles ----------
 // Bougies journalières (UTC) reconstruites ; décision une fois par jour, juste après la clôture journalière, au prix de ce moment.
 // Les stops sont vérifiés sur la clôture journalière (pas en cours de journée) : c'est plus simple et un peu moins favorable.
@@ -584,7 +586,7 @@ const STRAT_PRO={
 function reglePro(id){const S=STRAT_PRO[id];return(F,t,st,n)=>{const P0=F.p[F.Q[0]],k=P0.ji[t];if(!k||k===st._kj)return null;st._kj=k;const I=q=>F.p[q].ji[t]-1,o={},v=st._v||1e4,f=st._f||0;
     st._T=st._T||[];st._pk=Math.max(st._pk||v,v);const mois=new Date(F.T[t]+TF.bar).toISOString().slice(0,7);if(st._mois!==mois){st._mois=mois;st._m0=v}
     const pj=st._j0?v/st._j0-1:0;st._j0=v;const dd=(st._pk-v)/st._pk;st._pos=st._pos||{};const pos=st._pos;
-    const fermer=(q,raison)=>{const p=pos[q],P=F.p[q],x=P.jc[I(q)];st._T.push({q,r:((x/p.e-1)-2*f)/p.rf,raison});delete pos[q];o[q]=0};
+    const fermer=(q,raison)=>{const p=pos[q],P=F.p[q],x=P.jc[I(q)];st._T.push({q,r:((x/p.e-1)-2*f)/p.rf,raison,j:I(q),e:p.e,x});delete pos[q];o[q]=0};
     if(st._arret)return null;
     if(dd>=.15){for(const q in pos)fermer(q,'arrêt total : baisse de 15 % depuis le plus haut');st._arret=new Date(F.T[t]).toISOString();return o}
     if(S.rotation){if(mois===st._rot)return null;st._rot=mois;const L=F.Q.map(q=>{const P=F.p[q],i=I(q);return{q,P,i,m:i>=182?P.jc[i]/P.jc[i-182]-1:null,b:mmJ(P.jc,i,200)}}).filter(x=>x.m!==null).sort((a,b)=>b.m-a.m).slice(0,2);
@@ -602,6 +604,19 @@ function reglePro(id){const S=STRAT_PRO[id];return(F,t,st,n)=>{const P0=F.p[F.Q[
 for(const id in STRAT_PRO)FAMILLES[id]={nom:STRAT_PRO[id].nom,txt:STRAT_PRO[id].txt,pro:true,regle:reglePro(id)};
 // Statut selon 05_backtest_protocole.md : VALIDÉE seulement si tous les critères sont remplis ; SUSPENDUE si, en forward test,
 // l'espérance des 30 derniers trades devient négative ou si la baisse dépasse 1,5 × celle du backtest ; sinon À TESTER.
+// Données journalières seules (une crypto, une paire forex) : chaque « bougie » est une journée entière, décidée à sa clôture.
+// J : {paire:[{t,o,h,l,c,v}]} journées fermées, alignées sur les dates communes ; btcJ : journées du bitcoin pour le filtre de régime.
+function Fjour(J,btcJ){setTF(60);const Q=Object.keys(J).filter(q=>J[q].length);if(!Q.length)return null;const dates=Q.map(q=>new Set(J[q].map(x=>x.t)));
+  const T0=J[Q[0]].map(x=>x.t).filter(t=>dates.every(d=>d.has(t)));const F={Q,N:T0.length,T:T0.map(t=>t+864e5-TF.bar),p:{},jour:true};
+  for(const q of Q){const m=new Map(J[q].map(x=>[x.t,x])),A=T0.map(t=>m.get(t));F.p[q]={c:A.map(x=>x.c),jc:A.map(x=>x.c),jh:A.map(x=>x.h??x.c),jl:A.map(x=>x.l??x.c),jv:A.map(x=>x.v||0),ji:A.map((x,i)=>i+1)}}
+  F.reg=regimeBTC(F.T,btcJ);return F}
+// Proposition du jour (format de 03_checklist_trade.md) pour la stratégie gelée, en rejouant depuis la date de gel (pas avant : un arrêt
+// à 15 % survenu des années plus tôt ne doit pas bloquer aujourd'hui). La dernière journée fermée donne l'action à faire maintenant.
+function proposition(F,id,depuis,c){const from=Math.max(0,F.T.findIndex(t=>t>=depuis));if(from<0||from>=F.N)return null;const r=portefeuille(F,from,F.N,c,FAMILLES[id].regle),st=r.st,i=F.N-1,P0=st._pos||{};
+  return{jour:F.T[i]+TF.bar-864e5,valeur:1e4+r.pnl,baisse:r.dd,arret:st._arret||null,bloque:st._bloque||'',L:F.Q.map(q=>{const P=F.p[q],p=P0[q],x=P.jc[i],sortie=(st._T||[]).filter(z=>z.q===q&&z.j===i).pop();
+    const a=sortie?{action:'VENDRE',raison:sortie.raison,prix:x,resultatR:sortie.r}:p&&p.j===i?{action:'ACHETER',prix:x,stop:p.stop,objectif:p.objectif||null,part:p.w,risque:p.w*(x-p.stop)/x,gr:p.objectif?(p.objectif-x)/(x-p.stop):null}
+      :p?{action:'GARDER',prix:x,entree:p.e,stop:p.stop,objectif:p.objectif||null,part:p.w,risque:Math.max(0,p.w*(x-p.stop)/x)}:{action:'RIEN',prix:x,raison:st._arret?'stratégie arrêtée (baisse de 15 %)':st._bloque||'aucun signal aujourd’hui'};
+    return{paire:q,...a}})}}
 function statutPro(x,fw){const c=[[x.expR!==null&&x.expR>0,'espérance positive après frais'],[x.nT>=100,`au moins 100 trades (${x.nT})`],[x.dd<.2,'pire baisse sous 20 %'],
     [x.ent>0&&x.test>0,'positive sur les 70 % d’optimisation et sur les 30 % de vérification'],[!!(fw&&fw.jours>=28&&fw.valeur>=1e4*(1-1.5*x.dd)),'paper trading de 4 semaines cohérent']];
   const sus=fw&&(fw.dd>1.5*x.dd||(fw.n30>=30&&fw.esp30<0));return{statut:sus?'SUSPENDUE':c.every(z=>z[0])?'VALIDÉE':'À TESTER',criteres:c}}
@@ -633,10 +648,10 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 22:51';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 23:01';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({pk:10000,cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
- cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:.5,ddMax:15,hb:5,npT1:30,npJ1:30,npT2:100,npJ2:90,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
+ cfg:{capReel:500,size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:.5,ddMax:15,hb:5,npT1:30,npJ1:30,npT2:100,npJ2:90,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
 let S=D(),KEYS={k:'',s:''};
 try{const j=localStorage.getItem('tiq');if(j)S=Object.assign(D(),JSON.parse(j))}catch(e){}
 S.cfg=Object.assign(D().cfg,S.cfg);if(!S.cfg5){S.cfg.maxRuns=1440;S.cfg5=1}if(!S.cfg6){S.cfg.tf=10;S.cfg6=1}if(!S.cfg7){S.cfg.tf=5;S.cfg.nb=3;S.cfg7=1}setTF(S.cfg.tf);if(S.sim&&S.sim.tf!==TF.min){S.sim=0;S.rules={}}if(S.sim&&S.sim.v!==6){S.sim=0;S.rules={}}S.rules=S.rules||{};
@@ -945,6 +960,18 @@ function renderAgents(){vagHTML();delete PV.fst;
     <details data-k="${g.n}"${ouv.has(g.n)?' open':''}><summary>Ce qu’il regarde</summary>${a&&court(a.t)!==a.t?`<p><b>Détail :</b> ${a.t}</p>`:''}<p>${E[g.n]}</p>${g.n==='Journal'&&S.sim?'<p>'+simLine(S.sim)+'</p>':''}<p class="mut2">Règles fixes écrites dans le code, sans modèle d’IA.</p></details></div></div>`}).join('');
   if(hx!==REPS_){REPS_=hx;$('reps').innerHTML=hx}} // réécrit seulement si quelque chose a changé : animations sans à-coups
 let REPS_='';
+// Proposition du jour (serveur) : stratégie gelée appliquée à la crypto et à la paire forex choisies, format de la liste de contrôle.
+// Ce n'est qu'une proposition du bot : l'utilisateur décide et passe l'ordre lui-même, chez son courtier.
+function propHTML(){const e=$('prop');if(!e)return;const P=SV.prop;if(!P||!P.propositions){e.innerHTML=`<span class="mut">${SV.at?'Pas encore de proposition publiée par le serveur.':'Lecture du serveur…'}</span>`;return}
+  const cap=+S.cfg.capReel||0,eur=x=>cap?` (${(x*cap).toFixed(0)} € sur ${cap} €)`:'',p2=x=>(x*100).toFixed(1).replace('.',',')+' %',px=x=>x==null?'–':x<10?x.toFixed(4):x.toFixed(2),nom=q=>q.replace('USDT','')+(/USDT$/.test(q)?' · crypto':' · forex');
+  const ch={ACHETER:'long',VENDRE:'short',GARDER:'out',RIEN:''},fed=FOMC.find(x=>x>Date.now()&&x-Date.now()<36*H1),jours=(Date.now()-Date.parse(P.depuis))/864e5;
+  e.innerHTML=`<div class="mut">${P.nom||P.strategie} · gelée le ${new Date(P.depuis).toLocaleDateString('fr-FR')} · journée du ${P.propositions[P.actifs[0]]&&P.propositions[P.actifs[0]].jour?new Date(P.propositions[P.actifs[0]].jour).toLocaleDateString('fr-FR'):'–'}${P.faux?' · ⚠ prix inventés (test)':''}</div>`+
+    P.actifs.concat(P.controle||[]).map(q=>{const x=P.propositions[q];if(!x)return'';if(x.erreur)return`<div class="ess"><b>${nom(q)}</b> : ${x.erreur}. <span class="mut">${x.source||''}</span></div>`;
+      const d=x.action==='ACHETER'?`Entrée vers ${px(x.prix)} · stop ${px(x.stop)} · objectif ${x.objectif?px(x.objectif):'aucun (stop suiveur)'} · taille ${p2(x.part)} du capital${eur(x.part)} · risque ${p2(x.risque)}${eur(x.risque)}${x.gr?` · gain/risque ${x.gr.toFixed(1).replace('.',',')}`:''}`
+        :x.action==='GARDER'?`Position gardée (entrée ${px(x.entree)}) · stop à placer à ${px(x.stop)} · taille ${p2(x.part)} du capital`
+        :x.action==='VENDRE'?`Vendre vers ${px(x.prix)} : ${x.raison}`:`Rien à faire : ${x.raison}.`;
+      return`<div class="ess"><b>${nom(q)}</b>${x.controle?' <span class="mut">(contrôle seulement, pas à trader)</span>':''} <span class="chip ${ch[x.action]||''}">${x.action}</span><br>${d}<br><span class="mut">Données : ${x.source}. Coûts comptés : ${String(x.couts.fee).replace('.',',')} % + ${String(x.couts.slip).replace('.',',')} % par côté. Compte fictif de la stratégie : ${fmt(x.valeur)}.</span></div>`}).join('')+
+    `<p class="mut">${fed?`⚠ Annonce de la Fed le ${new Date(fed).toLocaleString('fr-FR')} : prudence. `:''}Proposition du bot, pas un conseil : c’est toi qui décides et qui passes l’ordre. ${jours<28?`Période de test en argent fictif : encore ${Math.max(0,Math.ceil(28-jours))} jours avant d’envisager un petit montant réel.`:'4 semaines de test écoulées : comparer le résultat fictif au backtest avant tout argent réel.'}</p>`}
 // Première phrase seulement dans la fiche (le reste est dans « Ce qu'il regarde ») ; un indice reste présenté comme une note du bot.
 const court=t=>{t=String(t||'');const m=t.match(/^.{20,140}?[.!?](\s|$)/),c=m?m[0].trim():t.length>140?t.slice(0,139)+'…':t;return/indice \d+ %/.test(c)&&!/pas une probabilité/.test(c)?c.replace(/\.$/,'')+' (note du bot, pas une probabilité).':c};
 // Décisions prises par le serveur (GitHub, 24 h/24, même quand ce téléphone ou ce PC est éteint), avec les prénoms des agents.
@@ -975,7 +1002,7 @@ function render(){
   $('hchart').innerHTML=E.length>1?`<line class="gr" x1="0" x2="300" y1="70" y2="70"/><path class="ar" d="M0,76 L${hp.map(x=>x.join(',')).join(' L')} L300,76 Z"/><polyline class="ln" points="${hp.map(x=>x.join(',')).join(' ')}"/>`:'';
   $('hchart').toggleAttribute('hidden',E.length<2);$('hemp').hidden=E.length>1;
   $('fchart').innerHTML=E.length>1?`<polyline fill="none" stroke="#4cc9a0" stroke-width="1.5" vector-effect="non-scaling-stroke" points="${E.map((v,i)=>(i/(E.length-1)*300).toFixed(1)+','+(76-(v-mn)/(mx-mn||1)*72).toFixed(1)).join(' ')}"/>`:'';
-  fwdHTML();$('simres').innerHTML=simHTML(S.sim);$('cmpres').innerHTML=cmpHTML(S.cmp);$('robres').innerHTML=robHTML(S.robu);renderAgents();paint()}
+  fwdHTML();propHTML();$('simres').innerHTML=simHTML(S.sim);$('cmpres').innerHTML=cmpHTML(S.cmp);$('robres').innerHTML=robHTML(S.robu);renderAgents();paint()}
 // Rafraîchissement léger 4 fois par seconde : seulement les textes qui changent (état, délai, débit, valeur, stop).
 const PV={};const put=(id,v)=>{if(PV[id]!==v){PV[id]=v;const e=$(id);if(e)e.textContent=v}};
 function paint(){const st=LV.st,cl=st==='EN DIRECT'?'ok':st==='DONNÉES FIGÉES'||st==='HORS LIGNE'?'ko':'wait';
@@ -1041,10 +1068,10 @@ function cmpHTML(C){if(!C||C.v!==1||!C.rows.length)return'<span class="mut">Pas 
 // résultat sous coûts × 2 (test de robustesse) et Sharpe corrigé du nombre d'essais (SR > SR0, soit DSR > 50 %).
 // Serveur : GitHub Actions fait tourner le même moteur toutes les 5 minutes avec une configuration gelée et publie ses fichiers
 // sur la branche forward-test du dépôt public. Le site les lit en lecture seule (aucune donnée envoyée).
-const SRV='https://raw.githubusercontent.com/claudecode988/public-iatrade/forward-test/forward/',SV={res:null,lg:null,cfg:null,fam:null,der:null,err:'',at:0};
+const SRV='https://raw.githubusercontent.com/claudecode988/public-iatrade/forward-test/forward/',SV={res:null,lg:null,cfg:null,fam:null,der:null,prop:null,err:'',at:0};
 async function lireServeur(){try{const g=async f=>{const r=await fetch(SRV+f+'?t='+Math.floor(Date.now()/6e4),{cache:'no-store'});return r.ok?r.json():null};
-    [SV.res,SV.cfg,SV.lg,SV.fam,SV.der]=await Promise.all([g('resume.json'),g('config.json'),g('mesure-longue.json'),g('familles-resume.json'),g('derniers.json')]);SV.err=SV.cfg?'':'Pas encore de données publiées par le serveur.'}
-  catch(e){SV.err='Serveur injoignable depuis ce navigateur.'}SV.at=Date.now();srvHTML();preuveHTML();absHTML()}
+    [SV.res,SV.cfg,SV.lg,SV.fam,SV.der,SV.prop]=await Promise.all([g('resume.json'),g('config.json'),g('mesure-longue.json'),g('familles-resume.json'),g('derniers.json'),g('proposition.json')]);SV.err=SV.cfg?'':'Pas encore de données publiées par le serveur.'}
+  catch(e){SV.err='Serveur injoignable depuis ce navigateur.'}SV.at=Date.now();srvHTML();preuveHTML();absHTML();propHTML()}
 setTimeout(lireServeur,1500);setInterval(lireServeur,5*6e4);
 function srvHTML(){const e=$('srv');if(!e)return;const r=SV.res,g=SV.cfg,L=SV.lg,ouv=!!(e.querySelector('details')||{}).open;
   if(!g&&!r){e.innerHTML=`<span class="mut">${SV.at?SV.err:'Lecture des données du serveur…'} Le serveur décide toutes les 5 minutes, même quand cette page est fermée.</span>`;return}
@@ -1112,7 +1139,7 @@ $('auto').onclick=()=>{if(timer){stopAuto();return}
 $('go').onclick=()=>decider(0,true);
 $('kill2').onclick=()=>$('kill').onclick();
 $('kill').onclick=()=>{S.stop=!S.stop;if(S.stop&&timer)stopAuto('Arrêt d\'urgence actif : agents arrêtés, aucune nouvelle entrée. Un stop ouvert reste surveillé.');save();render();$('msg').textContent=S.stop?'Tout est suspendu : aucun nouvel ordre.':'Reprise possible.'};
-const NUM={npT1:[1,1e4],npJ1:[1,3650],npT2:[1,1e5],npJ2:[1,3650],riskPct:[.05,5],ddMax:[1,50],hb:[2,60],nb:[1,10],size:[10,1e6],maxLoss:[.5,100],maxTrades:[1,1000],sl:[.5,50],thr:[50,99],hold:[0,200],atrK:[.5,10],fee:[0,2],slip:[0,2],maxRuns:[1,100000]};
+const NUM={capReel:[0,1e7],npT1:[1,1e4],npJ1:[1,3650],npT2:[1,1e5],npJ2:[1,3650],riskPct:[.05,5],ddMax:[1,50],hb:[2,60],nb:[1,10],size:[10,1e6],maxLoss:[.5,100],maxTrades:[1,1000],sl:[.5,50],thr:[50,99],hold:[0,200],atrK:[.5,10],fee:[0,2],slip:[0,2],maxRuns:[1,100000]};
 const STRAT=['tf','nb','size','maxLoss','maxTrades','sl','thr','hold','atrK','fee','slip','riskPct','ddMax','rsrc','news'];
 $('save').onclick=()=>{const avant=JSON.stringify(STRAT.map(k=>S.cfg[k])),cfg0={...S.cfg};for(const k in NUM){const v=parseFloat(String($(k).value).replace(',','.'));if(isFinite(v))S.cfg[k]=Math.min(NUM[k][1],Math.max(NUM[k][0],v))}
   const tf0=S.cfg.tf;S.cfg.tf=+$('tf').value;S.cfg.news=$('news').value;S.cfg.rsrc=$('rsrc').value;S.cfg.tn=$('tn').value;KEYS={k:$('k').value.trim(),s:$('s').value.trim()};RD.at=0;
