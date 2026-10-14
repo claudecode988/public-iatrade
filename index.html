@@ -87,6 +87,8 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 tr.cand th{color:var(--up)}
 .alertes p{margin:6px 0;padding:8px 10px;border-radius:10px;background:var(--warn);font-size:14px}.alertes p.ok{background:var(--chip);color:var(--mut)}
 .st.cote{width:100%;white-space:normal}.st.cote td{text-align:right;white-space:nowrap}.st.cote th:first-child{padding-left:0}
+details.plus>summary{cursor:pointer;color:var(--mut);font-size:14px;font-weight:600;padding:8px 0 2px;list-style:none}details.plus>summary::-webkit-details-marker{display:none}
+details.plus>summary:before{content:'▸ '}details.plus[open]>summary:before{content:'▾ '}details.sect>summary{margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
 .ess{padding:6px 0;border-top:1px solid var(--line)}.pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:12px;font-weight:700}.pill.ok{background:var(--up);color:var(--card)}.pill.no{background:var(--line);color:var(--ink)}
 </style></head><body>
 <div class="warn">Simulation avec argent fictif uniquement. Aucun conseil financier. Le trading réel comporte un risque de perte.</div>
@@ -94,7 +96,7 @@ tr.cand th{color:var(--up)}
 <header class="top"><div class="brand"><span class="logo" aria-hidden="true">TI</span><div><b>TradeInsight</b><span class="mut" id="src">Entraînement avec un portefeuille fictif.</span></div></div><span class="live" id="live">À l'arrêt</span></header>
 
 <section class="sec on" id="t0">
-<div class="card hero"><span class="lbl">Valeur du portefeuille fictif (frais et glissement inclus)</span><span class="hv" id="bal">–</span><span class="delta" id="ret">–</span>
+<div class="card hero"><span class="lbl" title="Frais et glissement inclus">Portefeuille fictif</span><span class="hv" id="bal">–</span><span class="delta" id="ret">–</span>
 <svg id="hchart" viewBox="0 0 300 76" preserveAspectRatio="none" role="img" aria-label="Évolution de la valeur du portefeuille fictif"></svg><div class="hempty" id="hemp">La courbe apparaît après le premier tour des agents.</div></div>
 <div class="kpis">
 <div class="kpi"><span title="Frais et glissement inclus">Gains réalisés nets</span><b id="pnl">–</b></div>
@@ -106,17 +108,19 @@ tr.cand th{color:var(--up)}
 </div>
 <button class="btn" id="auto">Démarrer les agents</button>
 <div class="act2"><button class="btn ghost" id="go">Évaluer maintenant</button><button class="btn stop" id="kill">Arrêt d'urgence</button></div>
-<div class="mut status" id="auto-st">Les agents sont à l'arrêt : aucune nouvelle entrée. Ils ne tournent que quand tu les démarres.</div>
+<div class="mut status" id="auto-st">Agents à l’arrêt.</div>
 <div class="mut" id="msg"></div>
 <h2>Niveau de preuve</h2><div class="card" id="preuve"></div>
-<h2>Forward test 24 h/24 (serveur)</h2><div class="card" id="srv"></div>
-<h2>Forward test (journal de décisions)</h2><div class="card" id="fwd"></div>
-<h2>Dernière décision du Chef</h2><div class="card" id="dec">Aucune décision pour l'instant. Touche « Démarrer les agents » ou « Évaluer maintenant ».</div>
-<h2>Position et fiabilité</h2><div class="card" id="cal"></div>
+<h2>Serveur 24 h/24</h2><div class="card" id="srv"></div>
+<h2>Dernière décision</h2><div class="card" id="dec">Aucune décision pour l'instant.</div>
+<h2>Position</h2><div class="card" id="cal"></div>
+<details class="plus sect"><summary>Plus de détails (journal, mesures de ce navigateur)</summary>
+<h2>Journal de décisions</h2><div class="card" id="fwd"></div>
 <h2>Mesure sur l'historique réel</h2><div class="card" id="simres"></div>
 <h2>Test de robustesse aux coûts</h2><div class="card" id="robres"></div>
 <h2>Comparatif des durées de bougies</h2><div class="card" id="cmpres"></div>
-<h2>Journal</h2><div class="card" id="log"><span class="mut">Le journal est vide.</span></div>
+<h2>Activité</h2><div class="card" id="log"><span class="mut">Le journal est vide.</span></div>
+</details>
 <p class="foot">La confiance affichée est un indice du bot, pas une probabilité. Les résultats passés ne garantissent rien.</p>
 <p class="foot" id="ver"></p>
 </section>
@@ -540,7 +544,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 20:59';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 21:07';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({pk:10000,cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:.5,ddMax:15,hb:5,npT1:30,npJ1:30,npT2:100,npJ2:90,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
@@ -950,16 +954,16 @@ async function lireServeur(){try{const g=async f=>{const r=await fetch(SRV+f+'?t
     [SV.res,SV.cfg,SV.lg,SV.fam,SV.der]=await Promise.all([g('resume.json'),g('config.json'),g('mesure-longue.json'),g('familles-resume.json'),g('derniers.json')]);SV.err=SV.cfg?'':'Pas encore de données publiées par le serveur.'}
   catch(e){SV.err='Serveur injoignable depuis ce navigateur.'}SV.at=Date.now();srvHTML();preuveHTML();absHTML()}
 setTimeout(lireServeur,1500);setInterval(lireServeur,5*6e4);
-function srvHTML(){const e=$('srv');if(!e)return;const r=SV.res,g=SV.cfg,L=SV.lg;
+function srvHTML(){const e=$('srv');if(!e)return;const r=SV.res,g=SV.cfg,L=SV.lg,ouv=!!(e.querySelector('details')||{}).open;
   if(!g&&!r){e.innerHTML=`<span class="mut">${SV.at?SV.err:'Lecture des données du serveur…'} Le serveur décide toutes les 5 minutes, même quand cette page est fermée.</span>`;return}
   const j=r?(Date.now()-r.debut)/864e5:0,pf=x=>x===null||x===undefined?'–':x.toFixed(2).replace('.',',');
   e.innerHTML=(r?`<div class="dd"><span class="chip ${Date.now()-r.maj<20*6e4?'long':'short'}">${Date.now()-r.maj<20*6e4?'EN SERVICE':'EN RETARD'}</span><span class="mut">dernier passage ${new Date(r.maj).toLocaleString('fr-FR')}</span></div>
     <b>${r.decisions}</b> décisions en <b>${Math.floor(j)} j ${Math.floor(j%1*24)} h</b> · ${r.trades} trades clos · bilan net <span class="${r.bilan>=0?'up':'dn'}">${fmt(r.bilan)}</span> · PF ${pf(r.pf)} · baisse depuis le plus haut ${pct(r.baisse)}
     ${r.position?`<br>Position ouverte : ${r.position.paire} en ${r.position.sens==='long'?'hausse':'baisse'}, ${fmt(r.position.taille)}, stop ${fp(r.position.stop)}.`:''}
-    <br><span class="mut">Bougies de ${r.tf}, configuration gelée le ${g&&g.geleeLe?new Date(g.geleeLe).toLocaleString('fr-FR'):'–'} (règles : ${(r.regles||[]).join(', ')||'version de départ'}). Retard médian d’un passage : ${r.retardMedianS??'–'} s (GitHub lance parfois les tâches en retard). Journal public, ajout seulement, chaîné par empreintes.${r.faux?' ⚠ Données de test (prix inventés).':''}</span>`:'<span class="mut">Configuration gelée publiée ; premier passage du serveur en attente.</span>')+
+    <details class="plus"><summary>Détails et mesures du serveur</summary><span class="mut">Bougies de ${r.tf}, configuration gelée le ${g&&g.geleeLe?new Date(g.geleeLe).toLocaleString('fr-FR'):'–'} (règles : ${(r.regles||[]).join(', ')||'version de départ'}). Retard médian d’un passage : ${r.retardMedianS??'–'} s (GitHub lance parfois les tâches en retard). Journal public, ajout seulement, chaîné par empreintes.${r.faux?' ⚠ Données de test (prix inventés).':''}</span>`:'<span class="mut">Configuration gelée publiée ; premier passage du serveur en attente.</span><details class="plus"><summary>Mesures du serveur</summary>')+
    (L?`<h3>Mesure longue (${L.mois} mois, serveur)</h3>${L.wf?`Walk-forward : ${L.wf.test.n} trades hors échantillon, bilan net <span class="${L.wf.test.pnl>=0?'up':'dn'}">${fmt(L.wf.test.pnl)}</span> (entraînement ${fmt(L.wf.ent.pnl)}), PF ${pf(L.wf.test.pf)}, ${L.wf.test.pos}/${L.wf.fen.length} fenêtres positives. `:''}
     Coûts × 2 : ${L.robustesse?fmt(L.robustesse[1].test.pnl):'–'} · × 3 : ${L.robustesse?fmt(L.robustesse[2].test.pnl):'–'}. Règle simple : ${L.agents?fmt(L.agents.ref.pnl):'–'} · acheter et garder : ${L.agents?fmt(L.agents.act.bh):'–'}.
-    <br><b>Fiabilité : ${L.fiabilite.niveau}</b> — ${L.fiabilite.raison} <span class="mut">${L.nEssais} configurations testées, du ${dt(L.du)} au ${dt(L.au)}, mise à jour ${new Date(L.maj).toLocaleString('fr-FR')}.${L.faux?' ⚠ Données de test (prix inventés).':''}</span>${famFwdHTML()}${famHTML(L&&L.familles3,'Familles sur 3 ans (bougies d’1 h)')}${famHTML(L&&L.familles,'Familles sur 12 mois (bougies de 5 min)')}${pistesHTML(L)}`:'<p class="mut">Mesure longue (12 mois) : pas encore publiée par le serveur (une fois par semaine).</p>')}
+    <br><b>Fiabilité : ${L.fiabilite.niveau}</b> — ${L.fiabilite.raison} <span class="mut">${L.nEssais} configurations testées, du ${dt(L.du)} au ${dt(L.au)}, mise à jour ${new Date(L.maj).toLocaleString('fr-FR')}.${L.faux?' ⚠ Données de test (prix inventés).':''}</span>${famFwdHTML()}${famHTML(L&&L.familles3,'Familles sur 3 ans (bougies d’1 h)')}${famHTML(L&&L.familles,'Familles sur 12 mois (bougies de 5 min)')}${pistesHTML(L)}`:'<p class="mut">Mesure longue (12 mois) : pas encore publiée par le serveur (une fois par semaine).</p>')+'</details>';if(ouv)e.querySelector('details').open=true}
 // Sources : la mesure la plus fournie (mesure longue du serveur si elle existe, sinon celle de ce navigateur) et le forward test
 // le plus long AVEC une configuration gelée (serveur, ou ce navigateur si « Geler la configuration » est actif).
 // Comparatif des familles de stratégies (mesure longue du serveur). Une famille est « candidate » seulement si elle bat
@@ -986,13 +990,13 @@ function niveauPreuve(){const c=S.cfg,M=S.sim,L=SV.lg&&!SV.lg.faux?SV.lg:null,tr
   const tr=Math.max(trL,trM),jS=SV.res&&!SV.res.faux?(Date.now()-SV.res.debut)/864e5:0,jL=S.gel&&JR.debut?(Date.now()-Math.max(S.gel.at,JR.debut))/864e5:0,j=Math.max(jS,jL);
   const x2=useL?L.robustesse&&L.robustesse[1]:S.robu&&S.robu.rows.find(r=>r.k===2),c2=x2?x2.test.pnl>0&&(!x2.wf||x2.wf.pnl>0):null,dd=useL?L.dsr:M&&M.dsr,sh=dd?dd.sr>dd.sr0:null;
   const niv=tr<c.npT1||j<c.npJ1?'insuffisant':tr<c.npT2||j<c.npJ2||c2!==true||sh!==true?'limité':'correct';return{niv,tr,j,c2,sh,src:useL?'mesure longue du serveur':'mesure de ce navigateur',srcJ:jS>=jL&&jS?'serveur':jL?'ce navigateur (gelé)':'aucun forward test gelé'}}
-function preuveHTML(){const e=$('preuve');if(!e)return;const n=niveauPreuve(),c=S.cfg,k=(b,t)=>`<li class="${b===true?'up':b===false?'dn':'mut'}">${b===true?'✓':b===false?'✗':'–'} ${t}</li>`;
+function preuveHTML(){const e=$('preuve');if(!e)return;const ouv=!!(e.querySelector('details')||{}).open;const n=niveauPreuve(),c=S.cfg,k=(b,t)=>`<li class="${b===true?'up':b===false?'dn':'mut'}">${b===true?'✓':b===false?'✗':'–'} ${t}</li>`;
   document.body.classList.toggle('pi',n.niv==='insuffisant');
   e.innerHTML=`<div class="fiab ${n.niv==='insuffisant'?'faible':n.niv==='limité'?'moyenne':'correcte'}"><b>Niveau de preuve : ${n.niv}</b>${n.niv==='insuffisant'?'<br>Résultat non concluant : les chiffres de gain sont grisés.':n.niv==='limité'?'<br>Indications seulement : pas encore assez de recul pour conclure.':'<br>Assez de recul selon tes seuils. Le passé ne garantit toujours pas l’avenir.'}</div>
-  <ul class="crit">${k(n.tr>=c.npT2?true:n.tr>=c.npT1?null:false,`${n.tr} trades hors échantillon, source : ${n.src} (paliers ${c.npT1} puis ${c.npT2})`)}
+  <details class="plus"><summary>Pourquoi ?</summary><ul class="crit">${k(n.tr>=c.npT2?true:n.tr>=c.npT1?null:false,`${n.tr} trades hors échantillon, source : ${n.src} (paliers ${c.npT1} puis ${c.npT2})`)}
   ${k(n.j>=c.npJ2?true:n.j>=c.npJ1?null:false,`${n.j.toFixed(1).replace('.',',')} jours de forward test avec configuration gelée, source : ${n.srcJ} (paliers ${c.npJ1} puis ${c.npJ2})`)}
   ${k(n.c2,n.c2===null?'Coûts doublés : test de robustesse pas encore lancé':n.c2?'Résultat positif avec des coûts doublés':'Résultat négatif avec des coûts doublés')}
-  ${k(n.sh,n.sh===null?'Sharpe corrigé du nombre d’essais : non calculable':n.sh?'Sharpe corrigé du nombre d’essais positif':'Sharpe corrigé du nombre d’essais négatif ou nul')}</ul>`}
+  ${k(n.sh,n.sh===null?'Sharpe corrigé du nombre d’essais : non calculable':n.sh?'Sharpe corrigé du nombre d’essais positif':'Sharpe corrigé du nombre d’essais négatif ou nul')}</ul></details>`;if(ouv)e.querySelector('details').open=true}
 function fwdHTML(){preuveHTML();const e=$('fwd');if(!e)return;if(!JR.db){e.innerHTML=`<span class="mut">${JR.err||'Ouverture du journal…'}</span>`;return}
   const d=JR.debut?Date.now()-JR.debut:0,j=Math.floor(d/864e5),h=Math.floor(d%864e5/H1),m=Math.floor(d%H1/6e4);
   e.innerHTML=`<b id="fwdn">${JR.n}</b> décision${JR.n>1?'s':''} enregistrée${JR.n>1?'s':''}. ${JR.debut?`Forward test en cours depuis <b>${j} j ${h} h ${m} min</b> (début le ${new Date(JR.debut).toLocaleString('fr-FR')}).`:'Le forward test commencera à la première décision.'}
@@ -1000,11 +1004,11 @@ function fwdHTML(){preuveHTML();const e=$('fwd');if(!e)return;if(!JR.db){e.inner
 function fillCfg(){for(const k in S.cfg)if($(k))$(k).value=S.cfg[k];gelHTML()}
 let timer=null;
 function stopAuto(m){clearTimeout(timer);timer=null;$('auto').textContent=$('auto2').textContent='Démarrer les agents';$('auto').classList.remove('stop');
-  $('auto-st').textContent=m||'Les agents sont à l\'arrêt : aucune nouvelle entrée. Un stop sur une position ouverte reste surveillé au tick.';renderAgents()}
+  $('auto-st').textContent=m||'Agents à l’arrêt. Une position ouverte garde son stop.';renderAgents()}
 $('auto').onclick=()=>{if(timer){stopAuto();return}
   if(S.stop){$('msg').textContent='Arrêt d\'urgence actif. Remets-le en marche avant de démarrer.';return}
   timer=setTimeout(()=>stopAuto('Durée maximale atteinte : agents arrêtés.'),S.cfg.maxRuns*60000);$('auto').textContent=$('auto2').textContent='Arrêter les agents';$('auto').classList.add('stop');
-  $('auto-st').textContent=`Agents en service : ils décident à chaque fermeture de bougie de ${TF.lab} (prochaine à ${hr(Math.ceil(Date.now()/TF.bar)*TF.bar)}). Stops vérifiés à chaque prix reçu. Arrêt automatique après ${S.cfg.maxRuns} min.`;renderAgents();decider(0,false)};
+  $('auto-st').textContent=`Agents en service · prochaine décision à ${hr(Math.ceil(Date.now()/TF.bar)*TF.bar).slice(0,5)}.`;renderAgents();decider(0,false)};
 $('go').onclick=()=>decider(0,true);
 $('kill2').onclick=()=>$('kill').onclick();
 $('kill').onclick=()=>{S.stop=!S.stop;if(S.stop&&timer)stopAuto('Arrêt d\'urgence actif : agents arrêtés, aucune nouvelle entrée. Un stop ouvert reste surveillé.');save();render();$('msg').textContent=S.stop?'Tout est suspendu : aucun nouvel ordre.':'Reprise possible.'};
