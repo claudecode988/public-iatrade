@@ -1,5 +1,6 @@
 # Forward test 24 h/24 : le même moteur que le site décide sur chaque bougie fermée avec la configuration gelée de
 # forward/config.json (branche forward-test). Argent fictif, aucun ordre, aucune clé.
+# Les familles de stratégies sont suivies en parallèle (tools/familles-fw.cjs, une décision par heure fermée).
 # GitHub retarde souvent les tâches programmées : chaque tâche reste donc active environ 50 minutes et vérifie chaque
 # minute si une nouvelle bougie s'est fermée ; une nouvelle tâche est demandée tous les quarts d'heure (une seule à la fois).
 name: Forward test 24 h/24
@@ -35,6 +36,7 @@ jobs:
           fin=$(( $(date +%s) + 50*60 ))
           while [ $(date +%s) -lt $fin ]; do
             node ../code/tools/forward.cjs forward || true
+            node ../code/tools/familles-fw.cjs forward || true
             git add -A forward
             if ! git diff --cached --quiet; then
               git commit -q -m "Forward test $(date -u +%Y-%m-%dT%H:%M:%SZ)"

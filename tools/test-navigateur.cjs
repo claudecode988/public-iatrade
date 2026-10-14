@@ -36,7 +36,7 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   await p.goto('file://'+path.join(__dirname,'..','index.html'));
   for(const t of ['1','2','0']){await p.click(`nav button[data-t="${t}"]`);ok(await p.isVisible(`#t${t}`)&&await p.isVisible('#kill2'),`onglet ${t} visible, arrêt d’urgence visible`)}
   await p.waitForFunction(()=>document.getElementById('cst').textContent==='EN DIRECT',null,{timeout:20000});ok(true,'prix en continu : état « EN DIRECT »');
-  {const t=await p.evaluate(()=>RA.t);ok(/Sources des pros/.test(t)&&/SOLUSDT/.test(t)&&/prochaine annonce de la Fed le 28\/10\/2026|calendrier de la Fed/.test(t)&&fapiCalls>0,'Radar : taux de financement, calendrier de la Fed et régime du bitcoin lus');}
+  {const t=await p.evaluate(()=>RA.t);ok(/Sources des pros/.test(t)&&/SOLUSDT/.test(t)&&/prochaine annonce de la Fed le 28\/10\/2026|calendrier de la Fed/.test(t)&&fapiCalls>0,'Pistache : taux de financement, calendrier de la Fed et régime du bitcoin lus');}
   await p.waitForTimeout(2500);const rate=parseInt(await p.textContent('#crate')),lag=await p.textContent('#clag');
   console.log(`     ${rate} messages/s affichés, ${lag}`);ok(rate>100&&/délai \d+ ms/.test(lag),'débit et délai affichés');
   ok(!(await p.content()).includes('Prix simulés'),'aucun prix simulé affiché');
@@ -104,7 +104,7 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   console.log('     ',await p.textContent('#simst'),`(${restCalls-r0} requêtes REST)`);ok(/Mesure terminée/.test(await p.textContent('#simst')),'mesure terminée');
   await p.click('#vaggo');await p.waitForFunction(()=>/Mesure terminée|Erreur|injoignable/.test(document.getElementById('vagst').textContent),null,{timeout:120000});
   const vg=await p.textContent('#vag');console.log('     ',await p.textContent('#vagst'));
-  ok(/règle simple/.test(vg)&&/acheter et garder/.test(vg)&&/Prisme/.test(vg)&&/Bouclier/.test(vg)&&/Se trompent-ils ensemble/.test(vg)&&/(n’apporte rien|fait mieux)/.test(vg),'valeur de chaque agent, références et accord entre agents');
+  ok(/règle simple/.test(vg)&&/acheter et garder/.test(vg)&&/Filou/.test(vg)&&/Rocky/.test(vg)&&/Se trompent-ils ensemble/.test(vg)&&/(n’apporte rien|fait mieux)/.test(vg),'valeur de chaque agent, références et accord entre agents');
   ok(!/\bIA\b/.test((await p.textContent('body')).replace(/sans modèle d’IA|mot « IA »/g,'')),'le mot « IA » n’est plus utilisé pour les agents');
   await p.click('#robgo');await p.waitForFunction(()=>/Test terminé|Erreur|injoignable/.test(document.getElementById('robst').textContent),null,{timeout:120000});
   const rb=await p.evaluate(()=>S.robu&&S.robu.rows.map(r=>r.k+':'+r.fee.toFixed(2)));console.log('     ',await p.textContent('#robst'),rb);
@@ -123,7 +123,7 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   ok(/Pour chaque seuil, entraînement → test/.test(sr),'aucun gain d’entraînement seul (seuils avec résultat de test)');
   ok(/Profit factor/.test(sr)&&/Acheter et garder/.test(sr)&&/contre .* pour « acheter et garder »/.test(sr),'profit factor et comparaison « acheter et garder »');
   await p.screenshot({path:path.join(process.env.SORTIE||'.','accueil.png'),fullPage:true});await p.click('nav button[data-t="1"]');await p.screenshot({path:path.join(process.env.SORTIE||'.','agents.png'),fullPage:true});
-  const fi=await p.textContent('#reps');ok((fi.match(/Règles fixes, sans modèle d’IA/g)||[]).length===6&&(fi.match(/Entrées/g)||[]).length===6&&/Dernière décision/.test(fi),'fiche de chaque agent : type, entrées, dernière décision');
+  const fi=await p.textContent('#reps');ok((fi.match(/sans modèle d’IA/g)||[]).length===6&&(fi.match(/Ce qu’il regarde/g)||[]).length===6&&['Pistache','Filou','Gaston','Rocky','Caramel','Gribouille'].every(n=>fi.includes(n))&&/l’écureuil/.test(fi),'fiche de chaque agent (noms d’animaux) : type, entrées, dernière décision');
   await p.click('nav button[data-t="0"]');const pv=await p.textContent('#preuve');
   ok(/Niveau de preuve : insuffisant/.test(pv)&&await p.evaluate(()=>document.body.classList.contains('pi'))&&/non concluant/.test(pv),'niveau de preuve insuffisant : gains grisés, « non concluant »');
   const pv2=await p.evaluate(()=>{S.cfg.npT1=0;S.cfg.npJ1=0;S.cfg.npT2=0;S.cfg.npJ2=0;preuveHTML();return document.getElementById('preuve').textContent});

@@ -58,7 +58,19 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 .fk{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}.fk div{background:#101a27;border:1px solid #1d2a3a;border-radius:6px;padding:6px}
 .fk i{display:block;font-style:normal;color:#7f93ad;font-size:10px}.fk b{font-size:15px;color:#fff}
 #fchart{width:100%;height:80px;background:#0a121c;border-radius:6px;border:1px solid #1d2a3a;display:block}
-#house{width:100%;max-width:100%;aspect-ratio:4/3;display:block;margin:10px 0 4px;background:#0a121c;border:1px solid #1d2a3a;border-radius:8px}
+#house{width:100%;max-width:100%;aspect-ratio:4/3;display:block;margin:10px 0 4px;background:#0a121c;border:1px solid #1d2a3a;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.agc{display:flex;gap:10px;padding:10px;margin-top:8px;border:1px solid #1d2a3a;border-radius:14px;background:linear-gradient(135deg,#111b29,#0c141f);font:13px/1.45 system-ui,-apple-system,sans-serif;transition:border-color .5s,box-shadow .5s}
+.agc.on{border-color:var(--c);box-shadow:0 0 0 1px var(--cf),0 6px 18px var(--cf)}
+.agc .av{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:27px;background:radial-gradient(circle at 35% 30%,var(--cf),#0b1018 75%);border:1px solid var(--cf)}
+.agc.on .av{animation:respire 2.6s ease-in-out infinite}@keyframes respire{50%{transform:scale(1.07)}}
+.agb{min-width:0;flex:1}.agt{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline}.agt b{color:#fff;font-size:15px}.agt span{color:var(--c);font-size:12px}
+.agt em{margin-left:auto;font-style:normal;font-size:11px;color:#9fb3cc;border:1px solid #24364b;border-radius:99px;padding:1px 8px}
+.agc p{margin:3px 0;color:#9fb3cc;overflow-wrap:anywhere}.agc .mut2{color:#6f8299;font-size:12px}
+.agd{color:#dbe8f7;background:#0a121c;border:1px solid #17263a;border-radius:9px;padding:6px 8px;margin-top:6px;overflow-wrap:anywhere}
+.agd .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#4a5b70;margin-right:6px;vertical-align:1px}.agc.on .dot{background:#4cc9a0;box-shadow:0 0 6px #4cc9a0}
+.agc details summary{cursor:pointer;color:var(--c);margin-top:6px;list-style:none;font-weight:600}.agc summary::-webkit-details-marker{display:none}
+.agc summary:before{content:'▸ '}.agc details[open] summary:before{content:'▾ '}
+@media (prefers-reduced-motion:reduce){.agc.on .av{animation:none}.agc{transition:none}}
 #hst{min-height:1.4em;margin-bottom:10px;color:#cfe3ff;background:#101a27;border:1px solid #1d2a3a;border-radius:6px;padding:6px 8px}
 .conn{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#101a27;border:1px solid #1d2a3a;border-radius:6px;padding:6px 8px;margin-bottom:6px;color:#9fb3cc}.conn b{padding:1px 8px;border-radius:99px}.conn b.ok{background:#12372b;color:#4cc9a0}.conn b.wait{background:#3a3118;color:#f2c14e}.conn b.ko{background:#3d1d1d;color:#ff8a80}.cn{color:#f2c14e;min-height:0}.cn:empty{display:none}
 .scan{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 2px}.scan span{background:#101a27;border:1px solid #1d2a3a;border-radius:99px;padding:2px 8px;font-size:11px;color:#9fb3cc}.scan .u{color:#4cc9a0}.scan .d{color:#ff8a80}
@@ -115,7 +127,7 @@ tr.cand th{color:var(--up)}
 <div class="fk"><div><i>Solde fictif</i><b id="f1">–</b></div><div><i>Gains / pertes</i><b id="f2">–</b></div><div><i>Réussite</i><b id="f3">–</b></div></div>
 <svg id="fchart" viewBox="0 0 300 80" preserveAspectRatio="none"></svg>
 <div class="scan" id="scan"></div><div class="cn" id="exclu"></div>
-<canvas id="house" role="img" aria-label="Maison des agents : chacun travaille dans sa pièce et apporte son rapport au suivant."></canvas><div id="hst">Les agents attendent dans leur maison.</div>
+<canvas id="house" role="img" aria-label="Maison des agents : chacun travaille dans sa pièce et apporte son rapport au suivant."></canvas><div id="hst">Les agents font la sieste dans leur maison.</div>
 <div class="fh"><b>ACTIVITÉ</b><span>récente</span></div><div class="fl" id="flog"></div>
 <div class="fh" style="margin-top:10px"><b>VALEUR MESURÉE</b><span>hors échantillon</span></div><div class="fl" id="vag"></div>
 <div class="fh" style="margin-top:10px"><b>FICHES DES AGENTS</b><span>règles · entrées · décision</span></div><div class="cn2">Les six agents sont des programmes à règles fixes écrites dans le code. Aucun n’utilise de modèle d’intelligence artificielle ni d’apprentissage : ils appliquent les mêmes calculs à chaque bougie. Le site n’emploie donc pas le mot « IA » pour eux.</div><div class="fl" id="reps"></div></div>
@@ -137,12 +149,12 @@ tr.cand th{color:var(--up)}
 <div class="mut" style="margin-top:8px">Marchés : toutes les paires crypto et forex sont analysées en permanence. Une paire que Binance ne propose pas est ignorée automatiquement.</div>
 <label>Taille d'un achat (USDT)<input id="size" type="number" min="10"></label>
 <label>Achats par décision<input id="nb" type="number" min="1" max="10" step="1"></label>
-<div class="mut">Quand tous les agents sont d'accord, Éclair passe ce nombre d'achats d'un coup : la position vaut ce nombre × la taille d'un achat. Les gains et les pertes sont multipliés d'autant, et chaque achat compte dans le maximum de trades par jour.</div>
+<div class="mut">Quand tous les agents sont d'accord, Caramel passe ce nombre d'achats d'un coup : la position vaut ce nombre × la taille d'un achat. Les gains et les pertes sont multipliés d'autant, et chaque achat compte dans le maximum de trades par jour.</div>
 <label>Perte maximale par jour (% du capital)<input id="maxLoss" type="number" min="0.5" step="0.5"></label>
 <label>Nombre maximal de trades par jour<input id="maxTrades" type="number" min="1"></label>
 <label>Stop de perte maximal (%)<input id="sl" type="number" min="0.5" step="0.5"></label>
 <label>Seuil de confiance pour entrer (%)<input id="thr" type="number" min="50" max="99"></label>
-<label>Source de Radar<select id="rsrc"><option value="auto">Automatique : indice peur et avidité (alternative.me)</option><option value="manuel">Saisie manuelle</option></select></label>
+<label>Source de Pistache<select id="rsrc"><option value="auto">Automatique : indice peur et avidité (alternative.me)</option><option value="manuel">Saisie manuelle</option></select></label>
 <label>Actualité en saisie manuelle<select id="news"><option>haussier</option><option>neutre</option><option>baissier</option></select></label>
 <label>Durée des bougies de décision<select id="tf"><option value="5">5 minutes (confirmation sur 1 h)</option><option value="10">10 minutes (confirmation sur 1 h)</option><option value="60">1 heure (confirmation sur 4 h)</option></select></label>
 <div class="mut">Plus les bougies sont courtes, plus il y a de trades et plus les frais pèsent. Mesure chaque durée sur l'historique avant de lui faire confiance.</div>
@@ -218,7 +230,7 @@ function analyse(a,k,news){const n=a.length,px=a[n-1],e9=emaS(a,9),e21=emaS(a,21
   const raw=sg.t*.3+sg.d*.2+sg.m*.15+sg.r*.15+sg.n*.2;let q=vol?1:0;
   if(raw>0&&z>2.2||raw<0&&z<-2.2)q*=.7;if(sg.t&&sg.d&&sg.t!==sg.d)q*=.7;
   return{px,rsi,sg,z,vol,sc:raw*q}}
-// Radar : indice peur et avidité -> actualité. Plus de 24 h ou absente : pas d'information, aucun effet sur le score.
+// Pistache : indice peur et avidité -> actualité. Plus de 24 h ou absente : pas d'information, aucun effet sur le score.
 function fngNews(d,now){if(!d||!isFinite(d.value)||!d.ts)return{ok:false,why:'donnée introuvable',news:'neutre'};
   if(now-d.ts>24*H1)return{ok:false,why:'donnée de plus de 24 h',news:'neutre'};
   const c=String(d.cls||'');return{ok:true,news:/greed/i.test(c)?'haussier':/fear/i.test(c)?'baissier':'neutre'}}
@@ -319,12 +331,12 @@ function refusEntree(P,t,dir,c,R){const k=rt(c);
   if(R.macro&&P.tm){const f=pauseFed(P.tm[t]+TF.bar);if(f.pause)return`pause autour de l’annonce de la Fed du ${new Date(f.d).toISOString().slice(0,10)}`}
   if(R.fund&&P.fr&&P.fr[t]!==null&&(dir==='long'?P.fr[t]>FUND_MAX:P.fr[t]<-FUND_MAX))return`taux de financement ${(P.fr[t]*100).toFixed(3).replace('.',',')} % par 8 h`;
   return''}
-// Boussole : meilleure paire qui passe le seuil et les règles actives à la bougie t.
+// Gaston : meilleure paire qui passe le seuil et les règles actives à la bougie t.
 function choisir(F,t,c,R){let b=null;const refus=[];
   for(const q of F.Q){const P=F.p[q],s=sigAt(P,t,R);if(!s.dir||s.pr*100<c.thr)continue;const r=refusEntree(P,t,s.dir,c,R);
     if(r){refus.push({q,r,pr:s.pr});continue}if(!b||Math.abs(s.sc)>Math.abs(b.sc))b={q,...s}}
   return{b,refus}}
-// Éclair passe nb achats identiques d'un coup : la position totale vaut nb × la taille d'une position.
+// Caramel passe nb achats identiques d'un coup : la position totale vaut nb × la taille d'une position.
 function ouvrir(F,q,t,dir,pr,c,R,px,taille){const P=F.p[q],nb=c.nb||1,sz=taille||c.size*nb;px=px??P.c[t];const s=c.slip/100,fill=dir==='long'?px*(1+s):px*(1-s),n=sz/fill;
   const dist=R.atr?Math.min(c.atrK*P.atr[t],c.sl/100*px):c.sl/100*px;
   return{q,side:dir,n,nb,size:sz,fill,px,dist,stop:dir==='long'?px-dist:px+dist,best:px,t0:F.T[t],p:pr,rev:0,fe:sz*c.fee/100}}
@@ -527,7 +539,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 18:03';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 20:53';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({pk:10000,cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:.5,ddMax:15,hb:5,npT1:30,npJ1:30,npT2:100,npJ2:90,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
@@ -663,7 +675,7 @@ async function decider0(t,manuel){const c=S.cfg,A=[],d0=today(),R=S.rules,W=v=>v
     else{RK=risque(c,valeur(),Math.max(S.pk||S.start,valeur()),distanceStop(F,b.q,i,c,R));if(!RK.ok){ok=false;rr=`Bloqué : règle ${RK.regle}.`}
       else rr=`Validé : ${c.nb} achat${c.nb>1?'s':''}, taille de risque ${fmt(RK.taille)} (${String(c.riskPct).replace('.',',')} % du capital au stop${RK.f<1?`, réduite à ${RK.f*100} % par le barème de baisse`:''}${RK.brute>RK.max?', plafonnée à la taille maximale':''}).`}}
   A.push({n:'Risque',s:ok?'Feu vert':'Veto',t:rr+' Le Chef ne peut pas contourner ce veto.'});
-  // Journal : la décision de Boussole (et le veto éventuel de Bouclier) est écrite ici, avant tout ordre et tout résultat.
+  // Journal : la décision de Gaston (et le veto éventuel de Rocky) est écrite ici, avant tout ordre et tout résultat.
   const jq=act==='open'?b.q:q,jid=await jrAjouter({agent:'Boussole',type:act==='open'?'entrée':act==='close'?'sortie':'abstention',paire:jq,sens:act==='open'?b.dir:P?P.side:s.dir,raison:why,confiance:act==='open'?Math.round(b.pr*100):pc,prix:jrPrix(jq),entrees:jrEntrees(F,i,jq,RA),trade:act==='close'?P.jid||null:null});
   if(act==='open'&&!ok)jrAjouter({agent:'Bouclier',type:'abstention',paire:jq,sens:b.dir,raison:'veto : '+rr.replace(/^Bloqué : /,''),confiance:Math.round(b.pr*100),prix:jrPrix(jq),entrees:jrEntrees(F,i,jq,RA)});
   if(act==='close'&&P)P.jsx=jid;
@@ -680,12 +692,15 @@ async function decider0(t,manuel){const c=S.cfg,A=[],d0=today(),R=S.rules,W=v=>v
   const at=Date.now();S.ags=A.map(a=>({...a,at}));house.play(A,q);S.dec={d,why,conf:pc+' %',rr};S.eq=(S.eq||[]).concat(valeur()).slice(-300);save();render();$('msg').textContent=manuel?'Évaluation terminée.':`Décision prise à la fermeture de ${hr(tb+TF.bar)}.`}
 const valeur=()=>{const P=S.pos;if(!P)return S.cash;const px=(P.side==='long'?LV.bid[P.q]:LV.ask[P.q])||LV.px[P.q]||P.px;return S.cash+P.size+(P.side==='long'?1:-1)*P.n*(px-P.fill)};
 
-const AG=[{n:'Actualités',who:'Radar',job:'Surveille les nouvelles du marché',c:'#d9902f',sh:'50%'},
-{n:'Analyste technique',who:'Prisme',job:'Lit les graphiques et les tendances',c:'#3b82c4',sh:'14px'},
-{n:'Chef',who:'Boussole',job:'Décide : entrer, attendre ou sortir',c:'#7a5cc4',sh:'50% 50% 14px 14px'},
-{n:'Risque',who:'Bouclier',job:'Vérifie les limites et peut tout bloquer',c:'#c44848',sh:'8px 50% 8px 50%'},
-{n:'Exécuteur fictif',who:'Éclair',job:'Passe les ordres dans le portefeuille fictif',c:'#2f9e75',sh:'40% 40% 50% 50%'},
-{n:'Journal',who:'Carnet',job:'Note chaque trade et mesure les résultats',c:'#8a8f98',sh:'50% 14px 50% 14px'}];
+// Les six agents portent des noms d'animaux (affichage seulement : le journal garde ses identifiants d'origine « Boussole » et « Bouclier »
+// pour ne pas casser la chaîne d'empreintes ni le forward test).
+const AG=[{n:'Actualités',who:'Pistache',emo:'🐿️',esp:'l’écureuil',job:'Surveille les nouvelles du marché',c:'#d9902f'},
+{n:'Analyste technique',who:'Filou',emo:'🦊',esp:'le renard',job:'Lit les graphiques et les tendances',c:'#3b82c4'},
+{n:'Chef',who:'Gaston',emo:'🦉',esp:'le hibou',job:'Décide : entrer, attendre ou sortir',c:'#7a5cc4'},
+{n:'Risque',who:'Rocky',emo:'🐕',esp:'le chien de garde',job:'Vérifie les limites et peut tout bloquer',c:'#c44848'},
+{n:'Exécuteur fictif',who:'Caramel',emo:'🐇',esp:'le lapin',job:'Passe les ordres dans le portefeuille fictif',c:'#2f9e75'},
+{n:'Journal',who:'Gribouille',emo:'🐢',esp:'la tortue',job:'Note chaque trade et mesure les résultats',c:'#8a8f98'}];
+const NOM_JOURNAL={Boussole:'Gaston',Bouclier:'Rocky'};
 
 const FNG='https://api.alternative.me/fng/?limit=1',RD={d:null,at:0,err:''};
 async function radar0(){const c=S.cfg;
@@ -724,46 +739,51 @@ async function testnetOrder(side,qty,quote,sym){
 }
 
 const house=(()=>{const cv=$('house'),W=320,H=240,cx=cv.getContext('2d'),RM=matchMedia('(prefers-reduced-motion: reduce)');
-  const dpr=Math.min(2,devicePixelRatio||1);cv.width=W*dpr;cv.height=H*dpr;cx.scale(dpr,dpr);
+  // Toile nette sur tous les écrans : dessin en coordonnées 320 × 240, agrandi à la taille réelle × densité de pixels (jusqu'à 3 sur iPhone).
+  let sc=1;const taille=()=>{const d=Math.min(3,devicePixelRatio||1),w=cv.clientWidth||W,s=w/W*d;if(Math.abs(s-sc)<.01&&cv.width)return;sc=s;cv.width=Math.round(W*sc);cv.height=Math.round(H*sc)};
+  taille();if(window.ResizeObserver)new ResizeObserver(taille).observe(cv);else addEventListener('resize',taille);
   const FL=['#1b2433','#182231','#1d2230','#221c25','#16242a','#1f2128'],ROLE=['Actualités','Analyse','Décision','Risque','Ordres','Archives'];
+  const EMO='"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
   const room=i=>({x:(i%3)*W/3,y:i<3?0:144,w:W/3,h:96}),door=i=>{const r=room(i);return{x:r.x+r.w/2,y:i<3?96:144}};
-  const home=i=>{const r=room(i);return{x:r.x+r.w/2,y:r.y+(i<3?62:42)}},spot=i=>{const r=room(i);return{x:r.x+26,y:r.y+(i<3?30:72)}};
+  const home=i=>{const r=room(i);return{x:r.x+r.w/2,y:r.y+(i<3?62:44)}},spot=i=>{const r=room(i);return{x:r.x+26,y:r.y+(i<3?32:72)}};
   const roomOf=p=>p.y<96?Math.min(2,Math.floor(p.x/(W/3))):p.y>144?3+Math.min(2,Math.floor(p.x/(W/3))):-1;
-  const P=AG.map((g,i)=>({...home(i),path:[],say:'',sayU:0,carry:0,glow:0,fx:1}));let Q=[],cur=null,wait=0,last=0,st='';
+  const P=AG.map((g,i)=>{const h=home(i);return{...h,rx:h.x,ry:h.y,path:[],say:'',sayU:0,sayT:0,carry:0,glow:0,fx:-1,ph:i*1.7}});let Q=[],cur=null,wait=0,last=0,st='';
   function route(a,t){const p=P[a],r0=roomOf(p),r1=roomOf(t),o=[];
     if(r0!==r1){if(r0>=0)o.push(door(r0),{x:door(r0).x,y:120});if(r1>=0)o.push({x:door(r1).x,y:120},door(r1))}o.push(t);return o}
-  function play(A,pair){if(Q.length||cur)return; // un seul circuit à la fois : en mode rapide on montre le dernier tour complet
+  function play(A){if(Q.length||cur)return; // un seul circuit à la fois : en mode rapide on montre le dernier tour complet
     const S_=A.map(x=>x.s||'');
     for(let i=0;i<6;i++){
-      Q.push({k:'go',a:i,to:spot(i),st:`${AG[i].who} fait ses recherches…`},{k:'say',a:i,txt:S_[i],ms:750});
-      if(i<5){const h=home(i+1);Q.push({k:'carry',a:i,v:1},{k:'go',a:i,to:{x:h.x-16,y:h.y},st:`${AG[i].who} apporte son rapport à ${AG[i+1].who}`},
-        {k:'give',a:i,b:i+1},{k:'say',a:i+1,txt:'Reçu',ms:320},{k:'go',a:i,to:home(i),st:'',bg:1})}
-      else Q.push({k:'go',a:i,to:home(i),st:`${AG[i].who} range le rapport dans les archives`})}}
+      Q.push({k:'go',a:i,to:spot(i),st:`${AG[i].emo} ${AG[i].who} fait ses recherches…`},{k:'say',a:i,txt:S_[i],ms:900});
+      if(i<5){const h=home(i+1);Q.push({k:'carry',a:i,v:1},{k:'go',a:i,to:{x:h.x-18,y:h.y},st:`${AG[i].emo} ${AG[i].who} apporte son rapport à ${AG[i+1].who}`},
+        {k:'give',a:i,b:i+1},{k:'say',a:i+1,txt:'Merci !',ms:420},{k:'go',a:i,to:home(i),st:'',bg:1})}
+      else Q.push({k:'go',a:i,to:home(i),st:`${AG[i].emo} ${AG[i].who} range le rapport dans les archives`})}}
+  // Page cachée ou autre onglet : le circuit en cours est terminé d'un coup (rien ne s'accumule), chacun rentre chez lui.
+  function finir(){Q=[];cur=null;P.forEach((p,i)=>{const h=home(i);Object.assign(p,{x:h.x,y:h.y,rx:h.x,ry:h.y,path:[],carry:0,say:''})});st='Circuit terminé. Les agents attendent le prochain tour.'}
   function next(){cur=Q.shift()||null;if(!cur){st='Circuit terminé. Les agents attendent le prochain tour.';return}
     const c=cur,p=P[c.a];if(c.st!==undefined&&c.st)st=c.st;
     if(c.k==='go'){p.path=route(c.a,c.to);if(c.bg){cur=null;next()}}
-    else if(c.k==='say'){p.say=c.txt;st=`${AG[c.a].who} : « ${c.txt} »`;p.sayU=performance.now()+c.ms;wait=c.ms}
+    else if(c.k==='say'){p.say=c.txt;st=`${AG[c.a].emo} ${AG[c.a].who} : « ${c.txt} »`;p.sayT=performance.now();p.sayU=p.sayT+c.ms+250;wait=c.ms}
     else if(c.k==='carry'){p.carry=c.v;cur=null;next()}
     else if(c.k==='give'){p.carry=0;P[c.b].glow=1;cur=null;next()}}
-  function step(p,dt){if(!p.path.length)return true;const t=p.path[0],dx=t.x-p.x,dy=t.y-p.y,d=Math.hypot(dx,dy),v=RM.matches?1e9:170*dt;if(Math.abs(dx)>.5)p.fx=dx>0?1:-1;
+  function step(p,dt){if(!p.path.length)return true;const t=p.path[0],dx=t.x-p.x,dy=t.y-p.y,d=Math.hypot(dx,dy),v=RM.matches?1e9:190*dt;if(Math.abs(dx)>.5)p.fx=dx>0?1:-1;
     if(d<=v){p.x=t.x;p.y=t.y;p.path.shift()}else{p.x+=dx/d*v;p.y+=dy/d*v}return!p.path.length}
   function rr(x,y,w,h,r){cx.beginPath();cx.roundRect?cx.roundRect(x,y,w,h,r):cx.rect(x,y,w,h)}
   const shade=(h,k)=>{const n=parseInt(h.slice(1),16),f=v=>Math.max(0,Math.min(255,Math.round(v*k)));return`rgb(${f(n>>16)},${f(n>>8&255)},${f(n&255)})`};
-  function draw(now){const run=!!timer||Q.length>0||!!cur,anim=!RM.matches;
+  function draw(now){const run=!!timer||Q.length>0||!!cur,anim=!RM.matches;cx.setTransform(sc,0,0,sc,0,0);
     cx.fillStyle='#0a1019';cx.fillRect(0,0,W,H);
     let g=cx.createLinearGradient(0,96,0,144);g.addColorStop(0,'#152132');g.addColorStop(1,'#0f1824');cx.fillStyle=g;cx.fillRect(0,96,W,48);
     cx.strokeStyle='rgba(127,160,200,.22)';cx.setLineDash([7,7]);cx.lineDashOffset=run&&anim?-now/40:0;cx.beginPath();cx.moveTo(6,120);cx.lineTo(W-6,120);cx.stroke();cx.setLineDash([]);
     for(let i=0;i<6;i++){const r=room(i),d=door(i),sp=spot(i),h=home(i),top=i<3;
-      g=cx.createLinearGradient(0,r.y,0,r.y+r.h);g.addColorStop(0,shade(FL[i],1.25));g.addColorStop(1,FL[i]);cx.fillStyle=g;cx.fillRect(r.x+2,r.y+2,r.w-4,r.h-4);
-      cx.strokeStyle='rgba(255,255,255,.035)';for(let x=r.x+14;x<r.x+r.w-4;x+=14){cx.beginPath();cx.moveTo(x,r.y+3);cx.lineTo(x,r.y+r.h-3);cx.stroke()}
-      if(run){g=cx.createRadialGradient(h.x,h.y,2,h.x,h.y,46);g.addColorStop(0,AG[i].c+'33');g.addColorStop(1,'transparent');cx.fillStyle=g;cx.fillRect(r.x+2,r.y+2,r.w-4,r.h-4)}
-      if(top){const wx=r.x+r.w-32,wy=r.y+22;g=cx.createLinearGradient(0,wy,0,wy+13);g.addColorStop(0,'#2b5a86');g.addColorStop(1,'#16314d');cx.fillStyle=g;cx.fillRect(wx,wy,22,13);cx.strokeStyle='#3d5674';cx.lineWidth=1;cx.strokeRect(wx,wy,22,13);cx.beginPath();cx.moveTo(wx+11,wy);cx.lineTo(wx+11,wy+13);cx.stroke()}
-      const px_=r.x+r.w-14,py_=top?r.y+r.h-20:r.y+r.h-22;cx.fillStyle='#5b4636';cx.fillRect(px_-4,py_+4,8,7);cx.fillStyle='#2f8f63';[[0,0,5],[-4,2,4],[4,2,4]].forEach(([a,b,c])=>{cx.beginPath();cx.arc(px_+a,py_+b,c,0,7);cx.fill()});
-      cx.fillStyle=AG[i].c+'22';cx.beginPath();cx.ellipse(h.x,h.y+8,24,10,0,0,7);cx.fill();
-      rr(h.x-17,h.y+8,34,8,2);cx.fillStyle='#2f425c';cx.fill();cx.fillStyle='#0a121c';cx.fillRect(h.x+3,h.y+1,11,8);cx.fillStyle=run?'#4cc9a0':'#24364b';cx.fillRect(h.x+5,h.y+5,7,1.5);
-      cx.strokeStyle='#33496a';cx.lineWidth=2;cx.strokeRect(r.x+2,r.y+2,r.w-4,r.h-4);cx.lineWidth=1;cx.fillStyle='#121c2a';cx.fillRect(d.x-12,d.y-3,24,6);
-      cx.fillStyle=AG[i].c;cx.beginPath();cx.arc(r.x+10,r.y+(top?12:89),2.5,0,7);cx.fill();
-      cx.fillStyle='#8ea3bd';cx.font='700 8px ui-monospace,Menlo,monospace';cx.fillText(`${AG[i].who.toUpperCase()} · ${ROLE[i]}`,r.x+16,r.y+(top?15:92));
+      g=cx.createLinearGradient(0,r.y,0,r.y+r.h);g.addColorStop(0,shade(FL[i],1.3));g.addColorStop(1,FL[i]);cx.fillStyle=g;rr(r.x+2,r.y+2,r.w-4,r.h-4,6);cx.fill();
+      cx.strokeStyle='rgba(255,255,255,.03)';for(let x=r.x+14;x<r.x+r.w-4;x+=14){cx.beginPath();cx.moveTo(x,r.y+4);cx.lineTo(x,r.y+r.h-4);cx.stroke()}
+      if(run){g=cx.createRadialGradient(h.x,h.y,2,h.x,h.y,50);g.addColorStop(0,AG[i].c+'40');g.addColorStop(1,'transparent');cx.fillStyle=g;cx.fillRect(r.x+2,r.y+2,r.w-4,r.h-4)}
+      if(top){const wx=r.x+r.w-32,wy=r.y+24;g=cx.createLinearGradient(0,wy,0,wy+13);g.addColorStop(0,'#2b5a86');g.addColorStop(1,'#16314d');cx.fillStyle=g;cx.fillRect(wx,wy,22,13);cx.strokeStyle='#3d5674';cx.lineWidth=1;cx.strokeRect(wx,wy,22,13);cx.beginPath();cx.moveTo(wx+11,wy);cx.lineTo(wx+11,wy+13);cx.stroke()}
+      const px_=r.x+r.w-14,py_=top?r.y+r.h-20:r.y+r.h-22;cx.fillStyle='#5b4636';cx.fillRect(px_-4,py_+4,8,7);cx.fillStyle='#2f8f63';[[0,0,5],[-4,2,4],[4,2,4]].forEach(([a,b,c])=>{cx.beginPath();cx.arc(px_+a,py_+b+(anim?Math.sin(now/900+i)*.4:0),c,0,7);cx.fill()});
+      cx.fillStyle=AG[i].c+'26';cx.beginPath();cx.ellipse(h.x,h.y+10,24,9,0,0,7);cx.fill();
+      cx.strokeStyle='#33496a';cx.lineWidth=1.5;rr(r.x+2,r.y+2,r.w-4,r.h-4,6);cx.stroke();cx.lineWidth=1;cx.fillStyle='#121c2a';cx.fillRect(d.x-12,d.y-3,24,6);
+      // étiquette : nom de l'animal et son rôle
+      const ly=r.y+(top?14:91);cx.font='700 9px system-ui,-apple-system,sans-serif';cx.fillStyle=AG[i].c;cx.fillText(AG[i].who,r.x+8,ly);
+      const nw=cx.measureText(AG[i].who).width;cx.font='500 8px system-ui,-apple-system,sans-serif';cx.fillStyle='#8ea3bd';cx.fillText('· '+ROLE[i],r.x+11+nw,ly);
       cx.fillStyle=cx.strokeStyle=AG[i].c;const t=now/400;
       if(i===0){cx.beginPath();cx.moveTo(sp.x,sp.y+12);cx.lineTo(sp.x,sp.y-6);cx.stroke();for(let k=1;k<3;k++){cx.globalAlpha=Math.max(0,.6-.25*k+.15*Math.sin(t+k));cx.beginPath();cx.arc(sp.x,sp.y-6,4*k,-2.4,-.7);cx.stroke()}cx.globalAlpha=1}
       else if(i===1){for(let k=0;k<3;k++){cx.fillStyle='#0a121c';cx.fillRect(sp.x-14+k*11,sp.y-14,10,9);cx.fillStyle='#4cc9a0';cx.fillRect(sp.x-12+k*11,sp.y-8-3*Math.abs(Math.sin(t+k)),2,3+3*Math.abs(Math.sin(t+k)))}}
@@ -771,57 +791,64 @@ const house=(()=>{const cv=$('house'),W=320,H=240,cx=cv.getContext('2d'),RM=matc
       else if(i===3){rr(sp.x-8,sp.y-12,16,16,3);cx.globalAlpha=.5;cx.fill();cx.globalAlpha=1;cx.strokeRect(sp.x-3,sp.y-7,6,6)}
       else if(i===4){cx.fillStyle='#0a121c';cx.fillRect(sp.x-10,sp.y-14,20,12);cx.strokeStyle='#4cc9a0';cx.beginPath();cx.moveTo(sp.x-8,sp.y-5);cx.lineTo(sp.x-3,sp.y-9);cx.lineTo(sp.x+2,sp.y-6);cx.lineTo(sp.x+8,sp.y-12);cx.stroke()}
       else{for(let k=0;k<3;k++){cx.fillStyle=['#8a8f98','#6b7280','#a3a8b0'][k];cx.fillRect(sp.x-10+k*7,sp.y-14,5,14)}}}
-    if(cur&&cur.k==='go'){const p=P[cur.a];if(p.path.length){cx.strokeStyle=AG[cur.a].c+'66';cx.setLineDash([2,4]);cx.beginPath();cx.moveTo(p.x,p.y+8);p.path.forEach(q=>cx.lineTo(q.x,q.y+8));cx.stroke();cx.setLineDash([])}}
-    P.forEach((p,i)=>{const mv=p.path.length>0&&anim,ph=now/70,b=mv?Math.abs(Math.sin(ph))*-1.5:0,g=AG[i],lg=mv?Math.sin(ph)*2.5:0;
-      cx.fillStyle='rgba(0,0,0,.4)';cx.beginPath();cx.ellipse(p.x,p.y+11,7,2.5,0,0,7);cx.fill();
-      if(p.glow>0){cx.strokeStyle=`rgba(76,201,160,${p.glow})`;cx.lineWidth=2;cx.beginPath();cx.arc(p.x,p.y+1+b,13,0,7);cx.stroke();cx.lineWidth=1}
-      cx.fillStyle=shade(g.c,.55);cx.fillRect(p.x-4+lg,p.y+5+b,3,6);cx.fillRect(p.x+1-lg,p.y+5+b,3,6);
-      rr(p.x-6,p.y-3+b,12,10,4);cx.fillStyle=shade(g.c,.8);cx.fill();
-      cx.fillStyle=g.c;cx.beginPath();cx.arc(p.x,p.y-8+b,6.5,0,7);cx.fill();
-      cx.fillStyle='#fff';const ex=p.fx*1.2;cx.fillRect(p.x-3.5+ex,p.y-10+b,2,2.6);cx.fillRect(p.x+1.5+ex,p.y-10+b,2,2.6);
-      if(p.carry){cx.save();cx.translate(p.x+p.fx*8,p.y-1+b);cx.rotate(p.fx*.15);cx.fillStyle='#f4f1e8';cx.fillRect(-3.5,-4.5,7,9);cx.fillStyle='#8a8f98';cx.fillRect(-2.5,-2,5,1);cx.fillRect(-2.5,0,4,1);cx.restore()}
-      if(p.say&&now<p.sayU){cx.font='700 9px system-ui,sans-serif';const tx=p.say.length>26?p.say.slice(0,25)+'…':p.say,w=cx.measureText(tx).width+12;
-        const bx=Math.max(2,Math.min(W-w-2,p.x-w/2)),by=Math.max(2,p.y-36);cx.fillStyle='#f4f1e8';rr(bx,by,w,16,5);cx.fill();
-        cx.beginPath();cx.moveTo(Math.max(bx+6,Math.min(bx+w-6,p.x))-4,by+16);cx.lineTo(Math.max(bx+6,Math.min(bx+w-6,p.x))+4,by+16);cx.lineTo(p.x,by+21);cx.fill();
-        cx.fillStyle='#17202e';cx.fillText(tx,bx+6,by+11.5)}});}
+    if(cur&&cur.k==='go'){const p=P[cur.a];if(p.path.length){cx.strokeStyle=AG[cur.a].c+'70';cx.setLineDash([2,4]);cx.beginPath();cx.moveTo(p.rx,p.ry+9);p.path.forEach(q=>cx.lineTo(q.x,q.y+9));cx.stroke();cx.setLineDash([])}}
+    // les animaux : petits sauts quand ils marchent, respiration au repos, « z » quand tout le monde dort
+    P.forEach((p,i)=>{const mv=p.path.length>0&&anim,hop=mv?-Math.abs(Math.sin(now/105+p.ph))*4.5:0,br=anim&&!mv?1+.04*Math.sin(now/650+p.ph):1;
+      cx.fillStyle='rgba(0,0,0,.42)';cx.beginPath();cx.ellipse(p.rx,p.ry+11,8+hop*.5,2.6,0,0,7);cx.fill();
+      if(p.glow>0){cx.strokeStyle=`rgba(76,201,160,${p.glow})`;cx.lineWidth=2;cx.beginPath();cx.arc(p.rx,p.ry,14+(1-p.glow)*6,0,7);cx.stroke();cx.lineWidth=1}
+      cx.save();cx.translate(p.rx,p.ry+hop);cx.scale((p.fx>0?-1:1)*br,br*(mv?1+hop*.012:1));cx.font=`24px ${EMO}`;cx.textAlign='center';cx.textBaseline='middle';cx.fillText(AG[i].emo,0,0);cx.restore();
+      if(p.carry){cx.save();cx.translate(p.rx+p.fx*11,p.ry-2+hop);cx.rotate(p.fx*.18);cx.fillStyle='#f4f1e8';rr(-3.5,-4.5,7,9,1);cx.fill();cx.fillStyle='#8a8f98';cx.fillRect(-2.5,-2,5,1);cx.fillRect(-2.5,0,4,1);cx.restore()}
+      if(!run&&anim){cx.font='700 8px system-ui,sans-serif';cx.textAlign='left';for(let k=0;k<2;k++){const u=((now/1600+k*.5+i*.13)%1);cx.fillStyle=`rgba(207,227,255,${(1-u)*.7})`;cx.fillText('z',p.rx+7+u*6,p.ry-9-u*12)}}
+      cx.textAlign='left';cx.textBaseline='alphabetic';
+      if(p.say&&now<p.sayU){const a=Math.min(1,(now-p.sayT)/160,(p.sayU-now)/220);cx.globalAlpha=Math.max(0,a);cx.font='700 9px system-ui,-apple-system,sans-serif';const tx=p.say.length>28?p.say.slice(0,27)+'…':p.say,w=cx.measureText(tx).width+12;
+        const bx=Math.max(2,Math.min(W-w-2,p.rx-w/2)),by=Math.max(2,p.ry-38+(1-a)*4);cx.fillStyle='#f4f1e8';rr(bx,by,w,16,6);cx.fill();
+        const ax=Math.max(bx+7,Math.min(bx+w-7,p.rx));cx.beginPath();cx.moveTo(ax-4,by+16);cx.lineTo(ax+4,by+16);cx.lineTo(p.rx,by+21);cx.fill();
+        cx.fillStyle='#17202e';cx.fillText(tx,bx+6,by+11.5);cx.globalAlpha=1}});}
   function loop(now){const dt=Math.min(.05,(now-(last||now))/1000);last=now;
-    P.forEach(p=>{p.glow=Math.max(0,p.glow-dt);step(p,dt)});
+    if(document.hidden||!$('t1').classList.contains('on')){if(Q.length||cur)finir();requestAnimationFrame(loop);return}
+    const k=RM.matches?1:1-Math.exp(-dt*16);
+    P.forEach(p=>{p.glow=Math.max(0,p.glow-dt);step(p,dt);p.rx+=(p.x-p.rx)*k;p.ry+=(p.y-p.ry)*k});
     if(cur){if(cur.k==='go'&&!P[cur.a].path.length)next();else if(cur.k==='say'&&(wait-=dt*1000)<=0)next()}else if(Q.length)next();
-    $('hst').textContent=st||'Les agents attendent dans leur maison.';draw(now);requestAnimationFrame(loop)}
+    const m=st||(timer?'Les agents attendent la fermeture de la prochaine bougie.':'Les agents font la sieste : touche « Démarrer les agents ».');if($('hst').textContent!==m)$('hst').textContent=m;draw(now);requestAnimationFrame(loop)}
   requestAnimationFrame(loop);return{play}})();
 const prochaine=()=>{const t=Math.ceil((Date.now()+1)/TF.bar)*TF.bar;return{h:hr(t).slice(0,5),m:Math.max(0,Math.ceil((t-Date.now())/6e4))}};
 const attente=()=>{const n=prochaine();return timer?`En service : prochaine décision à la fermeture de ${n.h} (dans ${n.m} min).`:'À l’arrêt : touche « Démarrer les agents » ou « Évaluer maintenant ».'};
 function vagHTML(){const V=S.vag,e=$('vag');if(!e)return;if(!V||V.v!==1){e.innerHTML='<div>Pas encore mesuré : touche « Mesurer la valeur de chaque agent » plus bas.</div>';return}
   const pf=r=>!r.n?'–':r.pf===null?(r.gain>0?'∞':'–'):r.pf.toFixed(2).replace('.',','),m=r=>`${fmt(r.pnl)} · PF ${pf(r)} · baisse ${pct(r.dd)} · ${r.n} trades${r.n<30?' (trop peu)':''}`;
   const A=V.act,ec=x=>`${x>=0?'+':'−'}${fmt(Math.abs(x)).replace('−','')}`,acc=A.accord,J=V.journal;
-  const L=[['Radar','Non mesurable sur l’historique : il n’existe pas d’historique de l’indice peur et avidité, la simulation le garde neutre.'+(J&&J.n?` En direct (journal) : Radar et Prisme vont dans le même sens dans ${Math.round(J.acc/J.n*100)} % des ${J.n} décisions notées.`:''),null],
-    ['Prisme',`Système actif : ${m(A)}. Même système avec la règle simple (croisement EMA 20/50) à la place de Prisme : ${m(V.ref)}. Écart : ${ec(A.pnl-V.ref.pnl)}.`,A.pnl>V.ref.pnl+.005&&A.n>=30?`Prisme fait mieux que la règle simple de ${fmt(A.pnl-V.ref.pnl)} sur cette période.`:'Prisme n’apporte rien de plus que la règle simple sur cette période.'],
-    ['Boussole',`Avec son seuil de ${S.cfg.thr} % : ${m(A)}. Sans seuil (toute note acceptée) : ${m(V.sansSeuil)}. Écart : ${ec(A.pnl-V.sansSeuil.pnl)}.`,A.pnl>V.sansSeuil.pnl+.005?'Le filtre de Boussole améliore le résultat sur cette période.':'Le filtre de Boussole n’apporte rien de plus sur cette période.'],
-    ['Bouclier',`Avec la couche de risque : ${m(A)}. Sans elle (taille maximale, sans coupe-circuit) : ${m(V.sansRisque)}.`,A.dd<V.sansRisque.dd-.0005?`Bouclier réduit la pire baisse de ${((V.sansRisque.dd-A.dd)*100).toFixed(1).replace('.',',')} points (son rôle est de limiter les pertes, pas d’augmenter les gains).`:'Bouclier ne réduit pas la pire baisse sur cette période.'],
-    ['Éclair',`Avec frais et glissement : ${fmt(A.pnl)}. Sans aucun coût : ${fmt(V.sansCouts.pnl)}. Coût d’exécution : ${fmt(A.pnl-V.sansCouts.pnl)}.`,'Éclair exécute seulement : il ne peut pas apporter de gain, il coûte des frais.'],
-    ['Carnet','Ne prend aucune décision de trading : rien à mesurer.',null]];
+  const L=[['Pistache','Non mesurable sur l’historique : il n’existe pas d’historique de l’indice peur et avidité, la simulation le garde neutre.'+(J&&J.n?` En direct (journal) : Pistache et Filou vont dans le même sens dans ${Math.round(J.acc/J.n*100)} % des ${J.n} décisions notées.`:''),null],
+    ['Filou',`Système actif : ${m(A)}. Même système avec la règle simple (croisement EMA 20/50) à la place de Filou : ${m(V.ref)}. Écart : ${ec(A.pnl-V.ref.pnl)}.`,A.pnl>V.ref.pnl+.005&&A.n>=30?`Filou fait mieux que la règle simple de ${fmt(A.pnl-V.ref.pnl)} sur cette période.`:'Filou n’apporte rien de plus que la règle simple sur cette période.'],
+    ['Gaston',`Avec son seuil de ${S.cfg.thr} % : ${m(A)}. Sans seuil (toute note acceptée) : ${m(V.sansSeuil)}. Écart : ${ec(A.pnl-V.sansSeuil.pnl)}.`,A.pnl>V.sansSeuil.pnl+.005?'Le filtre de Gaston améliore le résultat sur cette période.':'Le filtre de Gaston n’apporte rien de plus sur cette période.'],
+    ['Rocky',`Avec la couche de risque : ${m(A)}. Sans elle (taille maximale, sans coupe-circuit) : ${m(V.sansRisque)}.`,A.dd<V.sansRisque.dd-.0005?`Rocky réduit la pire baisse de ${((V.sansRisque.dd-A.dd)*100).toFixed(1).replace('.',',')} points (son rôle est de limiter les pertes, pas d’augmenter les gains).`:'Rocky ne réduit pas la pire baisse sur cette période.'],
+    ['Caramel',`Avec frais et glissement : ${fmt(A.pnl)}. Sans aucun coût : ${fmt(V.sansCouts.pnl)}. Coût d’exécution : ${fmt(A.pnl-V.sansCouts.pnl)}.`,'Caramel exécute seulement : il ne peut pas apporter de gain, il coûte des frais.'],
+    ['Gribouille','Ne prend aucune décision de trading : rien à mesurer.',null]];
   e.innerHTML=`<div>Partie test (30 % finaux), du ${dt(V.du)} au ${dt(V.au)}, bougies de ${V.tfLab}, mêmes frais, glissement et couche de risque. Références : règle simple ${fmt(V.ref.pnl)} (${V.ref.n} trades) · acheter et garder ${fmt(A.bh)}.</div>`+
     L.map(([n,t,v])=>`<div class="rep"><i style="background:${AG.find(g=>g.who===n).c}"></i><div><b>${n}</b><p>${t}${v?`<br><b class="${/n’apporte rien|ne réduit pas|coûte/.test(v)?'dn':'up'}">${v}</b>`:''}</p></div></div>`).join('')+
-    `<div class="rep"><i style="background:#9fb3cc"></i><div><b>Se trompent-ils ensemble ?</b><p>${acc.n?`Sur ${acc.n} trades du système actif, Prisme, la règle simple et la tendance longue étaient tous d’accord à l’entrée ${acc.acc} fois (${Math.round(acc.acc/acc.n*100)} %). Résultat quand ils sont d’accord : ${fmt(acc.pnlAcc)} (${acc.acc} trades) ; quand ils divergent : ${fmt(acc.pnlDiv)} (${acc.n-acc.acc} trades).${acc.acc<30||acc.n-acc.acc<30?' Trop peu de trades dans un des deux groupes pour conclure.':''}`:'Aucun trade sur la partie test.'}${J&&J.nr?` En direct : accord Radar/Prisme ${fmt(J.pnlAcc)} sur ${J.nrAcc} trades clos, désaccord ${fmt(J.pnlDiv)} sur ${J.nr-J.nrAcc}.`:''}</p></div></div>`}
+    `<div class="rep"><i style="background:#9fb3cc"></i><div><b>Se trompent-ils ensemble ?</b><p>${acc.n?`Sur ${acc.n} trades du système actif, Filou, la règle simple et la tendance longue étaient tous d’accord à l’entrée ${acc.acc} fois (${Math.round(acc.acc/acc.n*100)} %). Résultat quand ils sont d’accord : ${fmt(acc.pnlAcc)} (${acc.acc} trades) ; quand ils divergent : ${fmt(acc.pnlDiv)} (${acc.n-acc.acc} trades).${acc.acc<30||acc.n-acc.acc<30?' Trop peu de trades dans un des deux groupes pour conclure.':''}`:'Aucun trade sur la partie test.'}${J&&J.nr?` En direct : accord Pistache/Filou ${fmt(J.pnlAcc)} sur ${J.nrAcc} trades clos, désaccord ${fmt(J.pnlDiv)} sur ${J.nr-J.nrAcc}.`:''}</p></div></div>`}
 function renderAgents(){vagHTML();delete PV.fst;
   $('live').textContent=timer?'Agents en service':"À l'arrêt";$('live').classList.toggle('on',!!timer);
   $('scan').innerHTML=(S.scan||[]).map(x=>`<span>${x.q.replace('USDT','')} <b class="${x.sc>0?'u':x.sc<0?'d':''}">${x.sc>0?'▲':x.sc<0?'▼':'–'} ${Math.round((.5+.5*Math.abs(x.sc))*100)} %</b></span>`).join('');
   $('exclu').textContent=LV.excl.length?`Trop calmes pour couvrir les frais (ATR sous 3 × le coût aller-retour) : ${LV.excl.map(x=>x.replace('USDT','')).join(', ')}. Le forex y est souvent : c’est normal.`:'';
   const c=S.cfg,R=S.rules,E={
     'Actualités':c.rsrc==='manuel'?'Ta saisie manuelle dans Réglages (haussier, neutre ou baissier), appliquée aux cryptos seulement.':'Indice peur et avidité d’alternative.me (une valeur par jour, ignorée si elle a plus de 24 h), appliqué aux cryptos seulement. Sources des pros affichées en plus : régime du bitcoin (moyenne 50 jours), calendrier des annonces de la Fed, taux de financement des contrats perpétuels Binance ; elles ne filtrent les entrées que si la règle correspondante est activée.',
-    'Analyste technique':`Bougies fermées de ${TF.lab} et de ${TF.clab} de Binance pour chaque paire. Signaux : ${R.sig?'tendance EMA 20/50 sur bougies de '+TF.clab+', cassure du plus haut ou plus bas des 20 bougies, régime du RSI':'EMA 9/21, MACD, élan, RSI et Bollinger'}, plus volume, ATR et l’actualité de Radar.`,
-    'Chef':`Notes de Prisme pour chaque paire, seuil de l’indice (${c.thr} %), position ouverte et changements gardés par la mesure (${RULES().join(', ')||'aucun'}).`,
+    'Analyste technique':`Bougies fermées de ${TF.lab} et de ${TF.clab} de Binance pour chaque paire. Signaux : ${R.sig?'tendance EMA 20/50 sur bougies de '+TF.clab+', cassure du plus haut ou plus bas des 20 bougies, régime du RSI':'EMA 9/21, MACD, élan, RSI et Bollinger'}, plus volume, ATR et l’actualité de Pistache.`,
+    'Chef':`Notes de Filou pour chaque paire, seuil de l’indice (${c.thr} %), position ouverte et changements gardés par la mesure (${RULES().join(', ')||'aucun'}).`,
     'Risque':`Arrêt d’urgence, trades du jour (max ${c.maxTrades}), perte du jour (max ${String(c.maxLoss).replace('.',',')} %), solde fictif, fraîcheur des prix (pause après 5 s sans données).`,
     'Exécuteur fictif':`Prix d’achat et de vente en direct de Binance, frais ${String(c.fee).replace('.',',')} % et glissement ${String(c.slip).replace('.',',')} % par côté, ${c.nb} achat${c.nb>1?'s':''} de ${fmt(c.size)} par décision, stop ${R.atr?'ATR suiveur ':''}plafonné à ${String(c.sl).replace('.',',')} %.`,
     'Journal':'Trades clôturés (résultat, durée, indice annoncé) et résultats de la mesure sur l’historique.'};
-  $('reps').innerHTML=AG.map(g=>{const a=S.ags.find(x=>x.n===g.n);return `<div class="rep"><i style="background:${g.c}"></i><div><b>${g.who}</b> <em>· ${g.job}</em>
-    <dl><dt>Type</dt><dd>Règles fixes, sans modèle d’IA</dd><dt>Entrées</dt><dd>${E[g.n]}</dd><dt>Dernière décision</dt><dd>${a?`${a.at?hr(a.at).slice(0,5)+' · ':''}${a.t}`:attente()}${g.n==='Journal'&&S.sim?'<br>'+simLine(S.sim):''}</dd></dl></div></div>`}).join('')}
+  const ouv=new Set([...document.querySelectorAll('#reps details[open]')].map(d=>d.dataset.k));
+  const hx=AG.map(g=>{const a=S.ags.find(x=>x.n===g.n);return `<div class="agc${timer?' on':''}" style="--c:${g.c};--cf:${g.c}2e"><div class="av" aria-hidden="true">${g.emo}</div><div class="agb">
+    <div class="agt"><b>${g.who}</b><span>${g.esp}</span><em>${g.n}</em></div><p>${g.job}</p>
+    <div class="agd"><span class="dot"></span>${a?`${a.at?hr(a.at).slice(0,5)+' · ':''}${a.t}`:attente()}</div>
+    <details data-k="${g.n}"${ouv.has(g.n)?' open':''}><summary>Ce qu’il regarde</summary><p>${E[g.n]}</p>${g.n==='Journal'&&S.sim?'<p>'+simLine(S.sim)+'</p>':''}<p class="mut2">Règles fixes écrites dans le code, sans modèle d’IA.</p></details></div></div>`}).join('');
+  if(hx!==REPS_){REPS_=hx;$('reps').innerHTML=hx}} // réécrit seulement si quelque chose a changé : animations sans à-coups
+let REPS_='';
 function render(){
   const pnl=S.trades.reduce((a,b)=>a+b,0),w=S.trades.filter(x=>x>0).length,L=S.trades.length,P=S.pos,eq=valeur(),H=S.hist,n=H.length;
   $('bal').textContent=fmt(eq);$('pnl').textContent=fmt(pnl);$('pnl').className=pnl>=0?'up':'dn';
   $('wr').textContent=L?Math.round(w/L*100)+' %':'–';$('tax').textContent=fmt(Math.max(0,pnl)*TAX);
   const dk=d=>/HAUSSE/.test(d)?'long':/BAISSE/.test(d)?'short':/SORTIR/.test(d)?'out':'';
-  if(S.dec)$('dec').innerHTML=`<div class="dd"><span class="chip ${dk(S.dec.d)}">${S.dec.d}</span><span class="mut">indice de confiance du bot : ${S.dec.conf}</span></div>${S.dec.why}<br><span class="mut">Bouclier : ${S.dec.rr}</span>`;
+  if(S.dec)$('dec').innerHTML=`<div class="dd"><span class="chip ${dk(S.dec.d)}">${S.dec.d}</span><span class="mut">indice de confiance du bot : ${S.dec.conf}</span></div>${S.dec.why}<br><span class="mut">Rocky : ${S.dec.rr}</span>`;
   const r0=(eq-S.start)/S.start;$('ret').textContent=`${r0>=0?'+':'−'}${Math.abs(r0*100).toFixed(2).replace('.',',')} % depuis le départ (${fmt(S.start)})`;$('ret').className='delta '+(r0>=0?'up':'dn');
   $('nt').textContent=`${S.day===today()?S.nToday:0} / ${S.cfg.maxTrades}`;
   $('cal').innerHTML=(P?`<b>${P.q} : position ouverte en ${P.side==='long'?'hausse':'baisse'}</b> à ${fp(P.fill)}, stop <span id="pstop">${fp(P.stop)}</span>, résultat latent <span id="plat">–</span>.<br>`:'')+
@@ -882,7 +909,7 @@ function simHTML(M){if(!M||M.v!==6)return'<span class="mut">Pas encore lancée. 
   <h3>Changements essayés un par un</h3>${M.essais.map(e=>`<div class="ess"><span class="pill ${e.garde?'ok':'no'}">${e.garde?'Gardé':'Abandonné'}</span> <b>${e.nom}</b><br><span class="mut">Test ${fmt(e.avantTest.pnl)} → ${fmt(e.test.pnl)} (${e.test.n} trades${e.test.n<30?', trop peu pour conclure':''}) · entraînement ${fmt(e.avantCal.pnl)} → ${fmt(e.cal.pnl)} (${e.cal.n} trades). ${e.pq[0].toUpperCase()+e.pq.slice(1)}.</span></div>`).join('')}
   <h3>Seuil de l’indice de confiance</h3><div class="mut">Pour chaque seuil, entraînement → test : ${M.seuils.map(x=>`${x.thr} % : ${fmt(x.cal.pnl)} (${x.cal.n} tr.) → ${x.test?fmt(x.test.pnl)+' ('+x.test.n+' tr.)':'–'}`).join(' · ')}.<br>
   Meilleur sur l’entraînement : ${M.best} %. Sur le test : ${fmt(M.testBest.pnl)} contre ${fmt(M.avantSeuil)} au seuil des réglages (${M.thr} %). ${M.seuilOk?`Seuil de ${M.best} % confirmé sur le test : tu peux le choisir dans Réglages (il n’est pas changé automatiquement).`:'Pas de changement de seuil recommandé.'}</div>
-  <p class="mut">Simulation avec une actualité neutre : il n’y a pas d’historique de la source de Radar. Stops vérifiés avec le plus haut et le plus bas de chaque bougie (au tick en direct). La partie test a aussi servi à décider quels changements garder : elle n’est donc plus totalement indépendante. Le passé ne garantit pas l’avenir.</p>`}
+  <p class="mut">Simulation avec une actualité neutre : il n’y a pas d’historique de la source de Pistache. Stops vérifiés avec le plus haut et le plus bas de chaque bougie (au tick en direct). La partie test a aussi servi à décider quels changements garder : elle n’est donc plus totalement indépendante. Le passé ne garantit pas l’avenir.</p>`}
 const fragile=X=>X&&X.rows.some(r=>r.k>1&&(r.test.pnl<0||(r.wf&&r.wf.pnl<0)));
 function robHTML(X){if(!X||X.v!==1)return'<span class="mut">Pas encore lancé. Va dans l’onglet Agents et touche « Test de robustesse ».</span>';
   const pf=r=>!r||!r.n?'–':r.pf===null?(r.gain>0?'∞':'–'):r.pf.toFixed(2).replace('.',','),ce=r=>!r?'–':r.n<30?`<span class="mut">${fmt(r.pnl)}*</span>`:sg$(r.pnl);
@@ -984,7 +1011,7 @@ let GZ=0;$('gelgo').onclick=async()=>{const b=$('gelgo');if(S.gel){if(!GZ){GZ=se
   else S.gel={at:Date.now(),h:await vReglages()};save();gelHTML();render()};
 $('jcsv').onclick=async()=>{await JR.file;const L=await jrTout(),n=x=>x===undefined||x===null||!isFinite(x)?'':String(+(+x).toFixed(8)).replace('.',','),t=x=>(x==null?'':String(x)).replace(/[;\r\n]/g,',');
   const H=['numero','horodatage','agent','decision','paire','sens','raison','indice_confiance','prix_achat','prix_vente','note_prisme','tendance_longue','cassure','regime_rsi','volume','atr','actualite','version_agents','version_reglages','resultat','gain_net_usdt','frais_usdt','glissement_usdt','variation_prix_1h','empreinte','empreinte_precedente'];
-  const rows=L.map(r=>{const p=r.entrees&&r.entrees.prisme||{},x=r.resultat||{};return[r.id,new Date(r.ts).toLocaleString('fr-FR'),r.agent,r.type,r.paire||'',r.sens==='long'?'hausse':r.sens==='short'?'baisse':'',t(r.raison),n(r.confiance),n(r.prix&&r.prix.achat),n(r.prix&&r.prix.vente),n(p.note),n(p.tendance),n(p.cassure),n(p.regimeRSI),n(p.volume),n(p.atr),t(r.entrees&&r.entrees.radar&&r.entrees.radar.actualite),r.vAgents,r.vReglages,t(x.statut||'en attente'),n(x.net),n(x.frais),n(x.glissement),n(x.variation1h),r.h,r.prev].join(';')});
+  const rows=L.map(r=>{const p=r.entrees&&r.entrees.prisme||{},x=r.resultat||{};return[r.id,new Date(r.ts).toLocaleString('fr-FR'),NOM_JOURNAL[r.agent]||r.agent,r.type,r.paire||'',r.sens==='long'?'hausse':r.sens==='short'?'baisse':'',t(r.raison),n(r.confiance),n(r.prix&&r.prix.achat),n(r.prix&&r.prix.vente),n(p.note),n(p.tendance),n(p.cassure),n(p.regimeRSI),n(p.volume),n(p.atr),t(r.entrees&&r.entrees.radar&&r.entrees.radar.actualite),r.vAgents,r.vReglages,t(x.statut||'en attente'),n(x.net),n(x.frais),n(x.glissement),n(x.variation1h),r.h,r.prev].join(';')});
   telecharger(`tradeinsight-journal-${jour()}.csv`,'text/csv;charset=utf-8','﻿'+[H.join(';'),...rows].join('\r\n'));$('setmsg').textContent=`${L.length} décisions exportées.`};
 $('jjson').onclick=async()=>{await JR.file;const L=await jrTout(),A=JR.db?await idb('archives','readonly',tx=>tx.objectStore('archives').getAll()):[];
   telecharger(`tradeinsight-journal-${jour()}.json`,'application/json',JSON.stringify({app:'TradeInsight',argentFictif:true,exporte:new Date().toISOString(),versionAgents:JR.vAg,chaine:JR.integre||'intacte',journal:L,archives:A},null,1));$('setmsg').textContent=`${L.length} décisions et ${A.length} archive(s) exportées.`};
