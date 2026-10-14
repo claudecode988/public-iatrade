@@ -64,6 +64,8 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 .fl>div{padding:4px 0;border-top:1px solid #1d2a3a;color:#9fb3cc}.fl b{color:#fff}
 .sec{display:none}.sec.on{display:block}
 .tw{overflow-x:auto;margin:8px 0}.st{border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}.st th,.st td{padding:5px 8px;border-top:1px solid var(--line);text-align:right}.st th:first-child{text-align:left}.st thead th{color:var(--mut);font-weight:600;border:0}
+.alertes p{margin:6px 0;padding:8px 10px;border-radius:10px;background:var(--warn);font-size:14px}.alertes p.ok{background:var(--chip);color:var(--mut)}
+.st.cote td{text-align:right}
 .ess{padding:6px 0;border-top:1px solid var(--line)}.pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:12px;font-weight:700}.pill.ok{background:var(--up);color:var(--card)}.pill.no{background:var(--line);color:var(--ink)}
 </style></head><body>
 <div class="warn">Simulation avec argent fictif uniquement. Aucun conseil financier. Le trading réel comporte un risque de perte.</div>
@@ -251,40 +253,48 @@ function fermer(P,price,c){const s=c.slip/100,f=c.fee/100,fx=P.side==='long'?pri
 function acheterGarder(F,from,to,c){const s=c.slip/100,f=c.fee/100,a=1e4/F.Q.length;let v=0;
   for(const q of F.Q){const P=F.p[q],fill=P.c[from]*(1+s),n=a*(1-f)/fill,fx=P.c[to-1]*(1-s);v+=n*fx*(1-f)}return v-1e4}
 // Rejoue les règles heure par heure entre from et to (exclu) avec 10 000 $ fictifs. Stop vérifié dans chaque bougie (plus bas / plus haut).
-function simuler(F,from,to,c,R){let cash=1e4,P=null,nT=0,lossD=0,pk=1e4,dd=0,day='',fees=0,slip=0,lastX=-1e15;const T=[],Du=[],H=[],sum=a=>a.reduce((x,y)=>x+y,0);
+function simuler(F,from,to,c,R){let cash=1e4,P=null,nT=0,lossD=0,pk=1e4,dd=0,day='',fees=0,slip=0,lastX=-1e15,m=0,st=0,se=0,stt=0,see=0,ste=0;const T=[],Du=[],H=[],sum=a=>a.reduce((x,y)=>x+y,0);
   const sortir=(t,price)=>{const r=fermer(P,price,c);cash+=P.size+r.g-r.xf;fees+=P.fe+r.xf;slip+=r.slip;T.push(r.pnl);Du.push((F.T[t]-P.t0)/H1);H.push(P.p);lossD+=r.pnl;nT+=P.nb;lastX=F.T[t];P=null};
   for(let t=from;t<to;t++){const dj=new Date(F.T[t]).toISOString().slice(0,10);if(dj!==day){day=dj;nT=0;lossD=0}
     if(P){const x=F.p[P.q].C[t],hit=stopTick(P,x.l,x.h,R,x.o);if(hit!==null)sortir(t,hit);else if(sortieCloture(F,P,t,c,R))sortir(t,x.c)}
     else if(nT+(c.nb||1)<=c.maxTrades&&-lossD<1e4*c.maxLoss/100&&cash>=c.size*(c.nb||1)*(1+c.fee/100)&&(!R.cool||(F.T[t]-lastX)/TF.bar>=4)){const{b}=choisir(F,t,c,R);
       if(b){P=ouvrir(F,b.q,t,b.dir,b.pr,c,R);cash-=P.size+P.fe;nT+=P.nb}}
-    const un=P?(P.side==='long'?1:-1)*P.n*(F.p[P.q].c[t]-P.fill):0,eq=cash+(P?P.size+un:0);pk=Math.max(pk,eq);dd=Math.max(dd,(pk-eq)/pk)}
+    const un=P?(P.side==='long'?1:-1)*P.n*(F.p[P.q].c[t]-P.fill):0,eq=cash+(P?P.size+un:0);pk=Math.max(pk,eq);dd=Math.max(dd,(pk-eq)/pk);m++;st+=m;se+=eq;stt+=m*m;see+=eq*eq;ste+=m*eq}
   if(P)sortir(to-1,F.p[P.q].c[to-1]); // une position encore ouverte est clôturée au dernier prix pour être comptée
   const w=T.filter(x=>x>0);
-  const gs=sum(w),ls=sum(T.filter(x=>x<=0));
-  return{n:T.length,pnl:sum(T),gain:gs,loss:ls,pf:ls<0?gs/-ls:null,bh:acheterGarder(F,from,to-1>from?to:from+1,c),fees,slip,wr:T.length?w.length/T.length:0,dd,conf:H.length?sum(H)/H.length:0,
+  const gs=sum(w),ls=sum(T.filter(x=>x<=0)),vt=stt/m-(st/m)**2,ve=see/m-(se/m)**2,r2=m>2&&vt>0&&ve>1e-9?((ste/m-st/m*se/m)**2)/(vt*ve):0; // R² : 1 = courbe parfaitement droite
+  return{r2,n:T.length,pnl:sum(T),gain:gs,loss:ls,pf:ls<0?gs/-ls:null,bh:acheterGarder(F,from,to-1>from?to:from+1,c),fees,slip,wr:T.length?w.length/T.length:0,dd,conf:H.length?sum(H)/H.length:0,
     dur:Du.length?sum(Du)/Du.length:0,jours:Math.round((to-from)*TF.bar/864e5),du:F.T[from],au:F.T[to-1]}}
+// Signaux d'alerte contre la sur-interprétation d'un résultat (entraînement a, test b).
+function alertes(a,b){const o=[];
+  if(a.n<30||b.n<30)o.push(`Moins de 30 trades (${a.n} à l’entraînement, ${b.n} au test) : trop peu pour conclure.`);
+  for(const[r,nom]of[[a,'l’entraînement'],[b,'le test']])if(r.n>=30&&r.pnl>0&&(r.r2>=.97||r.dd<.005))
+    o.push(`Courbe trop lisse sur ${nom} (R² ${r.r2.toFixed(2).replace('.',',')}, pire baisse ${(r.dd*100).toFixed(2).replace('.',',')} %) : un résultat aussi régulier est rare en vrai et peut cacher une erreur ou un sur-ajustement.`);
+  if(a.n&&b.n&&Math.sign(a.pnl)!==Math.sign(b.pnl))o.push(`Écart important : ${a.pnl>0?'gain':'perte'} à l’entraînement mais ${b.pnl>0?'gain':'perte'} au test.`);
+  else if(a.pf&&b.pf!==null&&b.pf<a.pf/2)o.push(`Écart important : le profit factor passe de ${a.pf.toFixed(2).replace('.',',')} à l’entraînement à ${b.pf.toFixed(2).replace('.',',')} au test.`);
+  return o}
 // Méthode : départ = règles d'avant. Chaque changement est ajouté seul ; il est gardé seulement s'il améliore le bilan
-// sur le TEST (1/3 final) et aussi sur le calibrage (2/3), avec au moins 30 trades sur le test. Puis le seuil est choisi sur le calibrage seul et vérifié sur le test.
-function mesurer(F,c){const W=Math.min(TF.W,Math.floor(F.N/4)),cut=W+Math.floor((F.N-W)*2/3),seg=(R,thr)=>({cal:simuler(F,W,cut,{...c,thr},R),test:simuler(F,cut,F.N,{...c,thr},R)});
+// sur le TEST (30 % final) et aussi sur l'entraînement (70 % du début), avec au moins 30 trades sur le test. Puis le seuil est choisi sur le calibrage seul et vérifié sur le test.
+function mesurer(F,c){const W=Math.min(TF.W,Math.floor(F.N/4)),cut=W+Math.floor((F.N-W)*.7),seg=(R,thr)=>({cal:simuler(F,W,cut,{...c,thr},R),test:simuler(F,cut,F.N,{...c,thr},R)});
   const base=seg({},c.thr);let R={},cur=base;const essais=[];
   for(const m of CHANGES){const R2={...R,[m.id]:1},r=seg(R2,c.thr),bc=r.cal.pnl>cur.cal.pnl+.005,bt=r.test.pnl>cur.test.pnl+.005,peu=r.test.n<30,garde=bc&&bt&&!peu;
-    const pq=!r.cal.n&&!r.test.n?'aucun trade : rien à mesurer':peu&&bc&&bt?`seulement ${r.test.n} trades sur le test : trop peu pour conclure, donc pas gardé`:garde?'améliore le test et le calibrage':bt?'améliore le test mais pas le calibrage : rien ne permettait de le choisir avant de voir le test'
-      :bc?'améliore le calibrage mais pas le test : probablement un effet du hasard':'n’améliore ni le test ni le calibrage';
+    const pq=!r.cal.n&&!r.test.n?'aucun trade : rien à mesurer':peu&&bc&&bt?`seulement ${r.test.n} trades sur le test : trop peu pour conclure, donc pas gardé`:garde?'améliore le test et l’entraînement':bt?'améliore le test mais pas l’entraînement : rien ne permettait de le choisir avant de voir le test'
+      :bc?'améliore l’entraînement mais pas le test : probablement un effet du hasard':'n’améliore ni le test ni l’entraînement';
     essais.push({id:m.id,nom:m.nom,cal:r.cal,test:r.test,avantCal:cur.cal,avantTest:cur.test,garde,pq});if(garde){R=R2;cur=r}}
   const seuils=[70,75,80,85,90].map(thr=>({thr,cal:simuler(F,W,cut,{...c,thr},R)}));
   const best=seuils.reduce((a,b)=>b.cal.pnl>a.cal.pnl+.005?b:a).thr,tb=simuler(F,cut,F.N,{...c,thr:best},R),seuilOk=best!==c.thr&&tb.pnl>cur.test.pnl+.005;
-  return{v:4,tf:TF.min,tfLab:TF.lab,nb:c.nb||1,base,fin:seuilOk?seg(R,best):cur,essais,avantSeuil:cur.test.pnl,seuils,best,testBest:tb,seuilOk,thr:c.thr,R,c:{fee:c.fee,slip:c.slip,hold:c.hold,atrK:c.atrK,sl:c.sl},
+  return{v:5,tf:TF.min,tfLab:TF.lab,nb:c.nb||1,base,fin:seuilOk?seg(R,best):cur,essais,avantSeuil:cur.test.pnl,seuils,best,testBest:tb,seuilOk,thr:c.thr,R,c:{fee:c.fee,slip:c.slip,hold:c.hold,atrK:c.atrK,sl:c.sl},
     pairs:F.Q.length,du:F.T[W],coupe:F.T[cut],au:F.T[F.N-1],quand:Date.now()}}
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 14:52';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 14:54';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
 let S=D(),KEYS={k:'',s:''};
 try{const j=localStorage.getItem('tiq');if(j)S=Object.assign(D(),JSON.parse(j))}catch(e){}
-S.cfg=Object.assign(D().cfg,S.cfg);if(!S.cfg5){S.cfg.maxRuns=1440;S.cfg5=1}if(!S.cfg6){S.cfg.tf=10;S.cfg6=1}if(!S.cfg7){S.cfg.tf=5;S.cfg.nb=3;S.cfg7=1}setTF(S.cfg.tf);if(S.sim&&S.sim.tf!==TF.min){S.sim=0;S.rules={}}if(S.sim&&S.sim.v!==4){S.sim=0;S.rules={}}S.rules=S.rules||{};
+S.cfg=Object.assign(D().cfg,S.cfg);if(!S.cfg5){S.cfg.maxRuns=1440;S.cfg5=1}if(!S.cfg6){S.cfg.tf=10;S.cfg6=1}if(!S.cfg7){S.cfg.tf=5;S.cfg.nb=3;S.cfg7=1}setTF(S.cfg.tf);if(S.sim&&S.sim.tf!==TF.min){S.sim=0;S.rules={}}if(S.sim&&S.sim.v!==5){S.sim=0;S.rules={}}S.rules=S.rules||{};
 if(S.pos&&(!S.pos.q||!S.pos.dist)){S.cash+=S.pos.size||0;S.pos=null} // position d'une ancienne version : remboursée au prix d'entrée
 const save=()=>{try{localStorage.setItem('tiq',JSON.stringify(S))}catch(e){}};
 const TAX=0.314,today=()=>new Date().toISOString().slice(0,10),hr=t=>new Date(t||Date.now()).toLocaleTimeString('fr-FR');
@@ -515,20 +525,25 @@ function paint(){const st=LV.st,cl=st==='EN DIRECT'?'ok':st==='DONNÉES FIGÉES'
   const P=S.pos;if(P){const px=(P.side==='long'?LV.bid[P.q]:LV.ask[P.q])||P.px;put('plat',fmt((P.side==='long'?1:-1)*P.n*(px-P.fill)));put('pstop',fp(P.stop))}}
 setInterval(()=>{paint();if(S.pos)save()},250);
 const dt=x=>new Date(x).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'2-digit'}),pct=x=>(x*100).toFixed(1).replace('.',',')+' %',sg$=x=>`<b class="${x>=0?'up':'dn'}">${fmt(x)}</b>`;
-const simLine=M=>M&&M.v===4?`Mesure : départ ${fmt(M.base.test.pnl)} sur le test (${M.base.test.n} trades), après changements ${fmt(M.fin.test.pnl)} (${M.fin.test.n} trades, durée moyenne ${M.fin.test.dur.toFixed(1)} h, frais ${fmt(M.fin.test.fees)}, glissement ${fmt(M.fin.test.slip)}, pire baisse ${pct(M.fin.test.dd)})${M.fin.test.n<30?', trop peu de trades pour conclure':''}. Gardés : ${M.essais.filter(e=>e.garde).map(e=>e.nom).join(', ')||'aucun'}.`:'';
-function simHTML(M){if(!M||M.v!==4)return'<span class="mut">Pas encore lancée. Va dans l’onglet Agents et touche « Mesurer sur l’historique réel ».</span>';
+const simLine=M=>M&&M.v===5?`Mesure : départ ${fmt(M.base.test.pnl)} sur le test (${M.base.test.n} trades), après changements ${fmt(M.fin.test.pnl)} (${M.fin.test.n} trades, durée moyenne ${M.fin.test.dur.toFixed(1)} h, frais ${fmt(M.fin.test.fees)}, glissement ${fmt(M.fin.test.slip)}, pire baisse ${pct(M.fin.test.dd)})${M.fin.test.n<30?', trop peu de trades pour conclure':''}. Gardés : ${M.essais.filter(e=>e.garde).map(e=>e.nom).join(', ')||'aucun'}.`:'';
+function simHTML(M){if(!M||M.v!==5)return'<span class="mut">Pas encore lancée. Va dans l’onglet Agents et touche « Mesurer sur l’historique réel ».</span>';
   const peu=r=>r.n<30,pfx=r=>!r.n?'–':r.pf===null?(r.gain>0?'∞ (aucune perte)':'–'):r.pf.toFixed(2).replace('.',','),
     row=(n,r)=>`<tr><th>${n}</th><td>${peu(r)?'<span class="mut">trop peu de trades</span>':sg$(r.pnl)}</td><td>${r.n}</td><td>${pfx(r)}</td><td>${r.n?Math.round(r.wr*100)+' %':'–'}</td><td>${pct(r.dd)}</td><td>${sg$(r.bh)}</td><td>${r.dur.toFixed(1)} h</td><td class="up">${fmt(r.gain)}</td><td class="dn">${fmt(r.loss)}</td><td>${fmt(r.fees)}</td><td>${fmt(r.slip)}</td></tr>`;
-  const ft=M.fin.test;
-  return`<div class="mut">${M.pairs} marchés, bougies de ${M.tfLab}, ${M.nb} achat${M.nb>1?'s':''} de ${fmt(S.cfg.size)} par décision. Calibrage du ${dt(M.du)} au ${dt(M.coupe)} (${M.base.cal.jours} j), test du ${dt(M.coupe)} au ${dt(M.au)} (${M.base.test.jours} j). Frais ${String(M.c.fee).replace('.',',')} % et glissement ${String(M.c.slip).replace('.',',')} % par côté.</div>
+  const ft=M.fin.test,fc=M.fin.cal,al=alertes(fc,ft),cote=(n,f)=>`<tr><th>${n}</th><td>${f(fc)}</td><td>${f(ft)}</td></tr>`;
+  return`<div class="mut">${M.pairs} marchés, bougies de ${M.tfLab}, ${M.nb} achat${M.nb>1?'s':''} de ${fmt(S.cfg.size)} par décision. Entraînement (70 %) du ${dt(M.du)} au ${dt(M.coupe)} (${M.base.cal.jours} j), test (30 %) du ${dt(M.coupe)} au ${dt(M.au)} (${M.base.test.jours} j), dans l’ordre chronologique. Frais ${String(M.c.fee).replace('.',',')} % et glissement ${String(M.c.slip).replace('.',',')} % par côté.</div>
+  <h3>Version active : entraînement et test côte à côte</h3>
+  <div class="tw"><table class="st cote"><thead><tr><th></th><th>Entraînement</th><th>Test</th></tr></thead><tbody>
+  ${cote('Bilan net',r=>sg$(r.pnl))}${cote('Trades',r=>r.n)}${cote('Profit factor',pfx)}${cote('Réussite',r=>r.n?Math.round(r.wr*100)+' %':'–')}${cote('Pire baisse',r=>pct(r.dd))}${cote('Acheter et garder',r=>sg$(r.bh))}${cote('Régularité de la courbe (R²)',r=>r.r2.toFixed(2).replace('.',','))}</tbody></table></div>
+  <div class="alertes">${al.length?al.map(x=>`<p>⚠ ${x}</p>`).join(''):'<p class="ok">Aucun signal d’alerte automatique. Ça ne prouve pas que la stratégie marche : seulement que ces trois pièges classiques ne sont pas détectés.</p>'}</div>
+  <h3>Détail : version de départ et version active</h3>
   <div class="tw"><table class="st"><thead><tr><th></th><th>Bilan net</th><th>Trades</th><th>Profit factor</th><th>Réussite</th><th>Pire baisse</th><th>Acheter et garder</th><th>Durée moy.</th><th>Gagné</th><th>Perdu</th><th>Frais</th><th>Glissement</th></tr></thead><tbody>
-  ${row('Départ · calibrage',M.base.cal)}${row('Départ · test',M.base.test)}${row('Après · calibrage',M.fin.cal)}${row('Après · test',ft)}</tbody></table></div>
+  ${row('Départ · entraînement',M.base.cal)}${row('Départ · test',M.base.test)}${row('Active · entraînement',M.fin.cal)}${row('Active · test',ft)}</tbody></table></div>
   <p><b>Sur la partie test : ${fmt(ft.pnl)} pour la stratégie contre ${fmt(ft.bh)} pour « acheter et garder ».</b> ${ft.pnl>ft.bh?'La stratégie fait mieux que la référence sur cette période.':'La stratégie fait moins bien que simplement acheter et garder sur cette période.'}</p>
   <p class="mut">Bilan net = après frais et glissement, sur 10 000 $ fictifs. Profit factor = total gagné ÷ total perdu (au-dessus de 1 : les gains dépassent les pertes). Acheter et garder = 10 000 $ répartis à parts égales sur les ${M.pairs} paires au début de la période et revendus à la fin, mêmes frais et glissement. Moins de 30 trades : bilan affiché comme « trop peu de trades », il ne permet pas de conclure (il reste visible dans le détail ci-dessous).</p>
   <p><b>${peu(ft)?`Trop peu de trades sur la partie test (${ft.n}) pour conclure.`:ft.pnl>0?`Sur la partie test, le bilan après frais est positif (${fmt(ft.pnl)}).`:`Sur la partie test, la stratégie n’est pas rentable après frais (${fmt(ft.pnl)}).`}</b></p>
-  <h3>Changements essayés un par un</h3>${M.essais.map(e=>`<div class="ess"><span class="pill ${e.garde?'ok':'no'}">${e.garde?'Gardé':'Abandonné'}</span> <b>${e.nom}</b><br><span class="mut">Test ${fmt(e.avantTest.pnl)} → ${fmt(e.test.pnl)} (${e.test.n} trades${e.test.n<30?', trop peu pour conclure':''}) · calibrage ${fmt(e.avantCal.pnl)} → ${fmt(e.cal.pnl)} (${e.cal.n} trades). ${e.pq[0].toUpperCase()+e.pq.slice(1)}.</span></div>`).join('')}
-  <h3>Seuil de l’indice de confiance</h3><div class="mut">Sur le calibrage : ${M.seuils.map(x=>`${x.thr} % → ${fmt(x.cal.pnl)} (${x.cal.n} trades)`).join(' · ')}.<br>
-  Meilleur sur le calibrage : ${M.best} %. Sur le test : ${fmt(M.testBest.pnl)} contre ${fmt(M.avantSeuil)} au seuil des réglages (${M.thr} %). ${M.seuilOk?`Seuil de ${M.best} % confirmé sur le test : tu peux le choisir dans Réglages (il n’est pas changé automatiquement).`:'Pas de changement de seuil recommandé.'}</div>
+  <h3>Changements essayés un par un</h3>${M.essais.map(e=>`<div class="ess"><span class="pill ${e.garde?'ok':'no'}">${e.garde?'Gardé':'Abandonné'}</span> <b>${e.nom}</b><br><span class="mut">Test ${fmt(e.avantTest.pnl)} → ${fmt(e.test.pnl)} (${e.test.n} trades${e.test.n<30?', trop peu pour conclure':''}) · entraînement ${fmt(e.avantCal.pnl)} → ${fmt(e.cal.pnl)} (${e.cal.n} trades). ${e.pq[0].toUpperCase()+e.pq.slice(1)}.</span></div>`).join('')}
+  <h3>Seuil de l’indice de confiance</h3><div class="mut">Sur l’entraînement : ${M.seuils.map(x=>`${x.thr} % → ${fmt(x.cal.pnl)} (${x.cal.n} trades)`).join(' · ')}.<br>
+  Meilleur sur l’entraînement : ${M.best} %. Sur le test : ${fmt(M.testBest.pnl)} contre ${fmt(M.avantSeuil)} au seuil des réglages (${M.thr} %). ${M.seuilOk?`Seuil de ${M.best} % confirmé sur le test : tu peux le choisir dans Réglages (il n’est pas changé automatiquement).`:'Pas de changement de seuil recommandé.'}</div>
   <p class="mut">Simulation avec une actualité neutre : il n’y a pas d’historique de la source de Radar. Stops vérifiés avec le plus haut et le plus bas de chaque bougie (au tick en direct). La partie test a aussi servi à décider quels changements garder : elle n’est donc plus totalement indépendante. Le passé ne garantit pas l’avenir.</p>`}
 function fillCfg(){for(const k in S.cfg)if($(k))$(k).value=S.cfg[k]}
 let timer=null;
