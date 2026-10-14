@@ -2,14 +2,14 @@
 //   node tools/mesure.cjs                 bougies 1 h publiques Binance (lecture seule), environ 12 mois
 //   node tools/mesure.cjs --comparer       comparatif 5 min / 10 min / 1 h sur les mêmes 2 mois de bougies de 5 min
 //   node tools/mesure.cjs --synthetique   prix inventés : vérifie seulement que le moteur tourne, résultats sans valeur
-// Options : --duree 5|10|60 (minutes, 5 par défaut) --achats 3 --seuil 85 --taille 1000 --stop 2 --perte 5 --trades 50 --detention 6 --atr 2 --frais 0.1 --glissement 0.05 --pages N
+// Options : --duree 5|10|60 (minutes, 5 par défaut) --achats 3 --risque 0.5 --coupe 15 --seuil 85 --taille 1000 --stop 2 --perte 5 --trades 50 --detention 6 --atr 2 --frais 0.1 --glissement 0.05 --pages N
 const fs=require('fs'),path=require('path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const src=html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'));
 const E=new Function(src+';return{WL,historique,aligner,prep,mesurer,CHANGES,setTF,agreger,alertes,comparer,walkForward,dsr,fiabilite,sharpe,cleEssai,setEssai:f=>{ESSAI=f}}')();
 const arg=(k,d)=>{const i=process.argv.indexOf('--'+k);return i>0?+process.argv[i+1]:d};
 const TF=E.setTF(arg('duree',5));
-const c={nb:arg('achats',3),thr:arg('seuil',85),size:arg('taille',1000),sl:arg('stop',2),maxLoss:arg('perte',5),maxTrades:arg('trades',50),hold:arg('detention',6),atrK:arg('atr',2),fee:arg('frais',.1),slip:arg('glissement',.05)};
+const c={riskPct:arg('risque',.5),ddMax:arg('coupe',15),nb:arg('achats',3),thr:arg('seuil',85),size:arg('taille',1000),sl:arg('stop',2),maxLoss:arg('perte',5),maxTrades:arg('trades',50),hold:arg('detention',6),atrK:arg('atr',2),fee:arg('frais',.1),slip:arg('glissement',.05)};
 const L=[...E.WL.CRYPTO,...E.WL.FOREX];
 function synthetique(){const D={},t0=Date.UTC(2025,0,1);let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
   for(const q of L){let b=100,a=[];for(let i=0;i<TF.pages*1000;i++){const o=b;b*=1+(rnd()-.5)*.016*Math.sqrt(TF.srcMs/36e5);a.push({t:t0+i*TF.srcMs,o,h:Math.max(o,b)*(1+rnd()*.004),l:Math.min(o,b)*(1-rnd()*.004),c:b,v:100+rnd()*100})}D[q]=E.agreger(a)}return D}
