@@ -140,6 +140,11 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 <label>Secret testnet<input id="s" type="password" autocomplete="off"></label>
 <label>Envoyer aussi les ordres au testnet<select id="tn"><option value="0">Non, portefeuille interne seulement</option><option value="1">Oui, avec confirmation avant chaque ordre</option></select></label>
 <button class="btn" id="save">Enregistrer les réglages</button>
+<h2>Mes données</h2>
+<div class="mut">Portefeuille, réglages, journal et trades sont enregistrés automatiquement dans ce navigateur (sur cet appareil seulement). Les clés testnet ne sont jamais enregistrées ni exportées.</div>
+<div class="mut" id="stock"></div>
+<div class="act2"><button class="btn ghost" id="excsv">Trades (CSV)</button><button class="btn ghost" id="exjson">Tout (JSON)</button></div>
+<label>Restaurer une sauvegarde JSON<input id="imjson" type="file" accept="application/json,.json"></label>
 <button class="btn stop" id="reset">Remettre la simulation à zéro</button>
 <div class="mut" id="setmsg" role="status"></div>
 </section>
@@ -297,7 +302,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 14:56';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 14:58';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
@@ -305,7 +310,7 @@ let S=D(),KEYS={k:'',s:''};
 try{const j=localStorage.getItem('tiq');if(j)S=Object.assign(D(),JSON.parse(j))}catch(e){}
 S.cfg=Object.assign(D().cfg,S.cfg);if(!S.cfg5){S.cfg.maxRuns=1440;S.cfg5=1}if(!S.cfg6){S.cfg.tf=10;S.cfg6=1}if(!S.cfg7){S.cfg.tf=5;S.cfg.nb=3;S.cfg7=1}setTF(S.cfg.tf);if(S.sim&&S.sim.tf!==TF.min){S.sim=0;S.rules={}}if(S.sim&&S.sim.v!==5){S.sim=0;S.rules={}}S.rules=S.rules||{};
 if(S.pos&&(!S.pos.q||!S.pos.dist)){S.cash+=S.pos.size||0;S.pos=null} // position d'une ancienne version : remboursée au prix d'entrée
-const save=()=>{try{localStorage.setItem('tiq',JSON.stringify(S))}catch(e){}};
+let SAVED=0,SAVEERR='';const save=()=>{try{localStorage.setItem('tiq',JSON.stringify(S));SAVED=Date.now();SAVEERR=''}catch(e){SAVEERR='Sauvegarde impossible dans ce navigateur (mode privé ou stockage plein) : exporte tes données en JSON.'}};
 const TAX=0.314,today=()=>new Date().toISOString().slice(0,10),hr=t=>new Date(t||Date.now()).toLocaleTimeString('fr-FR');
 const pairs=()=>[...WL.CRYPTO,...WL.FOREX].filter(q=>!LV.bad.has(q));
 const RULES=()=>CHANGES.filter(m=>S.rules[m.id]).map(m=>m.nom);
@@ -360,7 +365,7 @@ function marche(){const C={};for(const q of Object.keys(LV.C1))if(LV.C1[q].lengt
 function verifierStop(){const P=S.pos;if(!P||!fresh())return;const px=P.side==='long'?LV.bid[P.q]:LV.ask[P.q];if(!px)return;
   const hit=stopTick(P,px,px,S.rules,px);if(hit!==null)cloturer(hit,'stop touché au tick',false)}
 async function cloturer(price,raison,manuel){const P=S.pos,c=S.cfg,r=fermer(P,price,c);
-  S.cash+=P.size+r.g-r.xf;S.trades.push(r.pnl);S.hist.push({p:P.p,side:P.side,pnl:r.pnl,dur:(Date.now()-P.t0-TF.bar)/H1});S.lossToday+=r.pnl;S.nToday+=P.nb||1;S.lastX=Math.floor(Date.now()/TF.bar)*TF.bar;
+  S.cash+=P.size+r.g-r.xf;S.trades.push(r.pnl);S.hist.push({p:P.p,side:P.side,pnl:r.pnl,dur:(Date.now()-(P.te||P.t0+TF.bar))/H1,q:P.q,nb:P.nb||1,size:P.size,te:P.te||P.t0+TF.bar,ts:Date.now(),pin:P.fill,pout:r.fx,fees:P.fe+r.xf,why:raison,tf:TF.min});S.hist=S.hist.slice(-5000);S.lossToday+=r.pnl;S.nToday+=P.nb||1;S.lastX=Math.floor(Date.now()/TF.bar)*TF.bar;
   let ex=`${P.q} : sortie fictive à ${fp(r.fx)} (${raison}) : ${fmt(r.pnl)} frais et glissement compris.`;
   if(c.tn==='1'&&manuel&&P.side==='long'&&TNP.includes(P.q))ex+=' '+await testnetOrder('SELL',(Math.floor(P.n*1e4)/1e4).toFixed(4),0,P.q);
   logA(`${P.q} : sortie à ${fp(r.fx)} : ${fmt(r.pnl)} (${raison})`);S.pos=null;S.ags=S.ags.map(a=>a.n==='Exécuteur fictif'?{...a,t:ex,s:'Position fermée'}:a);save();render();return ex}
@@ -389,7 +394,7 @@ async function decider0(t,manuel){const c=S.cfg,A=[],d0=today(),R=S.rules,W=v=>v
   A.push({n:'Risque',s:ok?'Feu vert':'Veto',t:rr+' Le Chef ne peut pas contourner ce veto.'});
   let ex='Aucun ordre.';
   if(act==='open'&&ok){const px=b.dir==='long'?LV.ask[b.q]:LV.bid[b.q];if(!px)ex='Aucun prix d’achat/vente reçu : ordre annulé.';else{
-    const N=ouvrir(F,b.q,i,b.dir,b.pr,c,R,px);N.t0=tb;S.pos=N;S.cash-=N.size+N.fe;S.nToday+=N.nb;
+    const N=ouvrir(F,b.q,i,b.dir,b.pr,c,R,px);N.t0=tb;N.te=Date.now();S.pos=N;S.cash-=N.size+N.fe;S.nToday+=N.nb;
     ex=`${b.q} : ${N.nb} achat${N.nb>1?'s':''} fictif${N.nb>1?'s':''} de ${fmt(c.size)} (${fmt(N.size)} au total), en ${b.dir==='long'?'hausse':'baisse'} à ${fp(N.fill)} (prix ${b.dir==='long'?'vendeur':'acheteur'} + glissement), stop ${fp(N.stop)}${R.atr?' suiveur':''}.`;
     if(c.tn==='1'&&manuel&&b.dir==='long'&&TNP.includes(b.q))for(let k=0;k<N.nb;k++)ex+=' '+await testnetOrder('BUY',0,c.size,b.q);
     logA(`${b.q} : ${N.nb} × ${fmt(c.size)} en ${b.dir==='long'?'hausse':'baisse'} à ${fp(N.fill)} (indice ${Math.round(b.pr*100)} %)`)}}
@@ -529,6 +534,7 @@ function paint(){const st=LV.st,cl=st==='EN DIRECT'?'ok':st==='DONNÉES FIGÉES'
   put('cst',st);if(PV.cl!==cl){PV.cl=cl;$('cst').className=cl}put('clag',LV.lag===null?'délai –':`délai ${Math.max(0,LV.lag)} ms`);put('crate',`${LV.rate} msg/s`);
   put('cnote',st==='DONNÉES FIGÉES'?'Données figées : aucun nouveau trade.':LV.note||'');
   put('src',st==='EN DIRECT'?'Prix Binance en direct (lecture seule). Ordres seulement au testnet.':st==='DONNÉES FIGÉES'?'Données figées : aucun nouveau trade.':st==='HORS LIGNE'?'Binance injoignable : aucun prix, aucun trade.':'Connexion aux prix Binance…');
+  put('stock',SAVEERR||(SAVED?`Dernière sauvegarde automatique : ${hr(SAVED)} · ${S.hist.length} trades enregistrés.`:'Aucune sauvegarde pour l’instant.'));
   const n=prochaine();put('fst',timer?`EN SERVICE · décision dans ${n.m} min`:"AGENTS À L'ARRÊT");
   const v=valeur();put('bal',fmt(v));put('f1',fmt(v));
   const P=S.pos;if(P){const px=(P.side==='long'?LV.bid[P.q]:LV.ask[P.q])||P.px;put('plat',fmt((P.side==='long'?1:-1)*P.n*(px-P.fill)));put('pstop',fp(P.stop))}}
@@ -583,6 +589,18 @@ let RZ=0;$('reset').onclick=()=>{const b=$('reset');
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
   document.querySelectorAll('.sec').forEach((s,i)=>s.classList.toggle('on',i==b.dataset.t))});
 $('auto2').onclick=()=>$('auto').onclick();
+// Export : un fichier téléchargé par le navigateur. CSV au format français (séparateur ;, virgule décimale) pour Excel ou Numbers.
+function telecharger(nom,type,txt){const u=URL.createObjectURL(new Blob([txt],{type}));const a=document.createElement('a');a.href=u;a.download=nom;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}
+const jour=()=>new Date().toISOString().slice(0,16).replace(/[-:T]/g,'');
+$('excsv').onclick=()=>{const n=x=>x===undefined||x===null||!isFinite(x)?'':String(+(+x).toFixed(8)).replace('.',','),d=t=>t?new Date(t).toLocaleString('fr-FR'):'';
+  const L=[['entree','sortie','paire','sens','achats','montant_usdt','prix_entree','prix_sortie','frais_usdt','resultat_usdt','duree_h','raison_sortie','indice_confiance','bougies_min'].join(';')];
+  for(const h of S.hist)L.push([d(h.te),d(h.ts),h.q||'',h.side==='long'?'hausse':'baisse',h.nb||'',n(h.size),n(h.pin),n(h.pout),n(h.fees),n(h.pnl),n(h.dur),(h.why||'').replace(/;/g,','),n(h.p),h.tf||''].join(';'));
+  telecharger(`tradeinsight-trades-${jour()}.csv`,'text/csv;charset=utf-8','﻿'+L.join('\r\n'));$('setmsg').textContent=`${S.hist.length} trades exportés.${S.hist.some(h=>!h.q)?' Les trades d’avant cette version n’ont que le résultat et la durée.':''}`};
+$('exjson').onclick=()=>{telecharger(`tradeinsight-sauvegarde-${jour()}.json`,'application/json',JSON.stringify({app:'TradeInsight IA',version:VERSION,exporte:new Date().toISOString(),argentFictif:true,etat:S},null,1));$('setmsg').textContent='Sauvegarde JSON exportée (sans clés testnet).'};
+$('imjson').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text()),e2=j&&j.etat;
+    if(!e2||typeof e2.cash!=='number'||!e2.cfg)throw new Error('ce fichier n’est pas une sauvegarde TradeInsight');
+    if(timer)stopAuto();S=Object.assign(D(),e2);S.cfg=Object.assign(D().cfg,e2.cfg);save();$('setmsg').textContent='Sauvegarde restaurée : rechargement…';setTimeout(()=>location.reload(),600)}
+  catch(err){$('setmsg').textContent='Restauration impossible : '+(err.message||err)}e.target.value=''};
 $('cmpgo').onclick=async()=>{const b=$('cmpgo');b.disabled=true;$('simgo').disabled=true;const st=m=>$('cmpst').textContent=m,tf0=S.cfg.tf;
   try{setTF(5);st('Téléchargement d’environ 2 mois de bougies de 5 min…');const{D:H,bad}=await historique(fetch,PUB,pairs(),18,st);setTF(tf0);
     if(!Object.keys(H).length){st('Binance injoignable : comparatif impossible. Aucun résultat inventé.');return}
