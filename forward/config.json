@@ -1,0 +1,7 @@
+{
+ "geleeLe": "2026-10-14T14:43:59Z",
+ "note": "Configuration gelée du forward test 24 h/24. La modifier archive le journal et fait repartir la preuve de zéro.",
+ "tf": 5,
+ "regles": [],
+ "cfg": {"size":1000,"nb":3,"maxLoss":5,"maxTrades":50,"sl":2,"thr":85,"hold":6,"atrK":2,"fee":0.1,"slip":0.05,"riskPct":0.5,"ddMax":15,"rsrc":"auto","news":"neutre"}
+}
