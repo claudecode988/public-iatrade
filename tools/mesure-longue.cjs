@@ -7,7 +7,7 @@ const fs=require('fs'),path=require('path'),zlib=require('zlib');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+
   ';return{WL,setTF,agreger,aligner,prep,mesurer,walkForward,robustesse,valeurAgents,familles,pistes,dsr,fiabilite,sharpe,cleEssai,setEssai:f=>{ESSAI=f}}')();
-const DIR=process.argv[2]||'forward',G=JSON.parse(fs.readFileSync(path.join(DIR,'config.json'),'utf8')),MOIS=+process.env.MOIS||12;
+const DIR=process.argv[2]||'forward',G=JSON.parse(fs.readFileSync(path.join(DIR,'config.json'),'utf8')),MOIS=+process.env.MOIS||12,MOIS3=+process.env.MOIS3||36;
 const TF=E.setTF(G.tf),c={...G.cfg,tf:G.tf},R=Object.fromEntries((G.regles||[]).map(k=>[k,1]));
 // Lecteur ZIP minimal : premier fichier de l'archive, méthode « deflate » (celle des fichiers Binance).
 function dezip(buf){let e=buf.length-22;while(e>=0&&buf.readUInt32LE(e)!==0x06054b50)e--;if(e<0)throw new Error('ZIP illisible');
@@ -15,8 +15,8 @@ function dezip(buf){let e=buf.length-22;while(e>=0&&buf.readUInt32LE(e)!==0x0605
   return(meth===8?zlib.inflateRawSync(d):d).toString('utf8')}
 // Les fichiers récents de Binance donnent l'heure en microsecondes : on ramène tout en millisecondes.
 const ms=t=>t>1e14?Math.floor(t/1e3):t;
-async function charger(q){const out=[],d=new Date();for(let m=MOIS;m>=1;m--){const x=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()-m,1)),ym=`${x.getUTCFullYear()}-${String(x.getUTCMonth()+1).padStart(2,'0')}`;
-    try{const r=await fetch(`https://data.binance.vision/data/spot/monthly/klines/${q}/${TF.src}/${q}-${TF.src}-${ym}.zip`);if(!r.ok)continue;
+async function charger(q,src=TF.src,mois=MOIS){const out=[],d=new Date();for(let m=mois;m>=1;m--){const x=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()-m,1)),ym=`${x.getUTCFullYear()}-${String(x.getUTCMonth()+1).padStart(2,'0')}`;
+    try{const r=await fetch(`https://data.binance.vision/data/spot/monthly/klines/${q}/${src}/${q}-${src}-${ym}.zip`);if(!r.ok)continue;
       for(const l of dezip(Buffer.from(await r.arrayBuffer())).split('\n')){const v=l.split(',');if(v.length<6||!/^\d/.test(v[0]))continue;out.push({t:ms(+v[0]),o:+v[1],h:+v[2],l:+v[3],c:+v[4],v:+v[5]})}}catch(e){}}
   return E.agreger(out)}
 // Taux de financement des contrats perpétuels (fichiers mensuels publics : calc_time, funding_interval_hours, last_funding_rate).
@@ -35,9 +35,16 @@ async function chargerFin(q){const out=[],d=new Date();for(let m=MOIS;m>=1;m--){
   const ESS={};E.setEssai((cc,r,res)=>{const k=E.cleEssai(cc,r),v=E.sharpe(res.ret);if(!ESS[k]&&v!==null)ESS[k]=v});
   const F=E.prep(al.D,null,{fund});console.log('Indicateurs prêts',((Date.now()-t0)/1e3).toFixed(0),'s');
   const M=E.mesurer(F,c),wf=E.walkForward(F,c),rob=E.robustesse(F,c,R),va=E.valeurAgents(F,c,R),srs=Object.values(ESS),d=wf?E.dsr(wf.test.ret,srs):null;
+  // Familles sur 3 ans (MOIS3, 36 par défaut) avec des bougies d'1 h : plusieurs phases de marché (hausse, baisse, stagnation).
+  let fam3=null;{E.setTF(60);const D3={};
+    if(process.env.FAUX_PRIX){for(const q of Object.keys(al.D))D3[q]=E.agreger(al.D[q].filter((x,i)=>i%12===11).map(x=>({...x})),36e5)}
+    else for(const q of L){const a=await charger(q,'1h',MOIS3);if(a.length)D3[q]=a;console.log(q,a.length,'bougies 1 h')}
+    const al3=E.aligner(D3);if(al3&&Object.keys(al3.D).length){const F3=E.prep(al3.D);fam3={...E.familles(F3,c,R),pairs:F3.Q.length,ecartees:al3.ecartees};
+      console.log('Familles 3 ans :',fam3.lignes.map(x=>`${x.nom} ${x.pnl.toFixed(0)} $`).join(' | '))}else console.log('Familles 3 ans : données introuvables');
+    E.setTF(G.tf)}
   const fam=E.familles(F,c,R),pis=E.pistes(F,c,R);console.log('Pistes :',pis.lignes.map(x=>`${x.nom} ${x.pnl.toFixed(0)} $`).join(' | '));console.log('Familles :',fam.lignes.map(x=>`${x.nom} ${x.pnl.toFixed(0)} $`).join(' | '));
   const net=o=>JSON.parse(JSON.stringify(o,(k,v)=>k==='ret'||k==='eqs'||k==='jrs'?undefined:v));
   fs.writeFileSync(path.join(DIR,'mesure-longue.json'),JSON.stringify({maj:Date.now(),tf:TF.lab,mois:MOIS,pairs:F.Q.length,ecartees:al.ecartees,du:F.T[0],au:F.T[F.N-1],config:G,
-    simple:{base:net(M.base),active:net(M.fin),regles:Object.keys(M.R)},wf:net(wf),robustesse:net(rob),agents:net(va),familles:net(fam),pistes:pis,financement:Object.keys(fund).length,nEssais:srs.length,dsr:d,fiabilite:E.fiabilite(wf,d,(G.regles||[]).length),faux:!!process.env.FAUX_PRIX},null,1));
+    simple:{base:net(M.base),active:net(M.fin),regles:Object.keys(M.R)},wf:net(wf),robustesse:net(rob),agents:net(va),familles:net(fam),familles3:fam3?net(fam3):null,pistes:pis,financement:Object.keys(fund).length,nEssais:srs.length,dsr:d,fiabilite:E.fiabilite(wf,d,(G.regles||[]).length),faux:!!process.env.FAUX_PRIX},null,1));
   console.log('Mesure longue terminée en',((Date.now()-t0)/1e3).toFixed(0),'s :',wf?`${wf.test.n} trades hors échantillon, bilan ${wf.test.pnl.toFixed(2)} $`:'walk-forward impossible')
 })().catch(e=>{console.error(e);process.exit(1)});
