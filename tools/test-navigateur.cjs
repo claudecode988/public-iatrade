@@ -106,6 +106,11 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   ok(/Profit factor/.test(sr)&&/Acheter et garder/.test(sr)&&/contre .* pour « acheter et garder »/.test(sr),'profit factor et comparaison « acheter et garder »');
   await p.screenshot({path:path.join(process.env.SORTIE||'.','accueil.png'),fullPage:true});await p.click('nav button[data-t="1"]');await p.screenshot({path:path.join(process.env.SORTIE||'.','agents.png'),fullPage:true});
   const fi=await p.textContent('#reps');ok((fi.match(/Règles fixes, sans modèle d’IA/g)||[]).length===6&&(fi.match(/Entrées/g)||[]).length===6&&/Dernière décision/.test(fi),'fiche de chaque agent : type, entrées, dernière décision');
+  await p.click('nav button[data-t="0"]');const pv=await p.textContent('#preuve');
+  ok(/Niveau de preuve : insuffisant/.test(pv)&&await p.evaluate(()=>document.body.classList.contains('pi'))&&/non concluant/.test(pv),'niveau de preuve insuffisant : gains grisés, « non concluant »');
+  const pv2=await p.evaluate(()=>{S.cfg.npT1=0;S.cfg.npJ1=0;S.cfg.npT2=0;S.cfg.npJ2=0;preuveHTML();return document.getElementById('preuve').textContent});
+  ok(/Niveau de preuve : (limité|correct)/.test(pv2)&&!/annualis/i.test((await p.evaluate(()=>document.body.innerText)).replace(/Aucun gain annualisé n'est affiché/,'')),'niveau de preuve : seuils réglables, aucun gain annualisé affiché');
+  await p.click('nav button[data-t="1"]');
   ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'pas de défilement horizontal à 400 px');
   console.log(`     ${net.length} requêtes refusées par les fausses réponses (paires inexistantes) : attendu.`);
   ok(!errs.length,'aucune erreur JavaScript dans la console'+(errs.length?' : '+errs.slice(0,5).join(' | '):''));
