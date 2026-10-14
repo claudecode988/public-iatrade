@@ -1,0 +1,91 @@
+{
+ "maj": 1791994755433,
+ "debut": 1791994755433,
+ "heure": "2026-10-14T15:00:00.000Z",
+ "pairs": 16,
+ "dernierHash": "e2694fb10fc25a6a2dea5dbd628c79e174064d6820426d5c309950a906e3b1b3",
+ "faux": false,
+ "lignes": [
+  {
+   "id": "tendance",
+   "nom": "Suivi de tendance lent",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0
+  },
+  {
+   "id": "retour",
+   "nom": "Retour à la moyenne",
+   "valeur": 9988.75,
+   "dd": 0.0011,
+   "investi": 0.751,
+   "n": 12,
+   "frais": 11.25
+  },
+  {
+   "id": "reeq",
+   "nom": "Rééquilibrage hebdomadaire",
+   "valeur": 9985,
+   "dd": 0.0015,
+   "investi": 1.002,
+   "n": 16,
+   "frais": 15
+  },
+  {
+   "id": "bh",
+   "nom": "Acheter et garder",
+   "valeur": 9985,
+   "dd": 0.0015,
+   "investi": 1.002,
+   "n": 16,
+   "frais": 15
+  },
+  {
+   "id": "regime",
+   "nom": "Tendance lente + régime du bitcoin",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0
+  },
+  {
+   "id": "volcible",
+   "nom": "Tendance lente + volatilité cible",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0
+  },
+  {
+   "id": "prudente",
+   "nom": "Prudente (tendance + régime + volatilité cible + pause Fed)",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0
+  },
+  {
+   "id": "elan",
+   "nom": "Élan sur 4 semaines",
+   "valeur": 9990.89,
+   "dd": 0.0009,
+   "investi": 0.608,
+   "n": 14,
+   "frais": 9.11
+  },
+  {
+   "id": "donchian",
+   "nom": "Cassures de Donchian (10, 20, 40 jours)",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0
+  }
+ ]
+}
