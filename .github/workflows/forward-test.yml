@@ -37,6 +37,7 @@ jobs:
           while [ $(date +%s) -lt $fin ]; do
             node ../code/tools/forward.cjs forward || true
             node ../code/tools/familles-fw.cjs forward || true
+            node ../code/tools/proposition.cjs forward || true
             git add -A forward
             if ! git diff --cached --quiet; then
               git commit -q -m "Forward test $(date -u +%Y-%m-%dT%H:%M:%SZ)"
