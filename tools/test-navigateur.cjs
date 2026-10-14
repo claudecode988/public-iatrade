@@ -76,6 +76,7 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   ok(/Entraînement \(70 %\)/.test(sr)&&/test \(30 %\)/.test(sr)&&/côte à côte/.test(sr)&&(/⚠/.test(sr)||/Aucun signal d’alerte/.test(sr)),'entraînement 70 % / test 30 % côte à côte, avec alertes');
   ok(/Profit factor/.test(sr)&&/Acheter et garder/.test(sr)&&/contre .* pour « acheter et garder »/.test(sr),'profit factor et comparaison « acheter et garder »');
   await p.screenshot({path:path.join(process.env.SORTIE||'.','accueil.png'),fullPage:true});await p.click('nav button[data-t="1"]');await p.screenshot({path:path.join(process.env.SORTIE||'.','agents.png'),fullPage:true});
+  const fi=await p.textContent('#reps');ok((fi.match(/Règles fixes, sans modèle d’IA/g)||[]).length===6&&(fi.match(/Entrées/g)||[]).length===6&&/Dernière décision/.test(fi),'fiche de chaque agent : type, entrées, dernière décision');
   ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'pas de défilement horizontal à 400 px');
   console.log(`     ${net.length} requêtes refusées par les fausses réponses (paires inexistantes) : attendu.`);
   ok(!errs.length,'aucune erreur JavaScript dans la console'+(errs.length?' : '+errs.slice(0,5).join(' | '):''));
