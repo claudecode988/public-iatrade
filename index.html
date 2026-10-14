@@ -587,8 +587,9 @@ function reglePro(id){const S=STRAT_PRO[id];return(F,t,st,n)=>{const P0=F.p[F.Q[
     st._T=st._T||[];st._pk=Math.max(st._pk||v,v);const mois=new Date(F.T[t]+TF.bar).toISOString().slice(0,7);if(st._mois!==mois){st._mois=mois;st._m0=v}
     const pj=st._j0?v/st._j0-1:0;st._j0=v;const dd=(st._pk-v)/st._pk;st._pos=st._pos||{};const pos=st._pos;
     const fermer=(q,raison)=>{const p=pos[q],P=F.p[q],x=P.jc[I(q)];st._T.push({q,r:((x/p.e-1)-2*f)/p.rf,raison,j:I(q),e:p.e,x});delete pos[q];o[q]=0};
-    if(st._arret)return null;
-    if(dd>=.15){for(const q in pos)fermer(q,'arrêt total : baisse de 15 % depuis le plus haut');st._arret=new Date(F.T[t]).toISOString();return o}
+    // Baisse ≥ 15 % : le dossier dit « arrêt total, retour en paper trading ». L'argent réel s'arrête, la stratégie continue en papier :
+    // la date est notée (et affichée), mais la simulation continue pour que la mesure couvre toute la période.
+    if(dd>=.15&&!st._arret)st._arret=new Date(F.T[t]).toISOString();
     if(S.rotation){if(mois===st._rot)return null;st._rot=mois;const L=F.Q.map(q=>{const P=F.p[q],i=I(q);return{q,P,i,m:i>=182?P.jc[i]/P.jc[i-182]-1:null,b:mmJ(P.jc,i,200)}}).filter(x=>x.m!==null).sort((a,b)=>b.m-a.m).slice(0,2);
       const garde=new Set(L.filter(x=>x.b&&x.P.jc[x.i]>x.b).map(x=>x.q));for(const q in pos)if(!garde.has(q))fermer(q,'rotation mensuelle');
       if((v/st._m0-1)>-.06)for(const q of garde)if(!pos[q]){pos[q]={e:F.p[q].jc[I(q)],rf:1,j:I(q)};o[q]=.5}return o}
@@ -613,11 +614,11 @@ function Fjour(J,btcJ){setTF(60);const Q=Object.keys(J).filter(q=>J[q].length);i
 // Proposition du jour (format de 03_checklist_trade.md) pour la stratégie gelée, en rejouant depuis la date de gel (pas avant : un arrêt
 // à 15 % survenu des années plus tôt ne doit pas bloquer aujourd'hui). La dernière journée fermée donne l'action à faire maintenant.
 function proposition(F,id,depuis,c){const from=Math.max(0,F.T.findIndex(t=>t>=depuis));if(from<0||from>=F.N)return null;const r=portefeuille(F,from,F.N,c,FAMILLES[id].regle),st=r.st,i=F.N-1,P0=st._pos||{};
-  return{jour:F.T[i]+TF.bar-864e5,valeur:1e4+r.pnl,baisse:r.dd,arret:st._arret||null,bloque:st._bloque||'',L:F.Q.map(q=>{const P=F.p[q],p=P0[q],x=P.jc[i],sortie=(st._T||[]).filter(z=>z.q===q&&z.j===i).pop();
+  return{jour:F.T[i]+TF.bar-864e5,papier:!!st._arret,valeur:1e4+r.pnl,baisse:r.dd,arret:st._arret||null,bloque:st._bloque||'',L:F.Q.map(q=>{const P=F.p[q],p=P0[q],x=P.jc[i],sortie=(st._T||[]).filter(z=>z.q===q&&z.j===i).pop();
     const a=sortie?{action:'VENDRE',raison:sortie.raison,prix:x,resultatR:sortie.r}:p&&p.j===i?{action:'ACHETER',prix:x,stop:p.stop,objectif:p.objectif||null,part:p.w,risque:p.w*(x-p.stop)/x,gr:p.objectif?(p.objectif-x)/(x-p.stop):null}
-      :p?{action:'GARDER',prix:x,entree:p.e,stop:p.stop,objectif:p.objectif||null,part:p.w,risque:Math.max(0,p.w*(x-p.stop)/x)}:{action:'RIEN',prix:x,raison:st._arret?'stratégie arrêtée (baisse de 15 %)':st._bloque||'aucun signal aujourd’hui'};
+      :p?{action:'GARDER',prix:x,entree:p.e,stop:p.stop,objectif:p.objectif||null,part:p.w,risque:Math.max(0,p.w*(x-p.stop)/x)}:{action:'RIEN',prix:x,raison:st._bloque||'aucun signal aujourd’hui'};
     return{paire:q,...a}})}}
-function statutPro(x,fw){const c=[[x.expR!==null&&x.expR>0,'espérance positive après frais'],[x.nT>=100,`au moins 100 trades (${x.nT})`],[x.dd<.2,'pire baisse sous 20 %'],
+function statutPro(x,fw){const c=[[x.expR!==null&&x.expR>0,'espérance positive après frais'],[x.nT>=100,`au moins 100 trades (${x.nT})`],[x.dd<.2&&!x.arret,'pire baisse sous 20 % et seuil d’arrêt de 15 % jamais atteint'],
     [x.ent>0&&x.test>0,'positive sur les 70 % d’optimisation et sur les 30 % de vérification'],[!!(fw&&fw.jours>=28&&fw.valeur>=1e4*(1-1.5*x.dd)),'paper trading de 4 semaines cohérent']];
   const sus=fw&&(fw.dd>1.5*x.dd||(fw.n30>=30&&fw.esp30<0));return{statut:sus?'SUSPENDUE':c.every(z=>z[0])?'VALIDÉE':'À TESTER',criteres:c}}
 const rendementsJours=j=>{const r=[];for(let i=1;i<j.length;i++)if(j[i-1]>0)r.push(j[i]/j[i-1]-1);return r};
@@ -648,7 +649,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 23:09';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 23:12';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({pk:10000,cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{capReel:500,size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:.5,ddMax:15,hb:5,npT1:30,npJ1:30,npT2:100,npJ2:90,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
@@ -970,7 +971,7 @@ function propHTML(){const e=$('prop');if(!e)return;const P=SV.prop;if(!P||!P.pro
       const d=x.action==='ACHETER'?`Entrée vers ${px(x.prix)} · stop ${px(x.stop)} · objectif ${x.objectif?px(x.objectif):'aucun (stop suiveur)'} · taille ${p2(x.part)} du capital${eur(x.part)} · risque ${p2(x.risque)}${eur(x.risque)}${x.gr?` · gain/risque ${x.gr.toFixed(1).replace('.',',')}`:''}`
         :x.action==='GARDER'?`Position gardée (entrée ${px(x.entree)}) · stop à placer à ${px(x.stop)} · taille ${p2(x.part)} du capital`
         :x.action==='VENDRE'?`Vendre vers ${px(x.prix)} : ${x.raison}`:`Rien à faire : ${x.raison}.`;
-      return`<div class="ess"><b>${nom(q)}</b>${x.controle?' <span class="mut">(contrôle seulement, pas à trader)</span>':''} <span class="chip ${ch[x.action]||''}">${x.action}</span><br>${d}<br><span class="mut">Données : ${x.source}. Coûts comptés : ${String(x.couts.fee).replace('.',',')} % + ${String(x.couts.slip).replace('.',',')} % par côté. Compte fictif de la stratégie : ${fmt(x.valeur)}.</span></div>`}).join('')+
+      return`<div class="ess"><b>${nom(q)}</b>${x.controle?' <span class="mut">(contrôle seulement, pas à trader)</span>':''} <span class="chip ${ch[x.action]||''}">${x.action}</span><br>${d}<br><span class="mut">Données : ${x.source}. Coûts comptés : ${String(x.couts.fee).replace('.',',')} % + ${String(x.couts.slip).replace('.',',')} % par côté. Compte fictif de la stratégie : ${fmt(x.valeur)}.</span>${x.papier?'<br><b class="dn">⚠ Baisse de 15 % atteinte depuis le gel : argent réel en pause, suivre seulement en papier (règle du dossier).</b>':''}</div>`}).join('')+
     `<p class="mut">${fed?`⚠ Annonce de la Fed le ${new Date(fed).toLocaleString('fr-FR')} : prudence. `:''}Proposition du bot, pas un conseil : c’est toi qui décides et qui passes l’ordre. ${jours<28?`Période de test en argent fictif : encore ${Math.max(0,Math.ceil(28-jours))} jours avant d’envisager un petit montant réel.`:'4 semaines de test écoulées : comparer le résultat fictif au backtest avant tout argent réel.'}</p>`}
 // Première phrase seulement dans la fiche (le reste est dans « Ce qu'il regarde ») ; un indice reste présenté comme une note du bot.
 const court=t=>{t=String(t||'');const m=t.match(/^.{20,140}?[.!?](\s|$)/),c=m?m[0].trim():t.length>140?t.slice(0,139)+'…':t;return/indice \d+ %/.test(c)&&!/pas une probabilité/.test(c)?c.replace(/\.$/,'')+' (note du bot, pas une probabilité).':c};
@@ -1100,7 +1101,7 @@ function proHTML(L){const G=L&&L.familles3;if(!G)return'';const X=G.lignes.filte
   return`<h3>Stratégies du dossier bot-trading (S1 à S5)</h3><div class="mut">Règles et gestion du risque du dossier appliquées telles quelles (1 % risqué par trade, 5 % au total, pertes du jour 2 %, du mois 6 %, arrêt à 15 % de baisse). Décision une fois par jour ; stops vérifiés sur la clôture journalière. Du ${dt(G.du)} au ${dt(G.au)}.</div>
   <div class="tw"><table class="st"><thead><tr><th>Stratégie</th><th>Statut</th><th>Rendement</th><th>Pire baisse</th><th>Trades</th><th>Réussite</th><th>Espérance par trade</th><th>Optimisation 70 %</th><th>Vérification 30 %</th><th>Sans frais</th><th>Coûts × 2</th></tr></thead><tbody>
   ${X.map(x=>{const s=statutPro(x,fw(x.id));return`<tr><th title="${x.txt}">${x.nom}</th><td><span class="pill ${s.statut==='VALIDÉE'?'ok':'no'}" title="${s.criteres.map(c=>(c[0]?'✓ ':'✗ ')+c[1]).join(' · ')}">${s.statut}</span></td><td class="${cl(x.pnl)}">${pc(x.pnl)}</td><td>${pct(x.dd)}</td><td>${x.nT??'–'}</td><td>${x.wrT==null?'–':Math.round(x.wrT*100)+' %'}</td><td class="${(x.expR||0)>=0?'up':'dn'}">${x.expR==null?'–':(x.expR>=0?'+':'−')+Math.abs(x.expR).toFixed(2).replace('.',',')+' R'}</td><td class="${cl(x.ent)}">${pc(x.ent)}</td><td class="${cl(x.test)}">${pc(x.test)}</td><td class="${x.sansFrais==null?'':cl(x.sansFrais)}">${x.sansFrais==null?'–':pc(x.sansFrais)}</td><td class="${cl(x.cout2)}">${pc(x.cout2)}</td></tr>`}).join('')}</tbody></table></div>
-  ${X.filter(x=>x.arret).map(x=>`<p class="mut">${x.nom} : arrêt total le ${dt(x.arret)} (baisse de 15 % atteinte), retour en papier comme le prévoit la règle.</p>`).join('')}
+  ${X.filter(x=>x.arret).map(x=>`<p class="mut">${x.nom} : baisse de 15 % atteinte le ${dt(x.arret)} : en vrai, l’argent réel se serait arrêté là (retour en papier) ; la mesure continue en papier pour couvrir toute la période.</p>`).join('')}
   <p class="mut">Critères pour « VALIDÉE » : espérance positive après frais, au moins 100 trades, pire baisse sous 20 %, positive sur l’optimisation et la vérification, 4 semaines de paper trading cohérentes. Touche un statut pour voir les critères.</p>`}
 // Forward test 24 h/24 des familles : chaque famille gère 10 000 $ fictifs depuis le même jour, règles écrites avant de voir ces prix.
 function famFwdHTML(){const f=SV.fam;if(!f||!f.lignes)return'<p class="mut">Forward test des familles : pas encore de données publiées par le serveur.</p>';const pc=x=>`${x>=0?'+':'−'}${Math.abs(x/100).toFixed(2).replace('.',',')} %`;
