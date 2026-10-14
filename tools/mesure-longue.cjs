@@ -29,7 +29,7 @@ async function charger(q){const out=[],d=new Date();for(let m=MOIS;m>=1;m--){con
   const F=E.prep(al.D);console.log('Indicateurs prêts',((Date.now()-t0)/1e3).toFixed(0),'s');
   const M=E.mesurer(F,c),wf=E.walkForward(F,c),rob=E.robustesse(F,c,R),va=E.valeurAgents(F,c,R),srs=Object.values(ESS),d=wf?E.dsr(wf.test.ret,srs):null;
   const fam=E.familles(F,c,R);console.log('Familles :',fam.lignes.map(x=>`${x.nom} ${x.pnl.toFixed(0)} $`).join(' | '));
-  const net=o=>JSON.parse(JSON.stringify(o,(k,v)=>k==='ret'||k==='eqs'?undefined:v));
+  const net=o=>JSON.parse(JSON.stringify(o,(k,v)=>k==='ret'||k==='eqs'||k==='jrs'?undefined:v));
   fs.writeFileSync(path.join(DIR,'mesure-longue.json'),JSON.stringify({maj:Date.now(),tf:TF.lab,mois:MOIS,pairs:F.Q.length,ecartees:al.ecartees,du:F.T[0],au:F.T[F.N-1],config:G,
     simple:{base:net(M.base),active:net(M.fin),regles:Object.keys(M.R)},wf:net(wf),robustesse:net(rob),agents:net(va),familles:net(fam),nEssais:srs.length,dsr:d,fiabilite:E.fiabilite(wf,d,(G.regles||[]).length),faux:!!process.env.FAUX_PRIX},null,1));
   console.log('Mesure longue terminée en',((Date.now()-t0)/1e3).toFixed(0),'s :',wf?`${wf.test.n} trades hors échantillon, bilan ${wf.test.pnl.toFixed(2)} $`:'walk-forward impossible')
