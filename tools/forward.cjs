@@ -9,7 +9,7 @@
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+
-  ';return{WL,H1,setTF,agreger,aligner,prep,choisir,ouvrir,stopTick,sortieCloture,fermer,risque,distanceStop,fngNews,sigAt,rt,kl,analyse,refusEntree}')();
+  ';return{WL,H1,setTF,agreger,aligner,prep,choisir,ouvrir,stopTick,sortieCloture,fermer,risque,distanceStop,fngNews,sigAt,rt,kl,analyse,refusEntree,pauseSerie}')();
 const DIR=process.argv[2]||'forward',F_ETAT=path.join(DIR,'etat.json'),F_CFG=path.join(DIR,'config.json'),F_J=path.join(DIR,'journal.jsonl'),F_RES=path.join(DIR,'resume.json');
 const sha=t=>crypto.createHash('sha256').update(t).digest('hex'),lire=(f,d)=>{try{return JSON.parse(fs.readFileSync(f,'utf8'))}catch(e){return d}};
 // Adresses publiques de Binance en lecture seule : data-api.binance.vision (données de marché uniquement, joignable
@@ -56,7 +56,7 @@ const BASES=['https://data-api.binance.vision','https://api.binance.com'],FNG='h
     else ajout({k:'decision',agent:'Boussole',type:'abstention',paire:q,sens:P.side,raison:'position ouverte, rien à changer',confiance:Math.round(s.pr*100),prix:{cloture:Pq.c[i]},entrees:entrees(q)})}
   else if(!b)ajout({k:'decision',agent:'Boussole',type:'abstention',paire:q,sens:s.dir,raison:`indice ${Math.round(s.pr*100)} % : aucune paire au-dessus du seuil de ${c.thr} % qui passe les règles`,confiance:Math.round(s.pr*100),prix:{cloture:Pq.c[i]},entrees:entrees(q)});
   else{const v=S.cash,pk=Math.max(S.pk,v),rk=E.risque(c,v,pk,E.distanceStop(F,b.q,i,c,R));
-    let veto=R.cool&&(tb-S.lastX)/TF.bar<4?'repos après la dernière sortie':S.nToday+c.nb>c.maxTrades?'maximum de trades par jour':-S.lossToday>=S.start*c.maxLoss/100?'perte maximale du jour':!rk.ok?rk.regle:S.cash<rk.taille*(1+c.fee/100)?'solde fictif insuffisant':'';
+    let veto=R.cool&&(tb-S.lastX)/TF.bar<4?'repos après la dernière sortie':R.serie&&E.pauseSerie(S.trades,S.lastX,tb)?'3 pertes de suite : pause de 12 h':S.nToday+c.nb>c.maxTrades?'maximum de trades par jour':-S.lossToday>=S.start*c.maxLoss/100?'perte maximale du jour':!rk.ok?rk.regle:S.cash<rk.taille*(1+c.fee/100)?'solde fictif insuffisant':'';
     const jid=ajout({k:'decision',agent:'Boussole',type:'entrée',paire:b.q,sens:b.dir,raison:`indice ${Math.round(b.pr*100)} %, au-dessus du seuil de ${c.thr} %`,confiance:Math.round(b.pr*100),prix:{cloture:F.p[b.q].c[i]},entrees:entrees(b.q)});
     if(veto){ajout({k:'decision',agent:'Bouclier',type:'abstention',paire:b.q,sens:b.dir,raison:'veto : '+veto,confiance:Math.round(b.pr*100),prix:{cloture:F.p[b.q].c[i]}});resultat(jid,{statut:'non exécutée : veto'})}
     else{const N=E.ouvrir(F,b.q,i,b.dir,b.pr,c,R,F.p[b.q].c[i],rk.taille);N.jid=jid;S.pos=N;S.cash-=N.size+N.fe;S.nToday+=N.nb}}
