@@ -46,6 +46,7 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   // Serveur et gel
   await p.waitForFunction(()=>SV.at>0,null,{timeout:10000});const sv=await p.textContent('#srv');
   ok(/décisions en/.test(sv)&&/Mesure longue \(\d+ mois, serveur\)/.test(sv)&&/Données de test/.test(sv),'forward test 24 h/24 et mesure longue du serveur affichés');
+  ok(/Familles de stratégies/.test(sv)&&/Suivi de tendance lent/.test(sv)&&/Acheter et garder/.test(sv)&&/(Candidate|Aucune stratégie ne bat)/.test(sv),'comparatif des familles de stratégies affiché');
   await p.click('nav button[data-t="2"]');await p.click('#gelgo');await p.waitForFunction(()=>!!S.gel);
   ok(await p.isDisabled('#thr')&&/Gelée le/.test(await p.textContent('#gelst')),'geler la configuration : réglages de stratégie verrouillés');
   await p.click('#gelgo');await p.click('#gelgo');ok(await p.evaluate(()=>!S.gel)&&!(await p.isDisabled('#thr')),'dégeler avec confirmation');
