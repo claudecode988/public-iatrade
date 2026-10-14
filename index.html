@@ -103,7 +103,7 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 <div class="fh"><b>ACTIVITÉ</b><span>récente</span></div><div class="fl" id="flog"></div>
 <div class="fh" style="margin-top:10px"><b>RAPPORTS</b><span>par agent</span></div><div class="fl" id="reps"></div></div>
 <button class="btn" id="auto2">Démarrer les agents</button>
-<div class="mut" id="mkts">Les prix arrivent en continu. Les agents décident d'une entrée seulement à la fermeture de chaque bougie (10 min ou 1 h, à choisir dans Réglages), avec de l'argent fictif. Le stop est vérifié à chaque prix reçu.</div>
+<div class="mut" id="mkts">Les prix arrivent en continu. Les agents décident d'une entrée seulement à la fermeture de chaque bougie (5 min, 10 min ou 1 h, à choisir dans Réglages), avec de l'argent fictif. Le stop est vérifié à chaque prix reçu.</div>
 <button class="btn" id="simgo" style="background:var(--card);color:var(--ink);border:1px solid var(--line)">Mesurer sur l'historique réel</button>
 <div class="mut" id="simst"></div>
 </section>
@@ -112,14 +112,16 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 <h2>Limites de risque</h2>
 <div class="mut">Appliquées par le code. L'IA ne peut pas les modifier.</div>
 <div class="mut" style="margin-top:8px">Marchés : toutes les paires crypto et forex sont analysées en permanence. Une paire que Binance ne propose pas est ignorée automatiquement.</div>
-<label>Taille d'une position (USDT)<input id="size" type="number" min="10"></label>
+<label>Taille d'un achat (USDT)<input id="size" type="number" min="10"></label>
+<label>Achats par décision<input id="nb" type="number" min="1" max="10" step="1"></label>
+<div class="mut">Quand tous les agents sont d'accord, Éclair passe ce nombre d'achats d'un coup : la position vaut ce nombre × la taille d'un achat. Les gains et les pertes sont multipliés d'autant, et chaque achat compte dans le maximum de trades par jour.</div>
 <label>Perte maximale par jour (% du capital)<input id="maxLoss" type="number" min="0.5" step="0.5"></label>
 <label>Nombre maximal de trades par jour<input id="maxTrades" type="number" min="1"></label>
 <label>Stop de perte maximal (%)<input id="sl" type="number" min="0.5" step="0.5"></label>
 <label>Seuil de confiance pour entrer (%)<input id="thr" type="number" min="50" max="99"></label>
 <label>Source de Radar<select id="rsrc"><option value="auto">Automatique : indice peur et avidité (alternative.me)</option><option value="manuel">Saisie manuelle</option></select></label>
 <label>Actualité en saisie manuelle<select id="news"><option>haussier</option><option>neutre</option><option>baissier</option></select></label>
-<label>Durée des bougies de décision<select id="tf"><option value="10">10 minutes (confirmation sur 1 h)</option><option value="60">1 heure (confirmation sur 4 h)</option></select></label>
+<label>Durée des bougies de décision<select id="tf"><option value="5">5 minutes (confirmation sur 1 h)</option><option value="10">10 minutes (confirmation sur 1 h)</option><option value="60">1 heure (confirmation sur 4 h)</option></select></label>
 <div class="mut">Plus les bougies sont courtes, plus il y a de trades et plus les frais pèsent. Mesure chaque durée sur l'historique avant de lui faire confiance.</div>
 <label>Durée minimale de détention (en bougies)<input id="hold" type="number" min="0" step="1"></label>
 <label>Stop : multiple de l'ATR 14 bougies<input id="atrK" type="number" min="0.5" step="0.5"></label>
@@ -143,9 +145,9 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 /* MOTEUR-DEBUT : fonctions pures (aucun accès à la page), relues telles quelles par tools/mesure.cjs */
 const WL={CRYPTO:['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','ADAUSDT','DOGEUSDT','LTCUSDT','AVAXUSDT','LINKUSDT','DOTUSDT','TRXUSDT','BCHUSDT','NEARUSDT','ATOMUSDT','TONUSDT'],FOREX:['EURUSDT','GBPUSDT','AUDUSDT']};
 const H1=36e5,H4=4*H1,sleep=ms=>new Promise(r=>setTimeout(r,ms));
-// Durée des bougies de décision. Binance n'a pas de bougies de 10 min : elles sont reconstruites à partir de 2 bougies de 5 min
-// (alignées sur :00, :10, :20…). La confirmation se fait sur la durée au-dessus : 1 h pour 10 min, 4 h pour 1 h.
-let TF;function setTF(m){TF=+m===10?{min:10,bar:6e5,conf:H1,src:'5m',srcMs:3e5,k:2,lab:'10 min',clab:'1 h',ci:'1h',pages:18}
+// Durée des bougies de décision : 5 min (bougies Binance directes), 10 min ou 1 h. Binance n'a pas de bougies de 10 min : elles sont reconstruites à partir de 2 bougies de 5 min
+// (alignées sur :00, :10, :20…). La confirmation se fait sur la durée au-dessus : 1 h pour 5 et 10 min, 4 h pour 1 h.
+let TF;function setTF(m){TF=+m===5?{min:5,bar:3e5,conf:H1,src:'5m',srcMs:3e5,k:1,lab:'5 min',clab:'1 h',ci:'1h',pages:18}:+m===10?{min:10,bar:6e5,conf:H1,src:'5m',srcMs:3e5,k:2,lab:'10 min',clab:'1 h',ci:'1h',pages:18}
   :{min:60,bar:H1,conf:H4,src:'1h',srcMs:H1,k:1,lab:'1 h',clab:'4 h',ci:'4h',pages:9};TF.kc=TF.conf/TF.bar;TF.W=50*TF.kc+20;return TF}setTF(60);
 // Regroupe les bougies sources (5 min) en bougies de décision complètes (10 min). Une bougie incomplète est ignorée.
 function agreger(a){if(TF.k===1)return a.slice();const o=[];let cur=null,n=0;
@@ -230,9 +232,10 @@ function choisir(F,t,c,R){let b=null;const refus=[];
   for(const q of F.Q){const P=F.p[q],s=sigAt(P,t,R);if(!s.dir||s.pr*100<c.thr)continue;const r=refusEntree(P,t,s.dir,c,R);
     if(r){refus.push({q,r,pr:s.pr});continue}if(!b||Math.abs(s.sc)>Math.abs(b.sc))b={q,...s}}
   return{b,refus}}
-function ouvrir(F,q,t,dir,pr,c,R,px){const P=F.p[q];px=px??P.c[t];const s=c.slip/100,fill=dir==='long'?px*(1+s):px*(1-s),n=c.size/fill;
+// Éclair passe nb achats identiques d'un coup : la position totale vaut nb × la taille d'une position.
+function ouvrir(F,q,t,dir,pr,c,R,px){const P=F.p[q],nb=c.nb||1,sz=c.size*nb;px=px??P.c[t];const s=c.slip/100,fill=dir==='long'?px*(1+s):px*(1-s),n=sz/fill;
   const dist=R.atr?Math.min(c.atrK*P.atr[t],c.sl/100*px):c.sl/100*px;
-  return{q,side:dir,n,size:c.size,fill,px,dist,stop:dir==='long'?px-dist:px+dist,best:px,t0:F.T[t],p:pr,rev:0,fe:c.size*c.fee/100}}
+  return{q,side:dir,n,nb,size:sz,fill,px,dist,stop:dir==='long'?px-dist:px+dist,best:px,t0:F.T[t],p:pr,rev:0,fe:sz*c.fee/100}}
 // Vérifie le stop avec le plus bas et le plus haut connus (une bougie, ou le prix d'un tick), puis fait suivre le stop.
 // Renvoie le prix de sortie si le stop est touché (au pire entre le stop et l'ouverture si le prix a sauté par-dessus).
 function stopTick(P,lo,hi,R,ouv){if(P.side==='long'){if(lo<=P.stop)return Math.min(P.stop,ouv??P.stop);if(R.atr){P.best=Math.max(P.best,hi);P.stop=Math.max(P.stop,P.best-P.dist)}}
@@ -245,38 +248,38 @@ function fermer(P,price,c){const s=c.slip/100,f=c.fee/100,fx=P.side==='long'?pri
   return{fx,g,xf,pnl:g-P.fe-xf,slip:P.n*(price+P.px)*s}}
 // Rejoue les règles heure par heure entre from et to (exclu) avec 10 000 $ fictifs. Stop vérifié dans chaque bougie (plus bas / plus haut).
 function simuler(F,from,to,c,R){let cash=1e4,P=null,nT=0,lossD=0,pk=1e4,dd=0,day='',fees=0,slip=0,lastX=-1e15;const T=[],Du=[],H=[],sum=a=>a.reduce((x,y)=>x+y,0);
-  const sortir=(t,price)=>{const r=fermer(P,price,c);cash+=P.size+r.g-r.xf;fees+=P.fe+r.xf;slip+=r.slip;T.push(r.pnl);Du.push((F.T[t]-P.t0)/H1);H.push(P.p);lossD+=r.pnl;nT++;lastX=F.T[t];P=null};
+  const sortir=(t,price)=>{const r=fermer(P,price,c);cash+=P.size+r.g-r.xf;fees+=P.fe+r.xf;slip+=r.slip;T.push(r.pnl);Du.push((F.T[t]-P.t0)/H1);H.push(P.p);lossD+=r.pnl;nT+=P.nb;lastX=F.T[t];P=null};
   for(let t=from;t<to;t++){const dj=new Date(F.T[t]).toISOString().slice(0,10);if(dj!==day){day=dj;nT=0;lossD=0}
     if(P){const x=F.p[P.q].C[t],hit=stopTick(P,x.l,x.h,R,x.o);if(hit!==null)sortir(t,hit);else if(sortieCloture(F,P,t,c,R))sortir(t,x.c)}
-    else if(nT<c.maxTrades&&-lossD<1e4*c.maxLoss/100&&cash>=c.size*(1+c.fee/100)&&(!R.cool||(F.T[t]-lastX)/TF.bar>=4)){const{b}=choisir(F,t,c,R);
-      if(b){P=ouvrir(F,b.q,t,b.dir,b.pr,c,R);cash-=P.size+P.fe;nT++}}
+    else if(nT+(c.nb||1)<=c.maxTrades&&-lossD<1e4*c.maxLoss/100&&cash>=c.size*(c.nb||1)*(1+c.fee/100)&&(!R.cool||(F.T[t]-lastX)/TF.bar>=4)){const{b}=choisir(F,t,c,R);
+      if(b){P=ouvrir(F,b.q,t,b.dir,b.pr,c,R);cash-=P.size+P.fe;nT+=P.nb}}
     const un=P?(P.side==='long'?1:-1)*P.n*(F.p[P.q].c[t]-P.fill):0,eq=cash+(P?P.size+un:0);pk=Math.max(pk,eq);dd=Math.max(dd,(pk-eq)/pk)}
   if(P)sortir(to-1,F.p[P.q].c[to-1]); // une position encore ouverte est clôturée au dernier prix pour être comptée
   const w=T.filter(x=>x>0);
   return{n:T.length,pnl:sum(T),gain:sum(w),loss:sum(T.filter(x=>x<=0)),fees,slip,wr:T.length?w.length/T.length:0,dd,conf:H.length?sum(H)/H.length:0,
     dur:Du.length?sum(Du)/Du.length:0,jours:Math.round((to-from)*TF.bar/864e5),du:F.T[from],au:F.T[to-1]}}
 // Méthode : départ = règles d'avant. Chaque changement est ajouté seul ; il est gardé seulement s'il améliore le bilan
-// sur le TEST (1/3 final) et aussi sur le calibrage (2/3). Puis le seuil est choisi sur le calibrage seul et vérifié sur le test.
+// sur le TEST (1/3 final) et aussi sur le calibrage (2/3), avec au moins 30 trades sur le test. Puis le seuil est choisi sur le calibrage seul et vérifié sur le test.
 function mesurer(F,c){const W=Math.min(TF.W,Math.floor(F.N/4)),cut=W+Math.floor((F.N-W)*2/3),seg=(R,thr)=>({cal:simuler(F,W,cut,{...c,thr},R),test:simuler(F,cut,F.N,{...c,thr},R)});
   const base=seg({},c.thr);let R={},cur=base;const essais=[];
-  for(const m of CHANGES){const R2={...R,[m.id]:1},r=seg(R2,c.thr),bc=r.cal.pnl>cur.cal.pnl+.005,bt=r.test.pnl>cur.test.pnl+.005,garde=bc&&bt;
-    const pq=!r.cal.n&&!r.test.n?'aucun trade : rien à mesurer':garde?'améliore le test et le calibrage':bt?'améliore le test mais pas le calibrage : rien ne permettait de le choisir avant de voir le test'
+  for(const m of CHANGES){const R2={...R,[m.id]:1},r=seg(R2,c.thr),bc=r.cal.pnl>cur.cal.pnl+.005,bt=r.test.pnl>cur.test.pnl+.005,peu=r.test.n<30,garde=bc&&bt&&!peu;
+    const pq=!r.cal.n&&!r.test.n?'aucun trade : rien à mesurer':peu&&bc&&bt?`seulement ${r.test.n} trades sur le test : trop peu pour conclure, donc pas gardé`:garde?'améliore le test et le calibrage':bt?'améliore le test mais pas le calibrage : rien ne permettait de le choisir avant de voir le test'
       :bc?'améliore le calibrage mais pas le test : probablement un effet du hasard':'n’améliore ni le test ni le calibrage';
     essais.push({id:m.id,nom:m.nom,cal:r.cal,test:r.test,avantCal:cur.cal,avantTest:cur.test,garde,pq});if(garde){R=R2;cur=r}}
   const seuils=[70,75,80,85,90].map(thr=>({thr,cal:simuler(F,W,cut,{...c,thr},R)}));
   const best=seuils.reduce((a,b)=>b.cal.pnl>a.cal.pnl+.005?b:a).thr,tb=simuler(F,cut,F.N,{...c,thr:best},R),seuilOk=best!==c.thr&&tb.pnl>cur.test.pnl+.005;
-  return{v:3,tf:TF.min,tfLab:TF.lab,base,fin:seuilOk?seg(R,best):cur,essais,avantSeuil:cur.test.pnl,seuils,best,testBest:tb,seuilOk,thr:c.thr,R,c:{fee:c.fee,slip:c.slip,hold:c.hold,atrK:c.atrK,sl:c.sl},
+  return{v:3,tf:TF.min,tfLab:TF.lab,nb:c.nb||1,base,fin:seuilOk?seg(R,best):cur,essais,avantSeuil:cur.test.pnl,seuils,best,testBest:tb,seuilOk,thr:c.thr,R,c:{fee:c.fee,slip:c.slip,hold:c.hold,atrK:c.atrK,sl:c.sl},
     pairs:F.Q.length,du:F.T[W],coupe:F.T[cut],au:F.T[F.N-1],quand:Date.now()}}
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 13:20';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 13:50';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
- cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:10,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
+ cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
 let S=D(),KEYS={k:'',s:''};
 try{const j=localStorage.getItem('tiq');if(j)S=Object.assign(D(),JSON.parse(j))}catch(e){}
-S.cfg=Object.assign(D().cfg,S.cfg);if(!S.cfg5){S.cfg.maxRuns=1440;S.cfg5=1}if(!S.cfg6){S.cfg.tf=10;S.cfg6=1}setTF(S.cfg.tf);if(S.sim&&S.sim.tf!==TF.min){S.sim=0;S.rules={}}if(S.sim&&S.sim.v!==3){S.sim=0;S.rules={}}S.rules=S.rules||{};
+S.cfg=Object.assign(D().cfg,S.cfg);if(!S.cfg5){S.cfg.maxRuns=1440;S.cfg5=1}if(!S.cfg6){S.cfg.tf=10;S.cfg6=1}if(!S.cfg7){S.cfg.tf=5;S.cfg.nb=3;S.cfg7=1}setTF(S.cfg.tf);if(S.sim&&S.sim.tf!==TF.min){S.sim=0;S.rules={}}if(S.sim&&S.sim.v!==3){S.sim=0;S.rules={}}S.rules=S.rules||{};
 if(S.pos&&(!S.pos.q||!S.pos.dist)){S.cash+=S.pos.size||0;S.pos=null} // position d'une ancienne version : remboursée au prix d'entrée
 const save=()=>{try{localStorage.setItem('tiq',JSON.stringify(S))}catch(e){}};
 const TAX=0.314,today=()=>new Date().toISOString().slice(0,10),hr=t=>new Date(t||Date.now()).toLocaleTimeString('fr-FR');
@@ -333,7 +336,7 @@ function marche(){const C={};for(const q of Object.keys(LV.C1))if(LV.C1[q].lengt
 function verifierStop(){const P=S.pos;if(!P||!fresh())return;const px=P.side==='long'?LV.bid[P.q]:LV.ask[P.q];if(!px)return;
   const hit=stopTick(P,px,px,S.rules,px);if(hit!==null)cloturer(hit,'stop touché au tick',false)}
 async function cloturer(price,raison,manuel){const P=S.pos,c=S.cfg,r=fermer(P,price,c);
-  S.cash+=P.size+r.g-r.xf;S.trades.push(r.pnl);S.hist.push({p:P.p,side:P.side,pnl:r.pnl,dur:(Date.now()-P.t0-TF.bar)/H1});S.lossToday+=r.pnl;S.nToday++;S.lastX=Math.floor(Date.now()/TF.bar)*TF.bar;
+  S.cash+=P.size+r.g-r.xf;S.trades.push(r.pnl);S.hist.push({p:P.p,side:P.side,pnl:r.pnl,dur:(Date.now()-P.t0-TF.bar)/H1});S.lossToday+=r.pnl;S.nToday+=P.nb||1;S.lastX=Math.floor(Date.now()/TF.bar)*TF.bar;
   let ex=`${P.q} : sortie fictive à ${fp(r.fx)} (${raison}) : ${fmt(r.pnl)} frais et glissement compris.`;
   if(c.tn==='1'&&manuel&&P.side==='long'&&TNP.includes(P.q))ex+=' '+await testnetOrder('SELL',(Math.floor(P.n*1e4)/1e4).toFixed(4),0,P.q);
   logA(`${P.q} : sortie à ${fp(r.fx)} : ${fmt(r.pnl)} (${raison})`);S.pos=null;S.ags=S.ags.map(a=>a.n==='Exécuteur fictif'?{...a,t:ex,s:'Position fermée'}:a);save();render();return ex}
@@ -355,17 +358,17 @@ async function decider0(t,manuel){const c=S.cfg,A=[],d0=today(),R=S.rules,W=v=>v
   else if(b){act='open';d=b.dir==='long'?'ENTRER EN HAUSSE':'ENTRER EN BAISSE';const bs=sigAt(F.p[b.q],i,R);why=`${b.q} : indice ${Math.round(bs.pr*100)} %, au-dessus du seuil de ${c.thr} %.`}
   else if(refus.length)why=`${refus[0].q} passe le seuil mais est refusé : ${refus[0].r}.`;
   A.push({n:'Chef',s:`${d}`,t:`${d} : ${why} L’indice de confiance est une note du bot, pas une probabilité. Changements actifs : ${RULES().join(', ')||'aucun (version de départ)'}.`});
-  let ok=true,rr=act==='close'?'Sortie toujours autorisée.':act?'Validé.':'Rien à valider.';
-  if(act==='open'){if(S.stop){ok=false;rr='Bloqué : arrêt d’urgence actif.'}else if(S.nToday>=c.maxTrades){ok=false;rr='Bloqué : nombre maximal de trades atteint.'}
-    else if(-S.lossToday>=S.start*c.maxLoss/100){ok=false;rr='Bloqué : perte maximale du jour atteinte.'}else if(S.cash<c.size*(1+c.fee/100)){ok=false;rr='Bloqué : solde fictif insuffisant.'}
+  let ok=true,rr=act==='close'?'Sortie toujours autorisée.':act?`Validé : ${c.nb} achat${c.nb>1?'s':''} de ${fmt(c.size)}.`:'Rien à valider.';
+  if(act==='open'){if(S.stop){ok=false;rr='Bloqué : arrêt d’urgence actif.'}else if(S.nToday+c.nb>c.maxTrades){ok=false;rr=`Bloqué : ${c.nb} achats dépasseraient le maximum de ${c.maxTrades} trades par jour.`}
+    else if(-S.lossToday>=S.start*c.maxLoss/100){ok=false;rr='Bloqué : perte maximale du jour atteinte.'}else if(S.cash<c.size*c.nb*(1+c.fee/100)){ok=false;rr=`Bloqué : solde fictif insuffisant pour ${c.nb} achats de ${fmt(c.size)}.`}
     else if(!fresh()){ok=false;rr='Bloqué : données figées.'}}
   A.push({n:'Risque',s:ok?'Feu vert':'Veto',t:rr+' Le Chef ne peut pas contourner ce veto.'});
   let ex='Aucun ordre.';
   if(act==='open'&&ok){const px=b.dir==='long'?LV.ask[b.q]:LV.bid[b.q];if(!px)ex='Aucun prix d’achat/vente reçu : ordre annulé.';else{
-    const N=ouvrir(F,b.q,i,b.dir,b.pr,c,R,px);N.t0=tb;S.pos=N;S.cash-=N.size+N.fe;S.nToday++;
-    ex=`${b.q} : entrée fictive en ${b.dir==='long'?'hausse':'baisse'} à ${fp(N.fill)} (prix ${b.dir==='long'?'vendeur':'acheteur'} + glissement), stop ${fp(N.stop)}${R.atr?' suiveur':''}.`;
-    if(c.tn==='1'&&manuel&&b.dir==='long'&&TNP.includes(b.q))ex+=' '+await testnetOrder('BUY',0,c.size,b.q);
-    logA(`${b.q} : entrée en ${b.dir==='long'?'hausse':'baisse'} à ${fp(N.fill)} (indice ${Math.round(b.pr*100)} %)`)}}
+    const N=ouvrir(F,b.q,i,b.dir,b.pr,c,R,px);N.t0=tb;S.pos=N;S.cash-=N.size+N.fe;S.nToday+=N.nb;
+    ex=`${b.q} : ${N.nb} achat${N.nb>1?'s':''} fictif${N.nb>1?'s':''} de ${fmt(c.size)} (${fmt(N.size)} au total), en ${b.dir==='long'?'hausse':'baisse'} à ${fp(N.fill)} (prix ${b.dir==='long'?'vendeur':'acheteur'} + glissement), stop ${fp(N.stop)}${R.atr?' suiveur':''}.`;
+    if(c.tn==='1'&&manuel&&b.dir==='long'&&TNP.includes(b.q))for(let k=0;k<N.nb;k++)ex+=' '+await testnetOrder('BUY',0,c.size,b.q);
+    logA(`${b.q} : ${N.nb} × ${fmt(c.size)} en ${b.dir==='long'?'hausse':'baisse'} à ${fp(N.fill)} (indice ${Math.round(b.pr*100)} %)`)}}
   else if(act==='close'){const px=P.side==='long'?LV.bid[P.q]:LV.ask[P.q];ex=px?await cloturer(px,why.replace(/\.$/,'').toLowerCase(),manuel):'Aucun prix reçu : sortie reportée.'}
   A.push({n:'Exécuteur fictif',s:act==='open'&&ok&&S.pos?'Ordre passé':act==='close'?'Position fermée':'Aucun ordre',t:ex+(c.tn==='1'&&manuel?' Le testnet ne reçoit que BTC et ETH, en hausse.':'')});
   const L=S.trades.length,w=S.trades.filter(x=>x>0).length;
@@ -511,7 +514,7 @@ const simLine=M=>M&&M.v===3?`Mesure : départ ${fmt(M.base.test.pnl)} sur le tes
 function simHTML(M){if(!M||M.v!==3)return'<span class="mut">Pas encore lancée. Va dans l’onglet Agents et touche « Mesurer sur l’historique réel ».</span>';
   const peu=r=>r.n<30,row=(n,r)=>`<tr><th>${n}</th><td>${peu(r)?'<span class="mut">trop peu de trades</span>':sg$(r.pnl)}</td><td>${r.n}</td><td>${r.dur.toFixed(1)} h</td><td>${r.n?Math.round(r.wr*100)+' %':'–'}</td><td class="up">${fmt(r.gain)}</td><td class="dn">${fmt(r.loss)}</td><td>${fmt(r.fees)}</td><td>${fmt(r.slip)}</td><td>${pct(r.dd)}</td></tr>`;
   const ft=M.fin.test;
-  return`<div class="mut">${M.pairs} marchés, bougies de ${M.tfLab}. Calibrage du ${dt(M.du)} au ${dt(M.coupe)} (${M.base.cal.jours} j), test du ${dt(M.coupe)} au ${dt(M.au)} (${M.base.test.jours} j). Frais ${String(M.c.fee).replace('.',',')} % et glissement ${String(M.c.slip).replace('.',',')} % par côté.</div>
+  return`<div class="mut">${M.pairs} marchés, bougies de ${M.tfLab}, ${M.nb} achat${M.nb>1?'s':''} de ${fmt(S.cfg.size)} par décision. Calibrage du ${dt(M.du)} au ${dt(M.coupe)} (${M.base.cal.jours} j), test du ${dt(M.coupe)} au ${dt(M.au)} (${M.base.test.jours} j). Frais ${String(M.c.fee).replace('.',',')} % et glissement ${String(M.c.slip).replace('.',',')} % par côté.</div>
   <div class="tw"><table class="st"><thead><tr><th></th><th>Bilan</th><th>Trades</th><th>Durée moy.</th><th>Réussite</th><th>Gagné</th><th>Perdu</th><th>Frais</th><th>Glissement</th><th>Pire baisse</th></tr></thead><tbody>
   ${row('Départ · calibrage',M.base.cal)}${row('Départ · test',M.base.test)}${row('Après · calibrage',M.fin.cal)}${row('Après · test',ft)}</tbody></table></div>
   <p class="mut">Le bilan inclut frais et glissement. Moins de 30 trades : bilan affiché comme « trop peu de trades », il ne permet pas de conclure (il reste visible dans le détail ci-dessous).</p>
@@ -530,7 +533,7 @@ $('auto').onclick=()=>{if(timer){stopAuto();return}
   $('auto-st').textContent=`Agents en service : ils décident à chaque fermeture de bougie de ${TF.lab} (prochaine à ${hr(Math.ceil(Date.now()/TF.bar)*TF.bar)}). Stops vérifiés à chaque prix reçu. Arrêt automatique après ${S.cfg.maxRuns} min.`;renderAgents();decider(0,false)};
 $('go').onclick=()=>decider(0,true);
 $('kill').onclick=()=>{S.stop=!S.stop;if(S.stop&&timer)stopAuto('Arrêt d\'urgence actif : agents arrêtés, aucune nouvelle entrée. Un stop ouvert reste surveillé.');save();render();$('msg').textContent=S.stop?'Tout est suspendu : aucun nouvel ordre.':'Reprise possible.'};
-const NUM={size:[10,1e6],maxLoss:[.5,100],maxTrades:[1,1000],sl:[.5,50],thr:[50,99],hold:[0,200],atrK:[.5,10],fee:[0,2],slip:[0,2],maxRuns:[1,100000]};
+const NUM={nb:[1,10],size:[10,1e6],maxLoss:[.5,100],maxTrades:[1,1000],sl:[.5,50],thr:[50,99],hold:[0,200],atrK:[.5,10],fee:[0,2],slip:[0,2],maxRuns:[1,100000]};
 $('save').onclick=()=>{for(const k in NUM){const v=parseFloat(String($(k).value).replace(',','.'));if(isFinite(v))S.cfg[k]=Math.min(NUM[k][1],Math.max(NUM[k][0],v))}
   const tf0=S.cfg.tf;S.cfg.tf=+$('tf').value;S.cfg.news=$('news').value;S.cfg.rsrc=$('rsrc').value;S.cfg.tn=$('tn').value;KEYS={k:$('k').value.trim(),s:$('s').value.trim()};RD.at=0;
   $('k').value='';$('s').value='';fillCfg();S.sim=0;S.rules={};save();render();$('setmsg').textContent='Réglages enregistrés. Relance la mesure : les changements gardés dépendent de ces réglages.'+(KEYS.k?' Clés gardées en mémoire pour cette session.':'');
@@ -541,7 +544,7 @@ let RZ=0;$('reset').onclick=()=>{const b=$('reset');
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
   document.querySelectorAll('.sec').forEach((s,i)=>s.classList.toggle('on',i==b.dataset.t))});
 $('auto2').onclick=()=>$('auto').onclick();
-$('simgo').onclick=async()=>{const b=$('simgo');b.disabled=true;const st=m=>$('simst').textContent=m;st(TF.min===10?'Téléchargement d’environ 2 mois de bougies de 5 min…':'Téléchargement d’environ 12 mois de bougies d’1 h…');
+$('simgo').onclick=async()=>{const b=$('simgo');b.disabled=true;const st=m=>$('simst').textContent=m;st(TF.min<60?'Téléchargement d’environ 2 mois de bougies de 5 min…':'Téléchargement d’environ 12 mois de bougies d’1 h…');
   try{const{D:H,bad}=await historique(fetch,PUB,pairs(),TF.pages,st);const al=aligner(H);
     if(!al||!Object.keys(al.D).length){st('Binance injoignable : impossible de mesurer sur l’historique réel. Aucun résultat inventé.');b.disabled=false;return}
     st('Calcul des indicateurs et des essais…');await sleep(30);
