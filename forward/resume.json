@@ -1,22 +1,22 @@
 {
- "maj": 1792004444975,
+ "maj": 1792004709462,
  "debut": 1791989614204,
  "geleeLe": "2026-10-14T14:43:59Z",
  "tf": "5 min",
  "vAgents": "506d8045d3e9479e",
  "vReglages": "2d0afdd925faff69",
  "regles": [],
- "decisions": 46,
- "passages": 46,
+ "decisions": 47,
+ "passages": 47,
  "trades": 0,
  "gagnants": 0,
  "bilan": 0,
  "gagne": 0,
  "perdu": 0,
  "pf": null,
- "valeur": 9997.75,
+ "valeur": 9996.25,
  "plusHaut": 10002.99,
- "baisse": 0.0005,
+ "baisse": 0.0007,
  "position": {
   "paire": "TRXUSDT",
   "sens": "long",
@@ -24,8 +24,8 @@
   "entree": 0.33386685,
   "stop": 0.327026
  },
- "retardMedianS": 36,
+ "retardMedianS": 35,
  "retardMaxS": 214,
- "dernierHash": "591248b09ea47dddf0414fbaedb2c9527026f8edb82f2638c7a2ffb7f9a3b526",
+ "dernierHash": "ab70da61d148347d94318bda7864c9b30a333746f3aa8b813b41de24e1e56d86",
  "faux": false
 }
