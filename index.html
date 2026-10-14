@@ -255,13 +255,13 @@ function pauseFed(t){const connu=t>=FOMC[0]-31*864e5&&t<=FOMC[FOMC.length-1]+FOM
 const FUND_MAX=.0005;
 // 3. Régime du bitcoin : clôture journalière (UTC) au-dessus (+1) ou au-dessous (−1) de son EMA 50 jours ; 0 = moins de 50 jours connus.
 //    Seule la dernière journée FERMÉE avant la fin de la bougie compte. Journées fournies (bougies 1 j de Binance) ou reconstruites depuis BTCUSDT.
-function joursDe(C){const o=[];let cur=null;for(const x of C){const d=Math.floor(x.t/864e5)*864e5;if(!cur||cur.t!==d){if(cur)o.push(cur);cur={t:d,c:x.c,fin:x.t+TF.bar}}else{cur.c=x.c;cur.fin=x.t+TF.bar}}
+function joursDe(C){const o=[];let cur=null;for(const x of C){const d=Math.floor(x.t/864e5)*864e5;if(!cur||cur.t!==d){if(cur)o.push(cur);cur={t:d,c:x.c,h:x.h,l:x.l,v:x.v,fin:x.t+TF.bar}}else{cur.c=x.c;cur.h=Math.max(cur.h,x.h);cur.l=Math.min(cur.l,x.l);cur.v+=x.v;cur.fin=x.t+TF.bar}}
   if(cur&&cur.fin>=cur.t+864e5)o.push(cur);return o}
 function regimeBTC(T,J){const o=new Array(T.length).fill(0);if(!J||!J.length)return o;let e=null,n=0,j=0,cur=0;
   const R=J.map(x=>{n++;e=e===null?x.c:x.c*2/51+e*49/51;return{fin:x.t+864e5,v:n>=50?(x.c>e?1:-1):0}});
   for(let i=0;i<T.length;i++){while(j<R.length&&R[j].fin<=T[i]+TF.bar){cur=R[j].v;j++}o[i]=cur}return o}
 // Clôtures journalières (UTC) d'une paire : jc = clôtures des journées fermées, ji[t] = nombre de journées fermées à la fin de la bougie t.
-function joursFermes(T,J){const jc=J.map(x=>x.c),ji=new Array(T.length);let j=0;for(let i=0;i<T.length;i++){while(j<J.length&&J[j].t+864e5<=T[i]+TF.bar)j++;ji[i]=j}return{jc,ji}}
+function joursFermes(T,J){const jc=J.map(x=>x.c),jh=J.map(x=>x.h??x.c),jl=J.map(x=>x.l??x.c),jv=J.map(x=>x.v??0),ji=new Array(T.length);let j=0;for(let i=0;i<T.length;i++){while(j<J.length&&J[j].t+864e5<=T[i]+TF.bar)j++;ji[i]=j}return{jc,jh,jl,jv,ji}}
 // Dernier taux de financement connu à la fin de chaque bougie (null si absent ou de plus de 9 h). L : [{t,r}] trié.
 function financement(T,L){const o=new Array(T.length).fill(null);if(!L||!L.length)return o;let j=-1;
   for(let i=0;i<T.length;i++){const fin=T[i]+TF.bar;while(j+1<L.length&&L[j+1].t<=fin)j++;if(j>=0&&fin-L[j].t<=9*H1)o[i]=L[j].r}return o}
@@ -530,10 +530,62 @@ function portefeuille(F,from,to,c,regle){const Q=F.Q,n=Q.length,k=Math.max(1,Mat
   let cash=1e4,pk=1e4,dd=0,fees=0,nTr=0,day='';for(const q of Q)pos[q]=0;const val=()=>cash+Q.reduce((a,q)=>a+pos[q],0);
   for(let t=from;t<to;t++){if(t>from)for(const q of Q)pos[q]*=F.p[q].c[t]/F.p[q].c[t-1];
     const dj=new Date(F.T[t]).toISOString().slice(0,10);if(dj!==day){if(day)J.push(val());day=dj}
-    if((t-from)%k===0){const v=val(),w=regle(F,t,st,n,(t-from)/k);if(w)for(const q in w){const d=v*w[q]-pos[q];if(Math.abs(d)>v*1e-4){const co=Math.abs(d)*f;cash-=d+co;pos[q]+=d;fees+=co;nTr++}}}
+    if((t-from)%k===0){const v=val();st._v=v;st._f=f;const w=regle(F,t,st,n,(t-from)/k);if(w)for(const q in w){const d=v*w[q]-pos[q];if(Math.abs(d)>v*1e-4){const co=Math.abs(d)*f;cash-=d+co;pos[q]+=d;fees+=co;nTr++}}}
     const v=val();pk=Math.max(pk,v);dd=Math.max(dd,(pk-v)/pk)}
   for(const q of Q)if(pos[q]){const co=pos[q]*f;cash+=pos[q]-co;fees+=co;pos[q]=0;nTr++}J.push(cash);
-  return{pnl:cash-1e4,dd,fees,n:nTr,jrs:J}}
+  const TR=st._T||[];return{pnl:cash-1e4,dd,fees,n:nTr,jrs:J,nT:TR.length,expR:TR.length?TR.reduce((a,x)=>a+x.r,0)/TR.length:null,wrT:TR.length?TR.filter(x=>x.r>0).length/TR.length:null,arret:st._arret||null}}
+// ---------- Stratégies du dossier « bot-trading » (S1 à S5), règles écrites par l'utilisateur, appliquées telles quelles ----------
+// Bougies journalières (UTC) reconstruites ; décision une fois par jour, juste après la clôture journalière, au prix de ce moment.
+// Les stops sont vérifiés sur la clôture journalière (pas en cours de journée) : c'est plus simple et un peu moins favorable.
+// Gestion du risque (01_gestion_risque.md, prioritaire) : 1 % du capital risqué par trade (taille = capital × 1 % ÷ (entrée − stop)),
+// 5 % de risque ouvert au total, au plus 2 positions très corrélées (corrélation > 0,8 sur 30 jours), perte du jour ≥ 2 % : plus
+// d'entrée ce jour-là, perte du mois ≥ 6 % : pause jusqu'au mois suivant, baisse ≥ 15 % depuis le plus haut : tout est vendu et la
+// stratégie s'arrête (retour en papier). Jamais de levier, jamais de moyenne à la baisse (une seule position par paire).
+const PRO_RISQUE=.01,PRO_RISQUE_TOTAL=.05;
+const mmJ=(a,i,n)=>{if(i+1<n)return null;let s=0;for(let k=i-n+1;k<=i;k++)s+=a[k];return s/n};
+function atrJ(P,i,n=14){if(i<n)return null;let s=0;for(let k=i-n+1;k<=i;k++)s+=Math.max(P.jh[k]-P.jl[k],Math.abs(P.jh[k]-P.jc[k-1]),Math.abs(P.jl[k]-P.jc[k-1]));return s/n}
+function rsiJ(a,i,n){if(i<n)return null;let g=0,l=0;for(let k=i-n+1;k<=i;k++){const d=a[k]-a[k-1];d>0?g+=d:l-=d}return l===0?100:100-100/(1+g/l)}
+function correl(P1,i1,P2,i2,n=30){const a=[],b=[];for(let d=n-1;d>=0;d--){const k1=i1-d,k2=i2-d;if(k1<1||k2<1)return 0;a.push(P1.jc[k1]/P1.jc[k1-1]-1);b.push(P2.jc[k2]/P2.jc[k2-1]-1)}
+  const ma=a.reduce((x,y)=>x+y,0)/n,mb=b.reduce((x,y)=>x+y,0)/n;let sab=0,sa=0,sb=0;for(let k=0;k<n;k++){sab+=(a[k]-ma)*(b[k]-mb);sa+=(a[k]-ma)**2;sb+=(b[k]-mb)**2}return sa&&sb?sab/Math.sqrt(sa*sb):0}
+// Signaux : entree(P,i) renvoie {stop, objectif?} ou null ; sortie(P,i,pos) renvoie une raison ou '' (et peut remonter le stop).
+const STRAT_PRO={
+  S1:{nom:'S1 · Suivi de tendance (MM50/MM200)',txt:'Achat quand la MM50 croise au-dessus de la MM200 et que la clôture est au-dessus de la MM50 ; stop 2 × ATR puis plus bas des 20 jours ; sortie si la MM50 repasse sous la MM200.',
+    entree:(P,i)=>{const a=mmJ(P.jc,i,50),b=mmJ(P.jc,i,200),a0=mmJ(P.jc,i-1,50),b0=mmJ(P.jc,i-1,200),x=atrJ(P,i);return a&&b&&a0&&b0&&x&&a>b&&a0<=b0&&P.jc[i]>a?{stop:P.jc[i]-2*x}:null},
+    sortie:(P,i,p)=>{p.stop=Math.max(p.stop,Math.min(...P.jl.slice(i-19,i+1)));const a=mmJ(P.jc,i,50),b=mmJ(P.jc,i,200);return a&&b&&a<b?'MM50 repassée sous la MM200':''}},
+  S2:{nom:'S2 · Retour à la moyenne (RSI 2)',txt:'Achat si la clôture est au-dessus de la MM200 et le RSI 2 jours sous 10 ; sortie au-dessus de la MM5 ou après 5 jours ; stop 3 × ATR.',
+    entree:(P,i)=>{const b=mmJ(P.jc,i,200),r=rsiJ(P.jc,i,2),x=atrJ(P,i);return b&&x&&r!==null&&P.jc[i]>b&&r<10?{stop:P.jc[i]-3*x}:null},
+    sortie:(P,i,p)=>{const m5=mmJ(P.jc,i,5);return m5&&P.jc[i]>m5?'clôture au-dessus de la MM5':i-p.j>=5?'stop temps : 5 jours':''}},
+  S3:{nom:'S3 · Cassure de Donchian (20 jours, filtre volume)',txt:'Achat si la clôture dépasse le plus haut des 20 jours précédents avec un volume au-dessus de sa moyenne 20 jours ; stop 2 × ATR ; sortie sous le plus bas des 10 jours précédents.',
+    entree:(P,i)=>{if(i<21)return null;const x=atrJ(P,i),vm=mmJ(P.jv,i-1,20);return x&&vm&&P.jc[i]>Math.max(...P.jh.slice(i-20,i))&&P.jv[i]>vm?{stop:P.jc[i]-2*x}:null},
+    sortie:(P,i)=>P.jc[i]<Math.min(...P.jl.slice(i-10,i))?'clôture sous le plus bas des 10 jours':''},
+  S4:{nom:'S4 · Pullback dans une tendance',txt:'MM50 au-dessus de la MM200 et en hausse ; après un contact avec la MM20, achat quand la clôture dépasse le plus haut de la veille ; stop sous le plus bas du repli ; objectif 2 × le risque.',
+    entree:(P,i)=>{if(i<205)return null;const a=mmJ(P.jc,i,50),b=mmJ(P.jc,i,200),a5=mmJ(P.jc,i-5,50);if(!(a>b&&a>a5))return null;
+      let touche=false;for(let k=i-3;k<i;k++){const m=mmJ(P.jc,k,20);if(m&&P.jl[k]<=m)touche=true}if(!touche||!(P.jc[i]>P.jh[i-1]))return null;
+      const st=Math.min(...P.jl.slice(i-5,i+1));return st<P.jc[i]?{stop:st,objectif:P.jc[i]+2*(P.jc[i]-st)}:null},
+    sortie:(P,i,p)=>p.objectif&&P.jc[i]>=p.objectif?'objectif atteint (2 × le risque)':''},
+  S5:{nom:'S5 · Rotation momentum mensuelle',txt:'Le premier jour du mois : les 2 paires qui ont le plus monté sur 6 mois, à parts égales ; une paire sous sa MM200 est remplacée par des liquidités. Pas de stop (rééquilibrage mensuel seulement).',rotation:true}};
+function reglePro(id){const S=STRAT_PRO[id];return(F,t,st,n)=>{const P0=F.p[F.Q[0]],k=P0.ji[t];if(!k||k===st._kj)return null;st._kj=k;const I=q=>F.p[q].ji[t]-1,o={},v=st._v||1e4,f=st._f||0;
+    st._T=st._T||[];st._pk=Math.max(st._pk||v,v);const mois=new Date(F.T[t]+TF.bar).toISOString().slice(0,7);if(st._mois!==mois){st._mois=mois;st._m0=v}
+    const pj=st._j0?v/st._j0-1:0;st._j0=v;const dd=(st._pk-v)/st._pk;st._pos=st._pos||{};const pos=st._pos;
+    const fermer=(q,raison)=>{const p=pos[q],P=F.p[q],x=P.jc[I(q)];st._T.push({q,r:((x/p.e-1)-2*f)/p.rf,raison});delete pos[q];o[q]=0};
+    if(st._arret)return null;
+    if(dd>=.15){for(const q in pos)fermer(q,'arrêt total : baisse de 15 % depuis le plus haut');st._arret=new Date(F.T[t]).toISOString();return o}
+    if(S.rotation){if(mois===st._rot)return null;st._rot=mois;const L=F.Q.map(q=>{const P=F.p[q],i=I(q);return{q,P,i,m:i>=182?P.jc[i]/P.jc[i-182]-1:null,b:mmJ(P.jc,i,200)}}).filter(x=>x.m!==null).sort((a,b)=>b.m-a.m).slice(0,2);
+      const garde=new Set(L.filter(x=>x.b&&x.P.jc[x.i]>x.b).map(x=>x.q));for(const q in pos)if(!garde.has(q))fermer(q,'rotation mensuelle');
+      if((v/st._m0-1)>-.06)for(const q of garde)if(!pos[q]){pos[q]={e:F.p[q].jc[I(q)],rf:1,j:I(q)};o[q]=.5}return o}
+    for(const q in pos){const P=F.p[q],p=pos[q],i=I(q),x=P.jc[i];if(x<=p.stop){fermer(q,'stop touché (clôture journalière)');continue}const r=S.sortie(P,i,p);if(r)fermer(q,r)}
+    const bloque=(v/st._m0-1)<=-.06?'perte du mois ≥ 6 %':pj<=-.02?'perte du jour ≥ 2 %':'';st._bloque=bloque;if(bloque)return o;
+    let risque=Object.keys(pos).reduce((a,q)=>{const p=pos[q],x=F.p[q].jc[I(q)];return a+Math.max(0,p.w*(x-p.stop)/x)},0);
+    for(const q of F.Q){if(pos[q]||risque+PRO_RISQUE>PRO_RISQUE_TOTAL+1e-9)continue;const P=F.p[q],i=I(q);if(i<1)continue;const s=S.entree(P,i);if(!s)continue;const x=P.jc[i],rf=(x-s.stop)/x;if(!(rf>0))continue;
+      if(Object.keys(pos).filter(h=>correl(P,i,F.p[h],I(h))>.8).length>=2)continue;
+      const w=Math.min(.5,PRO_RISQUE/rf);pos[q]={e:x,stop:s.stop,objectif:s.objectif,rf,w,j:i};o[q]=w;risque+=w*rf}
+    return o}}
+for(const id in STRAT_PRO)FAMILLES[id]={nom:STRAT_PRO[id].nom,txt:STRAT_PRO[id].txt,pro:true,regle:reglePro(id)};
+// Statut selon 05_backtest_protocole.md : VALIDÉE seulement si tous les critères sont remplis ; SUSPENDUE si, en forward test,
+// l'espérance des 30 derniers trades devient négative ou si la baisse dépasse 1,5 × celle du backtest ; sinon À TESTER.
+function statutPro(x,fw){const c=[[x.expR!==null&&x.expR>0,'espérance positive après frais'],[x.nT>=100,`au moins 100 trades (${x.nT})`],[x.dd<.2,'pire baisse sous 20 %'],
+    [x.ent>0&&x.test>0,'positive sur les 70 % d’optimisation et sur les 30 % de vérification'],[!!(fw&&fw.jours>=28&&fw.valeur>=1e4*(1-1.5*x.dd)),'paper trading de 4 semaines cohérent']];
+  const sus=fw&&(fw.dd>1.5*x.dd||(fw.n30>=30&&fw.esp30<0));return{statut:sus?'SUSPENDUE':c.every(z=>z[0])?'VALIDÉE':'À TESTER',criteres:c}}
 const rendementsJours=j=>{const r=[];for(let i=1;i<j.length;i++)if(j[i-1]>0)r.push(j[i]/j[i-1]-1);return r};
 // Compare les familles, les agents et la règle simple sur la même période, avec les mêmes coûts.
 // Indicateurs : rendement, pire baisse, Sharpe journalier (non annualisé), trimestres positifs, rendement avec coûts doublés, partie test (30 %).
@@ -541,7 +593,7 @@ function familles(F,c,R){const W=Math.min(Math.max(TF.W,200*Math.round(H1/TF.bar
   const run={agents:(a,b,cc)=>simuler(F,a,b,cc,R),simple:(a,b,cc)=>simuler(F,a,b,cc,{ref:'ma'})};for(const k in FAMILLES)run[k]=(a,b,cc)=>portefeuille(F,a,b,cc,FAMILLES[k].regle);
   const L=[];for(const k in run){const tout=run[k](W,N,c),q4=[0,1,2,3].map(i=>run[k](W+Math.floor((N-W)*i/4),W+Math.floor((N-W)*(i+1)/4),c).pnl),rj=rendementsJours(tout.jrs);
     L.push({id:k,nom:k==='agents'?'Agents (configuration gelée)':k==='simple'?'Règle simple (croisement EMA 20/50)':FAMILLES[k].nom,txt:k==='agents'?'Les six agents, avec la couche de risque (0,5 % du capital risqué par trade).':k==='simple'?'Croisement des moyennes EMA 20 et 50 sur les bougies de décision, même couche de risque.':FAMILLES[k].txt,
-      pnl:tout.pnl,dd:tout.dd,fees:tout.fees,n:tout.n,sharpe:sharpe(rj),jours:rj.length,trimPos:q4.filter(x=>x>0).length,trim:q4,cout2:run[k](W,N,c2).pnl,test:run[k](cut,N,c).pnl,mc:monteCarlo(rj),rj})}
+      pnl:tout.pnl,dd:tout.dd,fees:tout.fees,n:tout.n,sharpe:sharpe(rj),jours:rj.length,trimPos:q4.filter(x=>x>0).length,trim:q4,cout2:run[k](W,N,c2).pnl,test:run[k](cut,N,c).pnl,ent:run[k](W,cut,c).pnl,nT:tout.nT??null,expR:tout.expR??null,wrT:tout.wrT??null,arret:tout.arret??null,pro:k in FAMILLES&&!!FAMILLES[k].pro,mc:monteCarlo(rj),rj})}
   const srs=L.map(x=>x.sharpe).filter(x=>x!==null);for(const x of L){x.dsr=x.rj.length>=30?dsr(x.rj,srs):null;delete x.rj}
   return{lignes:L,du:F.T[W],coupe:F.T[cut],au:F.T[N-1]}}
 // Pistes de régularité : chaque nouvelle source ajoutée SEULE à la configuration des agents, mêmes données, mêmes coûts.
@@ -562,7 +614,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 21:50';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 22:47';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({pk:10000,cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:.5,ddMax:15,hb:5,npT1:30,npJ1:30,npT2:100,npJ2:90,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
@@ -984,7 +1036,7 @@ function srvHTML(){const e=$('srv');if(!e)return;const r=SV.res,g=SV.cfg,L=SV.lg
     <details class="plus"><summary>Détails et mesures du serveur</summary><span class="mut">Bougies de ${r.tf}, configuration gelée le ${g&&g.geleeLe?new Date(g.geleeLe).toLocaleString('fr-FR'):'–'} (règles : ${(r.regles||[]).join(', ')||'version de départ'}). Retard médian d’un passage : ${r.retardMedianS??'–'} s (GitHub lance parfois les tâches en retard). Journal public, ajout seulement, chaîné par empreintes.${r.faux?' ⚠ Données de test (prix inventés).':''}</span>`:'<span class="mut">Configuration gelée publiée ; premier passage du serveur en attente.</span><details class="plus"><summary>Mesures du serveur</summary>')+
    (L?`<h3>Mesure longue (${L.mois} mois, serveur)</h3>${L.wf?`Walk-forward : ${L.wf.test.n} trades hors échantillon, bilan net <span class="${L.wf.test.pnl>=0?'up':'dn'}">${fmt(L.wf.test.pnl)}</span> (entraînement ${fmt(L.wf.ent.pnl)}), PF ${pf(L.wf.test.pf)}, ${L.wf.test.pos}/${L.wf.fen.length} fenêtres positives. `:''}
     Coûts × 2 : ${L.robustesse?fmt(L.robustesse[1].test.pnl):'–'} · × 3 : ${L.robustesse?fmt(L.robustesse[2].test.pnl):'–'}. Règle simple : ${L.agents?fmt(L.agents.ref.pnl):'–'} · acheter et garder : ${L.agents?fmt(L.agents.act.bh):'–'}.
-    <br><b>Fiabilité : ${L.fiabilite.niveau}</b> — ${L.fiabilite.raison} <span class="mut">${L.nEssais} configurations testées, du ${dt(L.du)} au ${dt(L.au)}, mise à jour ${new Date(L.maj).toLocaleString('fr-FR')}.${L.faux?' ⚠ Données de test (prix inventés).':''}</span>${famFwdHTML()}${famHTML(L&&L.familles3,'Familles sur 3 ans (bougies d’1 h)')}${famHTML(L&&L.familles,'Familles sur 12 mois (bougies de 5 min)')}${pistesHTML(L)}`:'<p class="mut">Mesure longue (12 mois) : pas encore publiée par le serveur (une fois par semaine).</p>')+'</details>';if(ouv)e.querySelector('details').open=true}
+    <br><b>Fiabilité : ${L.fiabilite.niveau}</b> — ${L.fiabilite.raison} <span class="mut">${L.nEssais} configurations testées, du ${dt(L.du)} au ${dt(L.au)}, mise à jour ${new Date(L.maj).toLocaleString('fr-FR')}.${L.faux?' ⚠ Données de test (prix inventés).':''}</span>${famFwdHTML()}${proHTML(L)}${famHTML(L&&L.familles3,`Familles sur ${L.mois3?Math.round(L.mois3/12):3} ans (bougies d’1 h)`)}${famHTML(L&&L.familles,'Familles sur 12 mois (bougies de 5 min)')}${pistesHTML(L)}`:'<p class="mut">Mesure longue (12 mois) : pas encore publiée par le serveur (une fois par semaine).</p>')+'</details>';if(ouv)e.querySelector('details').open=true}
 // Sources : la mesure la plus fournie (mesure longue du serveur si elle existe, sinon celle de ce navigateur) et le forward test
 // le plus long AVEC une configuration gelée (serveur, ou ce navigateur si « Geler la configuration » est actif).
 // Comparatif des familles de stratégies (mesure longue du serveur). Une famille est « candidate » seulement si elle bat
@@ -996,12 +1048,20 @@ function pistesHTML(L){const G=L&&L.pistes;if(!G)return'';const r0=G.lignes[0],p
   <div class="tw"><table class="st"><thead><tr><th>Version</th><th>Rendement</th><th>Pire baisse</th><th>Trades</th><th title="Gain moyen par trade, en multiples du risque pris au stop (R)">Espérance par trade</th><th title="Indice de qualité du système (Van Tharp) : espérance ÷ dispersion × √trades (100 au plus)">SQN</th><th>Coûts × 2</th><th>Partie test</th><th>Couverture</th></tr></thead><tbody>
   ${G.lignes.map(x=>`<tr${mieux(x)?' class="cand"':''}><th>${x.nom}</th><td class="${cl(x.pnl)}">${pc(x.pnl)}</td><td>${pct(x.dd)}</td><td>${x.n}</td><td class="${(x.expR||0)>=0?'up':'dn'}">${x.expR==null?'–':(x.expR>=0?'+':'−')+Math.abs(x.expR).toFixed(2).replace('.',',')+' R'}</td><td>${x.sqn==null?'–':x.sqn.toFixed(2).replace('.',',')}</td><td class="${cl(x.cout2)}">${pc(x.cout2)}</td><td class="${cl(x.test)}">${pc(x.test)}</td><td>${x.couverture===undefined?'–':Math.round(x.couverture*100)+' %'}</td></tr>`).join('')}</tbody></table></div>
   <p><b>${B.length?`Piste${B.length>1?'s':''} à suivre : ${B.map(x=>x.nom).join(', ')} (mieux que la référence sur toute la période, la partie test et avec des coûts doublés, sans baisse plus forte). Ce n’est pas une preuve ; à confirmer en forward test avant tout changement de la configuration gelée.`:'Aucune de ces sources ne rend les agents plus réguliers de façon robuste sur cette période.'}</b></p>`}
+// Stratégies du dossier « bot-trading » : résultats sur plusieurs années et statut selon le protocole de validation (05).
+function proHTML(L){const G=L&&L.familles3;if(!G)return'';const X=G.lignes.filter(x=>x.pro);if(!X.length)return'';const pc=x=>`${x>=0?'+':'−'}${Math.abs(x/100).toFixed(1).replace('.',',')} %`,cl=x=>x>=0?'up':'dn';
+  const fw=id=>SV.fam&&SV.fam.lignes?SV.fam.lignes.find(y=>y.id===id):null;
+  return`<h3>Stratégies du dossier bot-trading (S1 à S5)</h3><div class="mut">Règles et gestion du risque du dossier appliquées telles quelles (1 % risqué par trade, 5 % au total, pertes du jour 2 %, du mois 6 %, arrêt à 15 % de baisse). Décision une fois par jour ; stops vérifiés sur la clôture journalière. Du ${dt(G.du)} au ${dt(G.au)}.</div>
+  <div class="tw"><table class="st"><thead><tr><th>Stratégie</th><th>Statut</th><th>Rendement</th><th>Pire baisse</th><th>Trades</th><th>Réussite</th><th>Espérance par trade</th><th>Optimisation 70 %</th><th>Vérification 30 %</th><th>Coûts × 2</th></tr></thead><tbody>
+  ${X.map(x=>{const s=statutPro(x,fw(x.id));return`<tr><th title="${x.txt}">${x.nom}</th><td><span class="pill ${s.statut==='VALIDÉE'?'ok':'no'}" title="${s.criteres.map(c=>(c[0]?'✓ ':'✗ ')+c[1]).join(' · ')}">${s.statut}</span></td><td class="${cl(x.pnl)}">${pc(x.pnl)}</td><td>${pct(x.dd)}</td><td>${x.nT??'–'}</td><td>${x.wrT==null?'–':Math.round(x.wrT*100)+' %'}</td><td class="${(x.expR||0)>=0?'up':'dn'}">${x.expR==null?'–':(x.expR>=0?'+':'−')+Math.abs(x.expR).toFixed(2).replace('.',',')+' R'}</td><td class="${cl(x.ent)}">${pc(x.ent)}</td><td class="${cl(x.test)}">${pc(x.test)}</td><td class="${cl(x.cout2)}">${pc(x.cout2)}</td></tr>`}).join('')}</tbody></table></div>
+  ${X.filter(x=>x.arret).map(x=>`<p class="mut">${x.nom} : arrêt total le ${dt(x.arret)} (baisse de 15 % atteinte), retour en papier comme le prévoit la règle.</p>`).join('')}
+  <p class="mut">Critères pour « VALIDÉE » : espérance positive après frais, au moins 100 trades, pire baisse sous 20 %, positive sur l’optimisation et la vérification, 4 semaines de paper trading cohérentes. Touche un statut pour voir les critères.</p>`}
 // Forward test 24 h/24 des familles : chaque famille gère 10 000 $ fictifs depuis le même jour, règles écrites avant de voir ces prix.
 function famFwdHTML(){const f=SV.fam;if(!f||!f.lignes)return'<p class="mut">Forward test des familles : pas encore de données publiées par le serveur.</p>';const pc=x=>`${x>=0?'+':'−'}${Math.abs(x/100).toFixed(2).replace('.',',')} %`;
   const j=(f.maj-f.debut)/864e5;return`<h3>Forward test des familles (prix réels en direct)</h3><div class="mut">Chaque famille gère 10 000 $ fictifs depuis le ${new Date(f.debut).toLocaleString('fr-FR')} (${j<1?Math.round(j*24)+' h':j.toFixed(1).replace('.',',')+' j'}), frais compris, décisions sur chaque heure fermée. ${f.faux?'⚠ Données de test (prix inventés).':''} Il faut des semaines avant de conclure.</div>
   <div class="tw"><table class="st"><thead><tr><th>Famille</th><th>Valeur</th><th>Depuis le début</th><th>Pire baisse</th><th>Investi</th><th>Échanges</th></tr></thead><tbody>
   ${f.lignes.map(x=>`<tr><th>${x.nom}</th><td>${fmt(x.valeur)}</td><td class="${x.valeur>=1e4?'up':'dn'}">${pc(x.valeur-1e4)}</td><td>${pct(x.dd)}</td><td>${Math.round(x.investi*100)} %</td><td>${x.n}</td></tr>`).join('')}</tbody></table></div>`}
-function famHTML(G,titre){if(!G)return'';const bh=G.lignes.find(x=>x.id==='bh'),pc=x=>`${x>=0?'+':'−'}${Math.abs(x/100).toFixed(1).replace('.',',')} %`,cl=x=>x>=0?'up':'dn';
+function famHTML(G0,titre){if(!G0)return'';const G={...G0,lignes:G0.lignes.filter(x=>!x.pro)};const bh=G.lignes.find(x=>x.id==='bh'),pc=x=>`${x>=0?'+':'−'}${Math.abs(x/100).toFixed(1).replace('.',',')} %`,cl=x=>x>=0?'up':'dn';
   const cand=x=>x.id!=='bh'&&bh&&x.pnl>bh.pnl&&x.test>bh.test&&x.cout2>0&&x.trimPos>=3,C=G.lignes.filter(cand);
   return`<h3>${titre} (même période, mêmes frais)</h3><div class="mut">Paramètres fixés à l’avance, jamais réglés sur ces données. Du ${dt(G.du)} au ${dt(G.au)}, partie test à partir du ${dt(G.coupe)}. Les familles en panier sont investies en entier ; les agents et la règle simple ne risquent que 0,5 % du capital par trade : compare surtout le rapport rendement / pire baisse.</div>
   <div class="tw"><table class="st"><thead><tr><th>Stratégie</th><th>Rendement</th><th>Pire baisse</th><th>Rendement ÷ baisse</th><th>Sharpe / jour</th><th>Quarts de la période positifs</th><th>Coûts × 2</th><th>Partie test</th><th>DSR</th><th title="1000 trajectoires simulées en remélangeant des blocs de 5 jours">Chance de finir en perte (simulé)</th><th title="Pire baisse atteinte dans 95 % des trajectoires simulées">Pire baisse probable (95 %)</th></tr></thead><tbody>

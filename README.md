@@ -49,4 +49,8 @@ Ces sources sont des **règles à essayer** (`regime`, `macro`, `fund`), désact
 
 Ces règles sont à essayer : elles ne sont pas actives dans la configuration gelée et sont mesurées dans le tableau « Pistes ».
 
+## Dossier « bot-trading » (docs/bot-trading)
+
+Les cinq stratégies S1 à S5 du dossier sont codées telles qu'écrites (bougies journalières, décision après la clôture du jour, stops vérifiés sur la clôture), avec la gestion du risque du dossier : 1 % risqué par trade, 5 % au total, au plus 2 positions corrélées, pause après 2 % de perte du jour ou 6 % du mois, arrêt total à 15 % de baisse. Elles sont mesurées sur 5 ans (`MOIS3=60`) et suivies en forward test ; leur statut (À TESTER, VALIDÉE, SUSPENDUE) suit `05_backtest_protocole.md`.
+
 Version en ligne : https://claudecode988.github.io/public-iatrade/

@@ -20,21 +20,21 @@ async function get(u){for(const B of BASES){try{const r=await fetch(B+u);if(r.st
   if(process.env.FAUX_PRIX){const px=(q,t)=>{const k=q.charCodeAt(0)+q.charCodeAt(1)*3;return 100*(1+.2*Math.sin(t/J1/30+k)+.05*Math.sin(t/H/9+k*2))};
     for(const q of L){const a=[];for(let i=999;i>=0;i--){const t=hNow-i*H,o=px(q,t),cl=px(q,t+H);a.push({t,o,h:Math.max(o,cl),l:Math.min(o,cl),c:cl,v:1})}D[q]=a;
       const j=[];for(let i=120;i>=1;i--){const t=Math.floor(now/J1)*J1-i*J1;j.push({t,c:px(q,t+J1)})}ext.jours[q]=j}ext.btcJ=ext.jours.BTCUSDT}
-  else{for(const q of L){const a=await get(`/api/v3/klines?symbol=${q}&interval=1h&limit=1000`),j=await get(`/api/v3/klines?symbol=${q}&interval=1d&limit=120`);
+  else{for(const q of L){const a=await get(`/api/v3/klines?symbol=${q}&interval=1h&limit=1000`),j=await get(`/api/v3/klines?symbol=${q}&interval=1d&limit=300`);
       if(a)D[q]=a.map(E.kl).filter(x=>x.t+H<=now);if(j)ext.jours[q]=j.map(E.kl).filter(x=>x.t+J1<=now)}ext.btcJ=ext.jours.BTCUSDT||[]}
   const al=E.aligner(D);if(!al||!Object.keys(al.D).length){console.error('Familles : Binance injoignable, aucune décision, aucun prix inventé.');return}
   const F=E.prep(al.D,null,ext),i=F.N-1,tb=F.T[i];if(!(tb>((S0&&S0.lastBar)||0))){console.log('Familles : pas de nouvelle heure fermée.');return}
   const S=S0||{v:1,debut:now,lastBar:0,h:0,seq:0,prev:'',fams:{}},J=[],ajout=l=>{const r={...l,id:++S.seq,ts:now,prev:S.prev};r.h=sha(JSON.stringify(r));S.prev=r.h;J.push(r)};
   if(S0)S.h+=Math.max(1,Math.round((tb-S.lastBar)/H));
-  for(const id in E.FAMILLES){const fm=E.FAMILLES[id],P=S.fams[id]=S.fams[id]||{cash:1e4,pos:{},px:{},st:{},pk:1e4,dd:0,fees:0,n:0};
+  for(const id in E.FAMILLES){const fm=E.FAMILLES[id],P=S.fams[id]=S.fams[id]||{debut:now,cash:1e4,pos:{},px:{},st:{},pk:1e4,dd:0,fees:0,n:0};
     // positions : valeur mise à jour au prix de clôture ; une paire disparue des données est vendue à son dernier prix connu
     for(const q in P.pos){if(F.p[q])P.pos[q]*=F.p[q].c[i]/P.px[q];else{const co=P.pos[q]*f;P.cash+=P.pos[q]-co;P.fees+=co;P.n++;ajout({famille:id,paire:q,montant:-P.pos[q],raison:'paire absente des données : vendue au dernier prix connu'});delete P.pos[q]}}
-    const v=P.cash+Object.values(P.pos).reduce((a,b)=>a+b,0),w=fm.regle(F,i,P.st,F.Q.length,S.h);
+    const v=P.cash+Object.values(P.pos).reduce((a,b)=>a+b,0);P.st._v=v;P.st._f=f;const w=fm.regle(F,i,P.st,F.Q.length,S.h);
     if(w)for(const q in w){const d=v*w[q]-(P.pos[q]||0);if(Math.abs(d)>v*1e-4){const co=Math.abs(d)*f;P.cash-=d+co;P.pos[q]=(P.pos[q]||0)+d;P.fees+=co;P.n++;
       ajout({famille:id,paire:q,montant:+d.toFixed(2),part:+w[q].toFixed(4),prix:F.p[q].c[i],bougie:new Date(tb).toISOString()});if(Math.abs(P.pos[q])<1e-6)delete P.pos[q]}}
     for(const q in P.pos)P.px[q]=F.p[q].c[i];const v2=P.cash+Object.values(P.pos).reduce((a,b)=>a+b,0);P.pk=Math.max(P.pk,v2);P.dd=Math.max(P.dd,(P.pk-v2)/P.pk);P.val=v2}
   S.lastBar=tb;fs.mkdirSync(DIR,{recursive:true});if(J.length)fs.appendFileSync(F_J,J.map(x=>JSON.stringify(x)).join('\n')+'\n');fs.writeFileSync(F_ETAT,JSON.stringify(S));
   fs.writeFileSync(F_RES,JSON.stringify({maj:now,debut:S.debut,heure:new Date(tb).toISOString(),pairs:F.Q.length,dernierHash:S.prev,faux:!!process.env.FAUX_PRIX,
-    lignes:Object.keys(E.FAMILLES).map(id=>{const P=S.fams[id],inv=Object.values(P.pos).reduce((a,b)=>a+b,0);return{id,nom:E.FAMILLES[id].nom,valeur:+P.val.toFixed(2),dd:+P.dd.toFixed(4),investi:P.val>0?+(inv/P.val).toFixed(3):0,n:P.n,frais:+P.fees.toFixed(2)}})},null,1));
+    lignes:Object.keys(E.FAMILLES).map(id=>{const P=S.fams[id],inv=Object.values(P.pos).reduce((a,b)=>a+b,0);const T=(P.st._T||[]).slice(-30);return{id,nom:E.FAMILLES[id].nom,valeur:+P.val.toFixed(2),dd:+P.dd.toFixed(4),investi:P.val>0?+(inv/P.val).toFixed(3):0,n:P.n,frais:+P.fees.toFixed(2),debut:P.debut||S.debut,jours:+((now-(P.debut||S.debut))/864e5).toFixed(2),nT:(P.st._T||[]).length,n30:T.length,esp30:T.length?+(T.reduce((a,x)=>a+x.r,0)/T.length).toFixed(4):null,arret:P.st._arret||null}})},null,1));
   console.log(`Familles : heure ${new Date(tb).toISOString()}, ${J.length} échange(s), ${Object.keys(E.FAMILLES).map(id=>id+' '+S.fams[id].val.toFixed(0)).join(' | ')}`)
 })().catch(e=>{console.error(e);process.exit(1)});
