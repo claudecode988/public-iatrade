@@ -35,17 +35,18 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   // Évaluation manuelle avec un seuil bas pour forcer une entrée, puis stop déclenché au tick
   await p.click('nav button[data-t="2"]');await p.fill('#thr','50');await p.click('#save');await p.click('nav button[data-t="0"]');
   await p.click('#go');await p.waitForFunction(()=>/Évaluation terminée|Historique|figées/.test(document.getElementById('msg').textContent),null,{timeout:15000});
-  const pos=await p.evaluate(()=>S.pos&&{q:S.pos.q,side:S.pos.side,stop:S.pos.stop,px:S.pos.px});ok(!!pos,'entrée fictive à l’évaluation manuelle'+(pos?` (${pos.q} en ${pos.side==='long'?'hausse':'baisse'}, stop ${pos.stop.toFixed(4)})`:''));
+  const pos=await p.evaluate(()=>S.pos&&{q:S.pos.q,side:S.pos.side,stop:S.pos.stop,px:S.pos.px,nb:S.pos.nb,size:S.pos.size,day:S.nToday});ok(!!pos,'entrée fictive à l’évaluation manuelle'+(pos?` (${pos.q} en ${pos.side==='long'?'hausse':'baisse'}, stop ${pos.stop.toFixed(4)})`:''));
+  if(pos)ok(pos.nb===3&&Math.abs(pos.size-3000)<1e-6&&pos.day===3,`3 achats par décision (${pos.nb} × 1000 $ = ${pos.size} $, ${pos.day} trades comptés)`);
   if(pos){const t0=Date.now();shift[pos.q]=pos.side==='long'?-.05:.05;
     await p.waitForFunction(()=>!S.pos,null,{timeout:5000}).catch(()=>{});const dt=Date.now()-t0,lg=await p.textContent('#log');
     ok(/stop touché au tick/.test(lg),`stop déclenché au tick (sortie ${dt} ms après le saut de prix)`);shift={}}
   // Démarrage, fermeture de bougie 1 h reçue par le flux, puis arrêt d'urgence
   await p.click('#auto');ok(/Agents en service/.test(await p.textContent('#auto-st')),'démarrage des agents');
-  // Fermeture d'une bougie de 10 min : deux bougies de 5 min fermées de suite, la seconde complète la tranche de 10 min.
+  // Fermeture de bougies de 5 min reçues par le flux.
   const last=await p.evaluate(()=>Math.max(...Object.values(LV.CS).map(a=>a[a.length-1].t)));await p.evaluate(()=>{LV.done={}});
   for(const dt of [3e5,6e5])for(const s of SY){const t=last+dt,c=px(s,t);if((t+3e5)%6e5&&dt===6e5)continue;
     cur.send(JSON.stringify({stream:s.toLowerCase()+'@kline_5m',data:{e:'kline',E:Date.now(),s,k:{t,T:t+3e5-1,s,i:'5m',o:String(c),c:String(c),h:String(c*1.001),l:String(c*.999),v:'150',x:true}}}))}
-  await p.waitForFunction(()=>/Décision prise à la fermeture/.test(document.getElementById('msg').textContent),null,{timeout:10000}).then(()=>ok(true,'décision prise à la fermeture d’une bougie de 10 min (2 bougies de 5 min) du flux')).catch(()=>ok(false,'décision à la fermeture de bougie'));
+  await p.waitForFunction(()=>/Décision prise à la fermeture/.test(document.getElementById('msg').textContent),null,{timeout:10000}).then(()=>ok(true,'décision prise à la fermeture d’une bougie de 5 min du flux')).catch(()=>ok(false,'décision à la fermeture de bougie'));
   await p.click('#kill');ok(/Arrêt d'urgence actif/.test(await p.textContent('#auto-st')),'arrêt d’urgence stoppe les agents');await p.click('#kill');
   // Coupure : plus aucun message -> données figées ; puis connexion fermée et refusée -> reconnexion avec délai croissant
   mode='silent';await p.waitForFunction(()=>document.getElementById('cst').textContent==='DONNÉES FIGÉES',null,{timeout:9000}).then(()=>ok(true,'silence de plus de 5 s : « DONNÉES FIGÉES »')).catch(()=>ok(false,'données figées'));
