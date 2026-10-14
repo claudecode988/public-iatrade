@@ -16,4 +16,4 @@ Simulateur de trading avec argent fictif, en un seul fichier : `index.html` (ouv
 
 `node tools/test-navigateur.cjs` (Playwright 1.48 ou plus). Binance (REST et WebSocket) et alternative.me y sont remplacés par de fausses réponses.
 
-Version en ligne : https://claudecode988.github.io/public-iatrade/ (une fois GitHub Pages activé).
+Version en ligne : https://claudecode988.github.io/public-iatrade/

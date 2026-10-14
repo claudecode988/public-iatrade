@@ -18,9 +18,9 @@ function synthetique(){const D={},t0=Date.UTC(2025,0,1);let seed=7;const rnd=()=
     if(!Object.keys(D).length){console.error('Binance injoignable : aucune mesure possible.');process.exit(1)}}
   const al=E.aligner(D),M=E.mesurer(E.prep(al.D),c),d=x=>new Date(x).toISOString().slice(0,16).replace('T',' ');
   const f=x=>(x<0?'-':' ')+Math.abs(x).toFixed(2).padStart(8),pc=x=>(x*100).toFixed(1).padStart(5)+' %';
-  const row=(n,r)=>console.log(n.padEnd(18),f(r.pnl),String(r.n).padStart(6),(r.dur.toFixed(1)+' h').padStart(8),(r.n?Math.round(r.wr*100)+' %':'–').padStart(8),f(r.gain),f(r.loss),f(r.fees),f(r.slip),pc(r.dd),r.n<30?'  trop peu de trades pour conclure':'');
+  const row=(n,r)=>console.log(n.padEnd(18),f(r.pnl),String(r.n).padStart(6),(r.pf===null?'–':r.pf.toFixed(2)).padStart(6),f(r.bh),(r.dur.toFixed(1)+' h').padStart(8),(r.n?Math.round(r.wr*100)+' %':'–').padStart(8),f(r.gain),f(r.loss),f(r.fees),f(r.slip),pc(r.dd),r.n<30?'  trop peu de trades pour conclure':'');
   console.log(`${M.pairs} paires, bougies de ${TF.lab}. Calibrage ${d(M.du)} → ${d(M.coupe)} UTC, test → ${d(M.au)} UTC.${al.ecartees.length||bad.length?' Écartées : '+[...al.ecartees,...bad].join(', '):''}`);
-  console.log(''.padEnd(18),'   Bilan','Trades','  Durée','Réussite','   Gagné','   Perdu','   Frais','  Gliss.','Pire baisse');
+  console.log(''.padEnd(18),'   Bilan','Trades','    PF',' Ach.&gard.','  Durée','Réussite','   Gagné','   Perdu','   Frais','  Gliss.','Pire baisse');
   row('Départ calibrage',M.base.cal);row('Départ test',M.base.test);row('Après calibrage',M.fin.cal);row('Après test',M.fin.test);
   console.log('\nChangements, un par un (bilan test avant → après | calibrage avant → après) :');
   for(const e of M.essais)console.log(` ${e.garde?'GARDÉ    ':'ABANDONNÉ'} ${e.nom.padEnd(28)} test ${f(e.avantTest.pnl)} → ${f(e.test.pnl)} (${e.test.n} tr.) | cal. ${f(e.avantCal.pnl)} → ${f(e.cal.pnl)} | ${e.pq}`);
