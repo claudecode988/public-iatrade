@@ -3,7 +3,7 @@
 // le fonctionnement de l'appli (flux, coupure, reconnexion, stop au tick…), pas les résultats de la stratégie.
 //   Usage : node tools/test-navigateur.cjs      (CHROMIUM=/chemin/chromium et SORTIE=dossier facultatifs)
 const { chromium } = require('playwright'),path=require('path');
-const H=36e5,IV={'1m':6e4,'5m':3e5,'1h':36e5,'4h':144e5},BAD=['GBPUSDT','AUDUSDT'],ok=(c,m)=>{console.log((c?'OK   ':'ÉCHEC ')+m);if(!c)process.exitCode=1};
+const H=36e5,IV={'1m':6e4,'5m':3e5,'1h':36e5,'4h':144e5,'1d':864e5},BAD=['GBPUSDT','AUDUSDT'],ok=(c,m)=>{console.log((c?'OK   ':'ÉCHEC ')+m);if(!c)process.exitCode=1};
 const px=(s,t)=>{const k=s.charCodeAt(0)+s.charCodeAt(1)*3,b=s.startsWith('BTC')?60000:s.startsWith('ETH')?3000:10+k%50;return b*(1+.06*Math.sin(t/H/60+k)+.02*Math.sin(t/H/9+k*2)+.004*Math.sin(t/H*1.7+k))};
 const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math.max(o,c)*1.002),String(Math.min(o,c)*.998),String(c),String(100+60*Math.abs(Math.sin(t/H/5))),t+d-1]};
 (async()=>{
@@ -17,6 +17,10 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
     if(st){for(let t=+st;t<=now&&a.length<lim;t+=d)a.push(bar(s,t,d))}else{const e=en?Math.floor(+en/d)*d:now,t0=now-18000*d;for(let t=e;t>=Math.max(t0,e-(lim-1)*d);t-=d)a.unshift(bar(s,t,d))}
     r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(a)})});
   await p.route('https://api.alternative.me/**',r=>r.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:JSON.stringify({data:[{value:'55',value_classification:'Greed',timestamp:String(Math.floor((Date.now()-H)/1000))}]})}));
+  // Faux taux de financement (fapi publique) : SOLUSDT au-dessus du seuil de 0,05 % par 8 h.
+  let fapiCalls=0;await p.route('https://fapi.binance.com/**',r=>{fapiCalls++;const u=new URL(r.request().url()),s=u.searchParams.get('symbol'),h={'access-control-allow-origin':'*'};
+    if(u.pathname.endsWith('premiumIndex'))return r.fulfill({status:200,contentType:'application/json',headers:h,body:JSON.stringify(['BTCUSDT','ETHUSDT','SOLUSDT'].map(x=>({symbol:x,lastFundingRate:x==='SOLUSDT'?'0.00070000':'0.00010000',time:Date.now()})))});
+    const n=Math.floor(Date.now()/(8*H))*8*H,a=[];for(let i=999;i>=0;i--)a.push({symbol:s,fundingTime:n-i*8*H,fundingRate:'0.00010000'});r.fulfill({status:200,contentType:'application/json',headers:h,body:JSON.stringify(a)})});
   // Faux fichiers du serveur (forward test 24 h/24 et mesure longue), marqués « données de test »
   const FW=process.env.FW;await p.route('https://raw.githubusercontent.com/**',r=>{const f=new URL(r.request().url()).pathname.split('/').pop();
     try{r.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:require('fs').readFileSync(path.join(FW,f),'utf8')})}catch(e){r.fulfill({status:404,body:''})}});
@@ -32,6 +36,7 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   await p.goto('file://'+path.join(__dirname,'..','index.html'));
   for(const t of ['1','2','0']){await p.click(`nav button[data-t="${t}"]`);ok(await p.isVisible(`#t${t}`)&&await p.isVisible('#kill2'),`onglet ${t} visible, arrêt d’urgence visible`)}
   await p.waitForFunction(()=>document.getElementById('cst').textContent==='EN DIRECT',null,{timeout:20000});ok(true,'prix en continu : état « EN DIRECT »');
+  {const t=await p.evaluate(()=>RA.t);ok(/Sources des pros/.test(t)&&/SOLUSDT/.test(t)&&/prochaine annonce de la Fed le 28\/10\/2026|calendrier de la Fed/.test(t)&&fapiCalls>0,'Radar : taux de financement, calendrier de la Fed et régime du bitcoin lus');}
   await p.waitForTimeout(2500);const rate=parseInt(await p.textContent('#crate')),lag=await p.textContent('#clag');
   console.log(`     ${rate} messages/s affichés, ${lag}`);ok(rate>100&&/délai \d+ ms/.test(lag),'débit et délai affichés');
   ok(!(await p.content()).includes('Prix simulés'),'aucun prix simulé affiché');
@@ -47,6 +52,7 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   await p.waitForFunction(()=>SV.at>0,null,{timeout:10000});const sv=await p.textContent('#srv');
   ok(/décisions en/.test(sv)&&/Mesure longue \(\d+ mois, serveur\)/.test(sv)&&/Données de test/.test(sv),'forward test 24 h/24 et mesure longue du serveur affichés');
   ok(/Familles de stratégies/.test(sv)&&/Suivi de tendance lent/.test(sv)&&/Acheter et garder/.test(sv)&&/(Candidate|Aucune stratégie ne bat)/.test(sv),'comparatif des familles de stratégies affiché');
+  ok(/Pistes pour des résultats plus réguliers/.test(sv)&&/Régime du bitcoin/.test(sv)&&/annonces de la Fed/.test(sv)&&/Taux de financement/.test(sv)&&/Volatilité cible|volatilité cible/.test(sv),'pistes de régularité (sources des pros) et familles prudentes affichées');
   await p.click('nav button[data-t="2"]');await p.click('#gelgo');await p.waitForFunction(()=>!!S.gel);
   ok(await p.isDisabled('#thr')&&/Gelée le/.test(await p.textContent('#gelst')),'geler la configuration : réglages de stratégie verrouillés');
   await p.click('#gelgo');await p.click('#gelgo');ok(await p.evaluate(()=>!S.gel)&&!(await p.isDisabled('#thr')),'dégeler avec confirmation');
