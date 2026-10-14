@@ -6,7 +6,7 @@
 const fs=require('fs'),path=require('path'),zlib=require('zlib');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+
-  ';return{WL,setTF,agreger,aligner,prep,mesurer,walkForward,robustesse,valeurAgents,familles,pistes,simuler,dsr,fiabilite,sharpe,cleEssai,setEssai:f=>{ESSAI=f}}')();
+  ';return{WL,setTF,agreger,aligner,prep,mesurer,walkForward,robustesse,valeurAgents,familles,pistes,simuler,journalTrois,dsr,fiabilite,sharpe,cleEssai,setEssai:f=>{ESSAI=f}}')();
 const DIR=process.argv[2]||'forward',G=JSON.parse(fs.readFileSync(path.join(DIR,'config.json'),'utf8')),MOIS=+process.env.MOIS||12,MOIS3=+process.env.MOIS3||60;
 const TF=E.setTF(G.tf),c={...G.cfg,tf:G.tf},R=Object.fromEntries((G.regles||[]).map(k=>[k,1]));
 // Lecteur ZIP minimal : premier fichier de l'archive, méthode « deflate » (celle des fichiers Binance).
@@ -39,7 +39,7 @@ async function chargerFin(q){const out=[],d=new Date();for(let m=MOIS;m>=1;m--){
   let fam3=null;{const T3=E.setTF(60);const D3={};
     if(process.env.FAUX_PRIX){for(const q of Object.keys(al.D))D3[q]=E.agreger(al.D[q].filter((x,i)=>i%12===11).map(x=>({...x})),36e5)}
     else for(const q of L){const a=await charger(q,'1h',MOIS3);if(a.length)D3[q]=a;console.log(q,a.length,'bougies 1 h')}
-    const al3=E.aligner(D3);if(al3&&Object.keys(al3.D).length){const F3=E.prep(al3.D);fam3={...E.familles(F3,c,R),pairs:F3.Q.length,ecartees:al3.ecartees};const w3=Math.min(T3.W,Math.floor(F3.N/4));fam3.diag60=E.simuler(F3,w3,F3.N,{...c,diag:1},R).diag;
+    const al3=E.aligner(D3);if(al3&&Object.keys(al3.D).length){const F3=E.prep(al3.D);fam3={...E.familles(F3,c,R),pairs:F3.Q.length,ecartees:al3.ecartees};const w3=Math.min(T3.W,Math.floor(F3.N/4));fam3.diag60=E.simuler(F3,w3,F3.N,{...c,diag:1},R).diag;fam3.trois=E.journalTrois(F3,c);
       console.log('Familles 3 ans :',fam3.lignes.map(x=>`${x.nom} ${x.pnl.toFixed(0)} $`).join(' | '))}else console.log('Familles 3 ans : données introuvables');
     E.setTF(G.tf)}
   const diag=E.simuler(F,Math.min(TF.W,Math.floor(F.N/4)),F.N,{...c,diag:1},R).diag;console.log('Diagnostic des agents :',JSON.stringify(diag));

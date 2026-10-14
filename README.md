@@ -57,4 +57,8 @@ Les cinq stratégies S1 à S5 du dossier sont codées telles qu'écrites (bougie
 
 `tools/proposition.cjs` applique la stratégie gelée (`config.json` → `proposition`) séparément à chaque actif choisi, sur bougies journalières : bitcoin (données Binance) et euro-dollar (données Stooq, taux de la BCE en secours), avec un contrôle sur l'ethereum. Il publie `proposition.json` : action du jour (ACHETER, VENDRE, GARDER, RIEN), entrée, stop, objectif, taille et risque, au format de la liste de contrôle, plus un test de chaque stratégie journalière actif par actif. Le site l'affiche ; l'utilisateur décide et passe l'ordre lui-même. Aucun ordre, aucune clé.
 
+## Onglets des trois stratégies suivies
+
+« Version 2 », « Prudente » et « Tendance » : portefeuille fictif de 100 € (forward test du serveur), gains, pertes, nombre de trades, réussite, pire baisse, frais, positions ouvertes, puis chaque trade (sens, résultat, dates, variation du prix) avec une petite analyse de la raison du gain ou de la perte, et le même journal sur la longue période (test sur le passé).
+
 Version en ligne : https://claudecode988.github.io/public-iatrade/
