@@ -69,6 +69,9 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 .sec{display:none}.sec.on{display:block}
 .tw{overflow-x:auto;margin:8px 0}.st{border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}.st th,.st td{padding:5px 8px;border-top:1px solid var(--line);text-align:right}.st th:first-child{text-align:left}.st thead th{color:var(--mut);font-weight:600;border:0}
 .fiab{padding:10px 12px;border-radius:10px;margin:4px 0 8px;font-size:14px}.fiab.faible{background:var(--warn)}.fiab.moyenne{background:var(--chip)}.fiab.correcte{background:var(--acc2)}
+.crit{list-style:none;padding:0;margin:8px 0 0;font-size:14px}.crit li{padding:3px 0}.crit li.mut{color:var(--mut)}
+.pi .up,.pi #ret,.pi #pnl,.pi #g1,.pi #wr,.pi #tax,.pi #f2,.pi #f3{color:var(--mut)!important;opacity:.55}
+.pi #simres::before,.pi #robres::before,.pi #cmpres::before{content:'Résultat non concluant (niveau de preuve insuffisant)';display:block;font-size:12px;font-weight:700;color:var(--dn);margin-bottom:6px}
 .alertes p{margin:6px 0;padding:8px 10px;border-radius:10px;background:var(--warn);font-size:14px}.alertes p.ok{background:var(--chip);color:var(--mut)}
 .st.cote{width:100%;white-space:normal}.st.cote td{text-align:right;white-space:nowrap}.st.cote th:first-child{padding-left:0}
 .ess{padding:6px 0;border-top:1px solid var(--line)}.pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:12px;font-weight:700}.pill.ok{background:var(--up);color:var(--card)}.pill.no{background:var(--line);color:var(--ink)}
@@ -92,6 +95,7 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 <div class="act2"><button class="btn ghost" id="go">Évaluer maintenant</button><button class="btn stop" id="kill">Arrêt d'urgence</button></div>
 <div class="mut status" id="auto-st">Les agents sont à l'arrêt : aucune nouvelle entrée. Ils ne tournent que quand tu les démarres.</div>
 <div class="mut" id="msg"></div>
+<h2>Niveau de preuve</h2><div class="card" id="preuve"></div>
 <h2>Forward test (journal de décisions)</h2><div class="card" id="fwd"></div>
 <h2>Dernière décision du Chef</h2><div class="card" id="dec">Aucune décision pour l'instant. Touche « Démarrer les agents » ou « Évaluer maintenant ».</div>
 <h2>Position et fiabilité</h2><div class="card" id="cal"></div>
@@ -153,6 +157,12 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 <label>Coupe-circuit : baisse maximale depuis le plus haut (%)<input id="ddMax" type="number" min="1" max="50" step="1"></label>
 <div class="mut">Barème : baisse sous 5 % → taille normale ; de 5 à 10 % → moitié ; au-delà → quart ; à ce seuil → plus aucune nouvelle entrée.</div>
 <label>Heartbeat : délai sans prix frais avant blocage (secondes)<input id="hb" type="number" min="2" max="60" step="1"></label>
+<h2>Niveau de preuve</h2>
+<div class="mut">Seuils affichés sur l'accueil. « Insuffisant » sous le premier palier (trades hors échantillon ou jours de forward test) ; « limité » sous le second ; « correct » au-delà, seulement si le résultat reste positif avec des coûts doublés et si le Sharpe corrigé du nombre d'essais reste positif. Tant que le niveau est insuffisant, les chiffres de gain sont grisés et marqués « non concluant ». Aucun gain annualisé n'est affiché avant le niveau « correct ».</div>
+<label>Palier 1 : trades hors échantillon<input id="npT1" type="number" min="1" step="1"></label>
+<label>Palier 1 : jours de forward test<input id="npJ1" type="number" min="1" step="1"></label>
+<label>Palier 2 : trades hors échantillon<input id="npT2" type="number" min="1" step="1"></label>
+<label>Palier 2 : jours de forward test<input id="npJ2" type="number" min="1" step="1"></label>
 <h2>Testnet Binance (facultatif)</h2>
 <div class="mut">Compte fictif uniquement. Les clés restent en mémoire et disparaissent si tu fermes la page. Ne mets jamais les clés de ton vrai compte.</div>
 <label>Clé d'API testnet<input id="k" autocomplete="off"></label>
@@ -401,10 +411,10 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 16:09';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 16:17';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({pk:10000,cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
- cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:.5,ddMax:15,hb:5,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
+ cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:.5,ddMax:15,hb:5,npT1:30,npJ1:30,npT2:100,npJ2:90,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
 let S=D(),KEYS={k:'',s:''};
 try{const j=localStorage.getItem('tiq');if(j)S=Object.assign(D(),JSON.parse(j))}catch(e){}
 S.cfg=Object.assign(D().cfg,S.cfg);if(!S.cfg5){S.cfg.maxRuns=1440;S.cfg5=1}if(!S.cfg6){S.cfg.tf=10;S.cfg6=1}if(!S.cfg7){S.cfg.tf=5;S.cfg.nb=3;S.cfg7=1}setTF(S.cfg.tf);if(S.sim&&S.sim.tf!==TF.min){S.sim=0;S.rules={}}if(S.sim&&S.sim.v!==6){S.sim=0;S.rules={}}S.rules=S.rules||{};
@@ -704,7 +714,7 @@ function paint(){const st=LV.st,cl=st==='EN DIRECT'?'ok':st==='DONNÉES FIGÉES'
   put('cnote',st==='DONNÉES FIGÉES'?'Données figées : aucun nouveau trade.':LV.note||'');
   put('src',st==='EN DIRECT'?'Prix Binance en direct (lecture seule). Ordres seulement au testnet.':st==='DONNÉES FIGÉES'?'Données figées : aucun nouveau trade.':st==='HORS LIGNE'?'Binance injoignable : aucun prix, aucun trade.':'Connexion aux prix Binance…');
   put('stock',SAVEERR||(SAVED?`Dernière sauvegarde automatique : ${hr(SAVED)} · ${S.hist.length} trades enregistrés.`:'Aucune sauvegarde pour l’instant.'));
-  if(JR.db&&PV.jn!==JR.n+'|'+JR.integre){PV.jn=JR.n+'|'+JR.integre;fwdHTML()}
+  {const k=JR.n+'|'+JR.integre+'|'+Math.floor(Date.now()/6e4);if(PV.jn!==k){PV.jn=k;fwdHTML()}}
   {const c=S.cfg,v=valeur(),pk=Math.max(S.pk||S.start,v),dd=(pk-v)/pk,f=BAREME_DD.find(x=>dd<x[0])[1],o=!S.stop&&fresh()&&dd<c.ddMax/100;
     const t=S.stop?'Arrêt d’urgence actif : aucune nouvelle entrée.':!fresh()?`Entrées bloquées : aucun prix frais depuis plus de ${c.hb} s (heartbeat).`:dd>=c.ddMax/100?`Entrées bloquées : coupe-circuit (baisse de ${(dd*100).toFixed(1).replace('.',',')} %).`:`Entrées autorisées · baisse ${(dd*100).toFixed(1).replace('.',',')} % · taille ${f*100} %`;
     put('rbst',t);const cl='rbar'+(o?'':' bloque')+(S.stop?' stopon':'');if(PV.rcl!==cl){PV.rcl=cl;$('rbar').className=cl}put('kill2',S.stop?'Remettre en marche':'Arrêt d’urgence')}
@@ -758,7 +768,19 @@ function cmpHTML(C){if(!C||C.v!==1||!C.rows.length)return'<span class="mut">Pas 
   <div class="tw"><table class="st"><thead><tr><th></th><th>Trades test</th><th>Bilan test</th><th>PF test</th><th>Pire baisse test</th><th>Acheter et garder (test)</th><th>Bilan entraînement</th><th>Alertes</th></tr></thead><tbody>
   ${C.rows.map(x=>ln(x,'base','départ')+ln(x,'act','active')).join('')}</tbody></table></div>
   <p class="mut">* moins de 30 trades : trop peu pour conclure. Les règles actives ont été choisies avec la durée « ${C.tfLab} » : sur les autres durées, elles n’ont pas été sélectionnées pour elles. Sur environ 2 mois, la durée 1 h donne peu de trades. Le passé ne garantit pas l’avenir.</p>`}
-function fwdHTML(){const e=$('fwd');if(!e)return;if(!JR.db){e.innerHTML=`<span class="mut">${JR.err||'Ouverture du journal…'}</span>`;return}
+// Niveau de preuve : trades hors échantillon (walk-forward, sinon partie test), jours de forward test (journal),
+// résultat sous coûts × 2 (test de robustesse) et Sharpe corrigé du nombre d'essais (SR > SR0, soit DSR > 50 %).
+function niveauPreuve(){const c=S.cfg,M=S.sim,tr=M?(M.wf?M.wf.test.n:M.fin.test.n):0,j=JR.debut?(Date.now()-JR.debut)/864e5:0,
+  x2=S.robu&&S.robu.rows.find(r=>r.k===2),c2=x2?x2.test.pnl>0&&(!x2.wf||x2.wf.pnl>0):null,sh=M&&M.dsr?M.dsr.sr>M.dsr.sr0:null;
+  const niv=tr<c.npT1||j<c.npJ1?'insuffisant':tr<c.npT2||j<c.npJ2||c2!==true||sh!==true?'limité':'correct';return{niv,tr,j,c2,sh}}
+function preuveHTML(){const e=$('preuve');if(!e)return;const n=niveauPreuve(),c=S.cfg,k=(b,t)=>`<li class="${b===true?'up':b===false?'dn':'mut'}">${b===true?'✓':b===false?'✗':'–'} ${t}</li>`;
+  document.body.classList.toggle('pi',n.niv==='insuffisant');
+  e.innerHTML=`<div class="fiab ${n.niv==='insuffisant'?'faible':n.niv==='limité'?'moyenne':'correcte'}"><b>Niveau de preuve : ${n.niv}</b>${n.niv==='insuffisant'?'<br>Résultat non concluant : les chiffres de gain sont grisés.':n.niv==='limité'?'<br>Indications seulement : pas encore assez de recul pour conclure.':'<br>Assez de recul selon tes seuils. Le passé ne garantit toujours pas l’avenir.'}</div>
+  <ul class="crit">${k(n.tr>=c.npT2?true:n.tr>=c.npT1?null:false,`${n.tr} trades hors échantillon (paliers ${c.npT1} puis ${c.npT2})${S.sim?'':' : lance la mesure'}`)}
+  ${k(n.j>=c.npJ2?true:n.j>=c.npJ1?null:false,`${n.j.toFixed(1).replace('.',',')} jours de forward test (paliers ${c.npJ1} puis ${c.npJ2})`)}
+  ${k(n.c2,n.c2===null?'Coûts doublés : test de robustesse pas encore lancé':n.c2?'Résultat positif avec des coûts doublés':'Résultat négatif avec des coûts doublés')}
+  ${k(n.sh,n.sh===null?'Sharpe corrigé du nombre d’essais : non calculable':n.sh?'Sharpe corrigé du nombre d’essais positif':'Sharpe corrigé du nombre d’essais négatif ou nul')}</ul>`}
+function fwdHTML(){preuveHTML();const e=$('fwd');if(!e)return;if(!JR.db){e.innerHTML=`<span class="mut">${JR.err||'Ouverture du journal…'}</span>`;return}
   const d=JR.debut?Date.now()-JR.debut:0,j=Math.floor(d/864e5),h=Math.floor(d%864e5/H1),m=Math.floor(d%H1/6e4);
   e.innerHTML=`<b id="fwdn">${JR.n}</b> décision${JR.n>1?'s':''} enregistrée${JR.n>1?'s':''}. ${JR.debut?`Forward test en cours depuis <b>${j} j ${h} h ${m} min</b> (début le ${new Date(JR.debut).toLocaleString('fr-FR')}).`:'Le forward test commencera à la première décision.'}
   <br><span class="mut">Version des agents ${JR.vAg||'–'}. ${JR.integre===null?'Vérification de la chaîne en cours…':JR.integre?'⚠ '+JR.integre:'Chaîne d’empreintes intacte : aucune ligne modifiée.'} Un forward test se juge sur des semaines de décisions, pas sur quelques heures.</span>`}
@@ -773,7 +795,7 @@ $('auto').onclick=()=>{if(timer){stopAuto();return}
 $('go').onclick=()=>decider(0,true);
 $('kill2').onclick=()=>$('kill').onclick();
 $('kill').onclick=()=>{S.stop=!S.stop;if(S.stop&&timer)stopAuto('Arrêt d\'urgence actif : agents arrêtés, aucune nouvelle entrée. Un stop ouvert reste surveillé.');save();render();$('msg').textContent=S.stop?'Tout est suspendu : aucun nouvel ordre.':'Reprise possible.'};
-const NUM={riskPct:[.05,5],ddMax:[1,50],hb:[2,60],nb:[1,10],size:[10,1e6],maxLoss:[.5,100],maxTrades:[1,1000],sl:[.5,50],thr:[50,99],hold:[0,200],atrK:[.5,10],fee:[0,2],slip:[0,2],maxRuns:[1,100000]};
+const NUM={npT1:[1,1e4],npJ1:[1,3650],npT2:[1,1e5],npJ2:[1,3650],riskPct:[.05,5],ddMax:[1,50],hb:[2,60],nb:[1,10],size:[10,1e6],maxLoss:[.5,100],maxTrades:[1,1000],sl:[.5,50],thr:[50,99],hold:[0,200],atrK:[.5,10],fee:[0,2],slip:[0,2],maxRuns:[1,100000]};
 $('save').onclick=()=>{for(const k in NUM){const v=parseFloat(String($(k).value).replace(',','.'));if(isFinite(v))S.cfg[k]=Math.min(NUM[k][1],Math.max(NUM[k][0],v))}
   const tf0=S.cfg.tf;S.cfg.tf=+$('tf').value;S.cfg.news=$('news').value;S.cfg.rsrc=$('rsrc').value;S.cfg.tn=$('tn').value;KEYS={k:$('k').value.trim(),s:$('s').value.trim()};RD.at=0;
   $('k').value='';$('s').value='';fillCfg();S.sim=0;S.rules={};save();render();$('setmsg').textContent='Réglages enregistrés. Relance la mesure : les changements gardés dépendent de ces réglages.'+(KEYS.k?' Clés gardées en mémoire pour cette session.':'');
