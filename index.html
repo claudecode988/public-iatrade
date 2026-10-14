@@ -67,7 +67,7 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 .sec{display:none}.sec.on{display:block}
 .tw{overflow-x:auto;margin:8px 0}.st{border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}.st th,.st td{padding:5px 8px;border-top:1px solid var(--line);text-align:right}.st th:first-child{text-align:left}.st thead th{color:var(--mut);font-weight:600;border:0}
 .alertes p{margin:6px 0;padding:8px 10px;border-radius:10px;background:var(--warn);font-size:14px}.alertes p.ok{background:var(--chip);color:var(--mut)}
-.st.cote td{text-align:right}
+.st.cote{width:100%;white-space:normal}.st.cote td{text-align:right;white-space:nowrap}.st.cote th:first-child{padding-left:0}
 .ess{padding:6px 0;border-top:1px solid var(--line)}.pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:12px;font-weight:700}.pill.ok{background:var(--up);color:var(--card)}.pill.no{background:var(--line);color:var(--ink)}
 </style></head><body>
 <div class="warn">Simulation avec argent fictif uniquement. Aucun conseil financier. Le trading réel comporte un risque de perte.</div>
@@ -304,7 +304,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 15:01';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 15:02';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
