@@ -390,18 +390,24 @@ function fermer(P,price,c){const s=c.slip/100,f=c.fee/100,fx=P.side==='long'?pri
 function acheterGarder(F,from,to,c){const s=c.slip/100,f=c.fee/100,a=1e4/F.Q.length;let v=0;
   for(const q of F.Q){const P=F.p[q],fill=P.c[from]*(1+s),n=a*(1-f)/fill,fx=P.c[to-1]*(1-s);v+=n*fx*(1-f)}return v-1e4}
 // Rejoue les règles heure par heure entre from et to (exclu) avec 10 000 $ fictifs. Stop vérifié dans chaque bougie (plus bas / plus haut).
-function simuler(F,from,to,c,R){let cash=1e4,P=null,nT=0,lossD=0,pk=1e4,dd=0,day='',fees=0,slip=0,lastX=-1e15,m=0,st=0,se=0,stt=0,see=0,ste=0;const T=[],Du=[],H=[],Rt=[],AC=[],EQ=[],RM=[],ech=Math.max(1,Math.floor((to-from)/150)),sum=a=>a.reduce((x,y)=>x+y,0);
-  const sortir=(t,price)=>{const r=fermer(P,price,c);cash+=P.size+r.g-r.xf;fees+=P.fe+r.xf;slip+=r.slip;T.push(r.pnl);Rt.push(r.pnl/P.size);RM.push(P.n*P.dist>0?r.pnl/(P.n*P.dist):0);AC.push([P.acc,r.pnl]);Du.push((F.T[t]-P.t0)/H1);H.push(P.p);lossD+=r.pnl;nT+=P.nb;lastX=F.T[t];P=null};
+function simuler(F,from,to,c,R){let cash=1e4,P=null,nT=0,lossD=0,pk=1e4,dd=0,day='',fees=0,slip=0,lastX=-1e15,m=0,st=0,se=0,stt=0,see=0,ste=0;const DG=c.diag?[]:null,T=[],Du=[],H=[],Rt=[],AC=[],EQ=[],RM=[],ech=Math.max(1,Math.floor((to-from)/150)),sum=a=>a.reduce((x,y)=>x+y,0);
+  const sortir=(t,price,why)=>{const r=fermer(P,price,c);if(DG){const sg=P.side==='long'?1:-1,brut=sg*P.n*(price-P.px),rk=P.n*P.dist||1;DG.push({brutR:brut/rk,coutR:(brut-r.pnl)/rk,netR:r.pnl/rk,side:P.side,why,dur:(F.T[t]-P.t0)/H1,dist:P.dist/P.px})}cash+=P.size+r.g-r.xf;fees+=P.fe+r.xf;slip+=r.slip;T.push(r.pnl);Rt.push(r.pnl/P.size);RM.push(P.n*P.dist>0?r.pnl/(P.n*P.dist):0);AC.push([P.acc,r.pnl]);Du.push((F.T[t]-P.t0)/H1);H.push(P.p);lossD+=r.pnl;nT+=P.nb;lastX=F.T[t];P=null};
   const JR_=[];for(let t=from;t<to;t++){const dj=new Date(F.T[t]).toISOString().slice(0,10);if(dj!==day){if(day)JR_.push(cash+(P?P.size+(P.side==='long'?1:-1)*P.n*(F.p[P.q].c[t-1]-P.fill):0));day=dj;nT=0;lossD=0}
-    if(P){const x=F.p[P.q].C[t],hit=stopTick(P,x.l,x.h,R,x.o);if(hit!==null)sortir(t,hit);else if(sortieCloture(F,P,t,c,R))sortir(t,x.c)}
+    if(P){const x=F.p[P.q].C[t],hit=stopTick(P,x.l,x.h,R,x.o);if(hit!==null)sortir(t,hit,'stop');else if(sortieCloture(F,P,t,c,R))sortir(t,x.c,'signal')}
     else if(nT+(c.nb||1)<=c.maxTrades&&-lossD<1e4*c.maxLoss/100&&cash>=c.size*(c.nb||1)*(1+c.fee/100)&&(!R.cool||(F.T[t]-lastX)/TF.bar>=4)&&!(R.serie&&pauseSerie(T,lastX,F.T[t]))){const{b}=choisir(F,t,c,R);
       if(b){const rk=risque(c,cash,pk,distanceStop(F,b.q,t,c,R));if(rk.ok){P=ouvrir(F,b.q,t,b.dir,b.pr,c,R,undefined,rk.taille);{const d=b.dir==='long'?1:-1,Pq=F.p[b.q];P.acc=Pq.mt[t]===d&&Pq.tr4[t]===d}cash-=P.size+P.fe;nT+=P.nb}}}
     const un=P?(P.side==='long'?1:-1)*P.n*(F.p[P.q].c[t]-P.fill):0,eq=cash+(P?P.size+un:0);pk=Math.max(pk,eq);dd=Math.max(dd,(pk-eq)/pk);m++;st+=m;se+=eq;stt+=m*m;see+=eq*eq;ste+=m*eq;if(m%ech===0)EQ.push(+eq.toFixed(2))}
-  if(P)sortir(to-1,F.p[P.q].c[to-1]); // une position encore ouverte est clôturée au dernier prix pour être comptée
+  if(P)sortir(to-1,F.p[P.q].c[to-1],'fin'); // une position encore ouverte est clôturée au dernier prix pour être comptée
   const w=T.filter(x=>x>0);
   const gs=sum(w),ls=sum(T.filter(x=>x<=0)),vt=stt/m-(st/m)**2,ve=see/m-(se/m)**2,r2=m>2&&vt>0&&ve>1e-9?((ste/m-st/m*se/m)**2)/(vt*ve):0; // R² : 1 = courbe parfaitement droite
-  EQ.push(+(1e4+sum(T)).toFixed(2));JR_.push(1e4+sum(T));const ac=AC.filter(x=>x[0]),dv=AC.filter(x=>!x[0]),mR=RM.length?sum(RM)/RM.length:0,sR=RM.length>1?sd(RM):0,res={expR:RM.length?mR:null,sqn:RM.length>=10&&sR>0?Math.sqrt(Math.min(RM.length,100))*mR/sR:null,jrs:JR_,accord:{n:AC.length,acc:ac.length,pnlAcc:sum(ac.map(x=>x[1])),pnlDiv:sum(dv.map(x=>x[1]))},ret:Rt,eqs:EQ,r2,n:T.length,pnl:sum(T),gain:gs,loss:ls,pf:ls<0?gs/-ls:null,bh:acheterGarder(F,from,to-1>from?to:from+1,c),fees,slip,wr:T.length?w.length/T.length:0,dd,conf:H.length?sum(H)/H.length:0,
+  EQ.push(+(1e4+sum(T)).toFixed(2));JR_.push(1e4+sum(T));const ac=AC.filter(x=>x[0]),dv=AC.filter(x=>!x[0]),mR=RM.length?sum(RM)/RM.length:0,sR=RM.length>1?sd(RM):0,res={diag:DG?resumeDiag(DG):undefined,expR:RM.length?mR:null,sqn:RM.length>=10&&sR>0?Math.sqrt(Math.min(RM.length,100))*mR/sR:null,jrs:JR_,accord:{n:AC.length,acc:ac.length,pnlAcc:sum(ac.map(x=>x[1])),pnlDiv:sum(dv.map(x=>x[1]))},ret:Rt,eqs:EQ,r2,n:T.length,pnl:sum(T),gain:gs,loss:ls,pf:ls<0?gs/-ls:null,bh:acheterGarder(F,from,to-1>from?to:from+1,c),fees,slip,wr:T.length?w.length/T.length:0,dd,conf:H.length?sum(H)/H.length:0,
     dur:Du.length?sum(Du)/Du.length:0,jours:Math.round((to-from)*TF.bar/864e5),du:F.T[from],au:F.T[to-1]};if(ESSAI)ESSAI(c,R,res);return res}
+// Diagnostic des trades : d'où viennent les pertes (signal brut, frais et glissement, type de sortie, sens), en multiples du risque (R).
+function resumeDiag(D){const m=(a,k)=>a.length?a.reduce((x,y)=>x+y[k],0)/a.length:null,grp=f=>{const o={};for(const x of D){const k=f(x);(o[k]=o[k]||[]).push(x)}
+    return Object.fromEntries(Object.entries(o).map(([k,a])=>[k,{n:a.length,netR:m(a,'netR'),brutR:m(a,'brutR'),reussite:a.filter(x=>x.netR>0).length/a.length}]))};
+  const G=D.filter(x=>x.netR>0),P=D.filter(x=>x.netR<=0);
+  return{n:D.length,reussite:D.length?G.length/D.length:null,brutR:m(D,'brutR'),coutR:m(D,'coutR'),netR:m(D,'netR'),gainMoyR:m(G,'netR'),perteMoyR:m(P,'netR'),
+    dureeH:m(D,'dur'),stopPct:m(D,'dist'),parSortie:grp(x=>x.why),parSens:grp(x=>x.side)}}
 // Signaux d'alerte contre la sur-interprétation d'un résultat (entraînement a, test b).
 function alertes(a,b){const o=[];
   if(a.n<30||b.n<30)o.push(`Moins de 30 trades (${a.n} à l’entraînement, ${b.n} au test) : trop peu pour conclure.`);
@@ -563,6 +569,17 @@ const STRAT_PRO={
       let touche=false;for(let k=i-3;k<i;k++){const m=mmJ(P.jc,k,20);if(m&&P.jl[k]<=m)touche=true}if(!touche||!(P.jc[i]>P.jh[i-1]))return null;
       const st=Math.min(...P.jl.slice(i-5,i+1));return st<P.jc[i]?{stop:st,objectif:P.jc[i]+2*(P.jc[i]-st)}:null},
     sortie:(P,i,p)=>p.objectif&&P.jc[i]>=p.objectif?'objectif atteint (2 × le risque)':''},
+  // Agents version 2 : les six agents appliquent le dossier. Pistache : régime du bitcoin et calendrier de la Fed ; Filou : signaux
+  // journaliers (tendance MM50/MM200, cassure des 20 jours avec volume, ou reprise après un repli sur la MM20) ; Gaston : liste de
+  // contrôle (tous les points doivent être OUI), les paires les plus fortes sur 3 mois d'abord ; Rocky : gestion du risque du dossier ;
+  // sortie : stop 2 × ATR remonté au plus bas des 20 jours, ou clôture sous la MM50 (les gains peuvent courir, les pertes sont coupées).
+  A2:{nom:'Agents version 2 (règles du dossier)',txt:'Les six agents avec les règles du dossier : bougies journalières, tendance de fond haussière obligatoire (MM50 > MM200, clôture au-dessus de la MM50, bitcoin au-dessus de sa moyenne 50 jours), déclencheur cassure 20 jours avec volume ou reprise après repli, pas d’entrée la veille d’une annonce de la Fed, 1 % risqué par trade, stop suiveur.',
+    filtre:(F,t)=>F.reg[t]!==-1&&!FOMC.some(x=>x>F.T[t]&&x-F.T[t]<=24*H1),
+    entree:(P,i)=>{if(i<205)return null;const a=mmJ(P.jc,i,50),b=mmJ(P.jc,i,200),x=atrJ(P,i),c=P.jc[i];if(!(a&&b&&x&&a>b&&c>a))return null;
+      const vm=mmJ(P.jv,i-1,20),casse=c>Math.max(...P.jh.slice(i-20,i))&&vm&&P.jv[i]>vm;let rep=false;
+      if(!casse){let touche=false;for(let k=i-3;k<i;k++){const m=mmJ(P.jc,k,20);if(m&&P.jl[k]<=m)touche=true}rep=touche&&c>P.jh[i-1]}
+      return casse||rep?{stop:c-2*x,force:c/P.jc[i-63]-1}:null},
+    sortie:(P,i,p)=>{p.stop=Math.max(p.stop,Math.min(...P.jl.slice(i-19,i+1)));const a=mmJ(P.jc,i,50);return a&&P.jc[i]<a?'clôture sous la MM50 : tendance perdue':''}},
   S5:{nom:'S5 · Rotation momentum mensuelle',txt:'Le premier jour du mois : les 2 paires qui ont le plus monté sur 6 mois, à parts égales ; une paire sous sa MM200 est remplacée par des liquidités. Pas de stop (rééquilibrage mensuel seulement).',rotation:true}};
 function reglePro(id){const S=STRAT_PRO[id];return(F,t,st,n)=>{const P0=F.p[F.Q[0]],k=P0.ji[t];if(!k||k===st._kj)return null;st._kj=k;const I=q=>F.p[q].ji[t]-1,o={},v=st._v||1e4,f=st._f||0;
     st._T=st._T||[];st._pk=Math.max(st._pk||v,v);const mois=new Date(F.T[t]+TF.bar).toISOString().slice(0,7);if(st._mois!==mois){st._mois=mois;st._m0=v}
@@ -574,9 +591,11 @@ function reglePro(id){const S=STRAT_PRO[id];return(F,t,st,n)=>{const P0=F.p[F.Q[
       const garde=new Set(L.filter(x=>x.b&&x.P.jc[x.i]>x.b).map(x=>x.q));for(const q in pos)if(!garde.has(q))fermer(q,'rotation mensuelle');
       if((v/st._m0-1)>-.06)for(const q of garde)if(!pos[q]){pos[q]={e:F.p[q].jc[I(q)],rf:1,j:I(q)};o[q]=.5}return o}
     for(const q in pos){const P=F.p[q],p=pos[q],i=I(q),x=P.jc[i];if(x<=p.stop){fermer(q,'stop touché (clôture journalière)');continue}const r=S.sortie(P,i,p);if(r)fermer(q,r)}
-    const bloque=(v/st._m0-1)<=-.06?'perte du mois ≥ 6 %':pj<=-.02?'perte du jour ≥ 2 %':'';st._bloque=bloque;if(bloque)return o;
+    const bloque=(v/st._m0-1)<=-.06?'perte du mois ≥ 6 %':pj<=-.02?'perte du jour ≥ 2 %':S.filtre&&!S.filtre(F,t)?'filtre de Pistache (bitcoin baissier ou annonce de la Fed)':'';st._bloque=bloque;if(bloque)return o;
     let risque=Object.keys(pos).reduce((a,q)=>{const p=pos[q],x=F.p[q].jc[I(q)];return a+Math.max(0,p.w*(x-p.stop)/x)},0);
-    for(const q of F.Q){if(pos[q]||risque+PRO_RISQUE>PRO_RISQUE_TOTAL+1e-9)continue;const P=F.p[q],i=I(q);if(i<1)continue;const s=S.entree(P,i);if(!s)continue;const x=P.jc[i],rf=(x-s.stop)/x;if(!(rf>0))continue;
+    const cands=[];for(const q of F.Q){if(pos[q])continue;const P=F.p[q],i=I(q);if(i<1)continue;const s=S.entree(P,i);if(s)cands.push({q,P,i,s})}
+    cands.sort((a,b)=>(b.s.force||0)-(a.s.force||0));
+    for(const{q,P,i,s}of cands){if(risque+PRO_RISQUE>PRO_RISQUE_TOTAL+1e-9)break;const x=P.jc[i],rf=(x-s.stop)/x;if(!(rf>0))continue;
       if(Object.keys(pos).filter(h=>correl(P,i,F.p[h],I(h))>.8).length>=2)continue;
       const w=Math.min(.5,PRO_RISQUE/rf);pos[q]={e:x,stop:s.stop,objectif:s.objectif,rf,w,j:i};o[q]=w;risque+=w*rf}
     return o}}
@@ -614,7 +633,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 22:47';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 22:51';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({pk:10000,cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:.5,ddMax:15,hb:5,npT1:30,npJ1:30,npT2:100,npJ2:90,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
