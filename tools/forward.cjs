@@ -12,7 +12,9 @@ const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/*
   ';return{WL,H1,setTF,agreger,aligner,prep,choisir,ouvrir,stopTick,sortieCloture,fermer,risque,distanceStop,fngNews,sigAt,rt,kl,analyse,refusEntree}')();
 const DIR=process.argv[2]||'forward',F_ETAT=path.join(DIR,'etat.json'),F_CFG=path.join(DIR,'config.json'),F_J=path.join(DIR,'journal.jsonl'),F_RES=path.join(DIR,'resume.json');
 const sha=t=>crypto.createHash('sha256').update(t).digest('hex'),lire=(f,d)=>{try{return JSON.parse(fs.readFileSync(f,'utf8'))}catch(e){return d}};
-const PUB='https://api.binance.com',FNG='https://api.alternative.me/fng/?limit=1',now=+process.env.MAINTENANT||Date.now(); // MAINTENANT : pour les tests seulement
+// Adresses publiques de Binance en lecture seule : data-api.binance.vision (données de marché uniquement, joignable
+// depuis les serveurs de GitHub), puis api.binance.com en secours.
+const BASES=['https://data-api.binance.vision','https://api.binance.com'],FNG='https://api.alternative.me/fng/?limit=1',now=+process.env.MAINTENANT||Date.now(); // MAINTENANT : pour les tests seulement
 (async()=>{
   const G=lire(F_CFG,null);if(!G){console.error('config.json absent : rien à faire.');return}
   const TF=E.setTF(G.tf),c={...G.cfg,tf:G.tf},R=Object.fromEntries((G.regles||[]).map(k=>[k,1]));
@@ -27,8 +29,10 @@ const PUB='https://api.binance.com',FNG='https://api.alternative.me/fng/?limit=1
   const L=[...E.WL.CRYPTO,...E.WL.FOREX],D={};let pas=0;
   if(process.env.FAUX_PRIX){const t1=Math.floor(now/TF.srcMs)*TF.srcMs,f=(q,t)=>{const k=q.charCodeAt(0)+q.charCodeAt(1)*3;return 100*(1+.04*Math.sin(t/36e5/9+k)+.012*Math.sin(t/36e5/1.7+k*2)+.004*Math.sin(t/3e5/1.3+k))};
     for(const q of L){const a=[];for(let i=999;i>=1;i--){const t=t1-i*TF.srcMs,o=f(q,t),cl=f(q,t+TF.srcMs);a.push({t,o,h:Math.max(o,cl)*1.0015,l:Math.min(o,cl)*.9985,c:cl,v:100+50*Math.abs(Math.sin(t/36e5))})}D[q]=E.agreger(a)}}
-  else{for(const q of L){try{const r=await fetch(`${PUB}/api/v3/klines?symbol=${q}&interval=${TF.src}&limit=1000`);if(r.status===429||r.status===418){console.error('Binance limite les requêtes : passage annulé.');return}
-      if(!r.ok)continue;D[q]=E.agreger((await r.json()).map(E.kl).filter(x=>x.t+TF.srcMs<=now))}catch(e){}pas++}}
+  else{const etats={};for(const q of L){for(const B of BASES){try{const r=await fetch(`${B}/api/v3/klines?symbol=${q}&interval=${TF.src}&limit=1000`);etats[B+' '+r.status]=(etats[B+' '+r.status]||0)+1;
+        if(r.status===429||r.status===418){console.error('Binance limite les requêtes : passage annulé.');return}
+        if(!r.ok)continue;D[q]=E.agreger((await r.json()).map(E.kl).filter(x=>x.t+TF.srcMs<=now));break}catch(e){etats[B+' erreur '+(e.cause&&e.cause.code||e.message)]=(etats[B+' erreur '+(e.cause&&e.cause.code||e.message)]||0)+1}}pas++}
+    console.log('Réponses de Binance :',JSON.stringify(etats))}
   const al=E.aligner(D);if(!al||!Object.keys(al.D).length){console.error('Binance injoignable : aucune décision, aucun prix inventé.');return}
   let news='neutre',radar='pas d’information';
   if(c.rsrc!=='manuel'&&!process.env.FAUX_PRIX){try{const x=(await (await fetch(FNG)).json()).data[0],f=E.fngNews({value:+x.value,cls:x.value_classification,ts:+x.timestamp*1000},now);if(f.ok){news=f.news;radar=`${x.value}/100 (${x.value_classification})`}}catch(e){}}
