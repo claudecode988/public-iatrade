@@ -103,8 +103,8 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 <div class="fh"><b>ACTIVITÉ</b><span>récente</span></div><div class="fl" id="flog"></div>
 <div class="fh" style="margin-top:10px"><b>RAPPORTS</b><span>par agent</span></div><div class="fl" id="reps"></div></div>
 <button class="btn" id="auto2">Démarrer les agents</button>
-<div class="mut" id="mkts">Les prix arrivent en continu. Les agents décident d'une entrée seulement à la fermeture de chaque bougie d'1 h (avec confirmation 4 h si ce changement est gardé), avec de l'argent fictif. Le stop est vérifié à chaque prix reçu.</div>
-<button class="btn" id="simgo" style="background:var(--card);color:var(--ink);border:1px solid var(--line)">Mesurer sur l'historique réel (environ 12 mois)</button>
+<div class="mut" id="mkts">Les prix arrivent en continu. Les agents décident d'une entrée seulement à la fermeture de chaque bougie (10 min ou 1 h, à choisir dans Réglages), avec de l'argent fictif. Le stop est vérifié à chaque prix reçu.</div>
+<button class="btn" id="simgo" style="background:var(--card);color:var(--ink);border:1px solid var(--line)">Mesurer sur l'historique réel</button>
 <div class="mut" id="simst"></div>
 </section>
 
@@ -119,8 +119,10 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 <label>Seuil de confiance pour entrer (%)<input id="thr" type="number" min="50" max="99"></label>
 <label>Source de Radar<select id="rsrc"><option value="auto">Automatique : indice peur et avidité (alternative.me)</option><option value="manuel">Saisie manuelle</option></select></label>
 <label>Actualité en saisie manuelle<select id="news"><option>haussier</option><option>neutre</option><option>baissier</option></select></label>
-<label>Durée minimale de détention (bougies d'1 h)<input id="hold" type="number" min="0" step="1"></label>
-<label>Stop : multiple de l'ATR 14 (1 h)<input id="atrK" type="number" min="0.5" step="0.5"></label>
+<label>Durée des bougies de décision<select id="tf"><option value="10">10 minutes (confirmation sur 1 h)</option><option value="60">1 heure (confirmation sur 4 h)</option></select></label>
+<div class="mut">Plus les bougies sont courtes, plus il y a de trades et plus les frais pèsent. Mesure chaque durée sur l'historique avant de lui faire confiance.</div>
+<label>Durée minimale de détention (en bougies)<input id="hold" type="number" min="0" step="1"></label>
+<label>Stop : multiple de l'ATR 14 bougies<input id="atrK" type="number" min="0.5" step="0.5"></label>
 <label>Frais par côté (%)<input id="fee" type="number" min="0" step="0.01"></label>
 <label>Glissement par côté (%)<input id="slip" type="number" min="0" step="0.01"></label>
 <div class="mut">Le stop fixe ci-dessus reste un plafond : le stop ATR ne peut jamais être plus large.</div>
@@ -141,6 +143,15 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 /* MOTEUR-DEBUT : fonctions pures (aucun accès à la page), relues telles quelles par tools/mesure.cjs */
 const WL={CRYPTO:['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','ADAUSDT','DOGEUSDT','LTCUSDT','AVAXUSDT','LINKUSDT','DOTUSDT','TRXUSDT','BCHUSDT','NEARUSDT','ATOMUSDT','TONUSDT'],FOREX:['EURUSDT','GBPUSDT','AUDUSDT']};
 const H1=36e5,H4=4*H1,sleep=ms=>new Promise(r=>setTimeout(r,ms));
+// Durée des bougies de décision. Binance n'a pas de bougies de 10 min : elles sont reconstruites à partir de 2 bougies de 5 min
+// (alignées sur :00, :10, :20…). La confirmation se fait sur la durée au-dessus : 1 h pour 10 min, 4 h pour 1 h.
+let TF;function setTF(m){TF=+m===10?{min:10,bar:6e5,conf:H1,src:'5m',srcMs:3e5,k:2,lab:'10 min',clab:'1 h',ci:'1h',pages:18}
+  :{min:60,bar:H1,conf:H4,src:'1h',srcMs:H1,k:1,lab:'1 h',clab:'4 h',ci:'4h',pages:9};TF.kc=TF.conf/TF.bar;TF.W=50*TF.kc+20;return TF}setTF(60);
+// Regroupe les bougies sources (5 min) en bougies de décision complètes (10 min). Une bougie incomplète est ignorée.
+function agreger(a){if(TF.k===1)return a.slice();const o=[];let cur=null,n=0;
+  for(const x of a){const b=Math.floor(x.t/TF.bar)*TF.bar;if(!cur||cur.t!==b){if(cur&&n===TF.k)o.push(cur);cur={t:b,o:x.o,h:x.h,l:x.l,c:x.c,v:x.v};n=1}
+    else{cur.h=Math.max(cur.h,x.h);cur.l=Math.min(cur.l,x.l);cur.c=x.c;cur.v+=x.v;n++}}
+  if(cur&&n===TF.k)o.push(cur);return o}
 const emaS=(a,n)=>{const k=2/(n+1),o=[a[0]];for(let i=1;i<a.length;i++)o.push(a[i]*k+o[i-1]*(1-k));return o};
 const sd=a=>{const m=a.reduce((x,y)=>x+y,0)/a.length;return Math.sqrt(a.reduce((x,y)=>x+(y-m)**2,0)/a.length)};
 const RSI=a=>{let g=0,l=0;const n=Math.min(14,a.length-1);for(let i=a.length-n;i<a.length;i++){const d=a[i]-a[i-1];d>0?g+=d:l-=d}return l===0?100:100-100/(1+g/l)};
@@ -162,28 +173,28 @@ function fngNews(d,now){if(!d||!isFinite(d.value)||!d.ts)return{ok:false,why:'do
   const c=String(d.cls||'');return{ok:true,news:/greed/i.test(c)?'haussier':/fear/i.test(c)?'baissier':'neutre'}}
 // Changements essayés un par un par mesurer(), dans cet ordre.
 const CHANGES=[
-  {id:'mtf',nom:'Confirmation 4 h',txt:'Entrée seulement si la tendance des bougies de 4 h (EMA 20 contre EMA 50) va dans le même sens.'},
+  {id:'mtf',nom:'Confirmation sur bougies longues',txt:'Entrée seulement si la tendance des bougies longues (4 h pour des bougies d’1 h, 1 h pour 10 min ; EMA 20 contre EMA 50) va dans le même sens.'},
   {id:'hold',nom:'Durée minimale de détention',txt:'Pendant les premières bougies (réglable, 6 par défaut), sortie seulement sur le stop.'},
   {id:'rev',nom:'Inversion confirmée',txt:'Sortie sur inversion seulement après 2 bougies fermées de suite à au moins 70 % dans l’autre sens.'},
   {id:'atr',nom:'Stop ATR suiveur',txt:'Stop à k × ATR 14 (1 h), plafonné par le stop fixe, qui suit le prix sans jamais reculer.'},
   {id:'cool',nom:'Repos après une sortie',txt:'4 bougies d’attente avant de rouvrir une position.'},
   {id:'fee',nom:'Filtre de frais',txt:'Entrée refusée si 1,5 × ATR ne couvre pas 3 fois le coût aller-retour (frais + glissement).'},
   {id:'vol',nom:'Filtre de volume',txt:'Signal ignoré si le volume de la bougie est sous sa moyenne des 20 bougies précédentes.'},
-  {id:'sig',nom:'Nouveaux signaux',txt:'Tendance 4 h (EMA 20/50), cassure du plus haut ou plus bas des 20 bougies, régime du RSI et actualité, à la place des signaux redondants.'},
-  {id:'excl',nom:'Marchés trop calmes exclus',txt:'Paire ignorée si son ATR 1 h est sous 3 fois le coût aller-retour.'}];
+  {id:'sig',nom:'Nouveaux signaux',txt:'Tendance des bougies longues (EMA 20/50), cassure du plus haut ou plus bas des 20 bougies, régime du RSI et actualité, à la place des signaux redondants.'},
+  {id:'excl',nom:'Marchés trop calmes exclus',txt:'Paire ignorée si son ATR 14 bougies est sous 3 fois le coût aller-retour.'}];
 const kl=x=>({t:+x[0],o:+x[1],h:+x[2],l:+x[3],c:+x[4],v:+x[5]});
 // Requête REST publique avec pause sur 429/418 (en-tête Retry-After, 60 s si illisible).
 async function restGet(get,url,etat){for(let i=0;i<5;i++){const r=await get(url);
     if(r.status===429||r.status===418){const s=+(r.headers&&r.headers.get&&r.headers.get('Retry-After'))||60;if(etat)etat(`Binance limite les requêtes (${r.status}) : pause de ${s} s.`);
       if(r.status===418)throw new Error(`Binance a bloqué l’adresse IP pendant ${s} s (418).`);await sleep(s*1000);continue}
     return r}throw new Error('Trop de refus de Binance.')}
-// Historique 1 h public par pages de 1000 (poids 2 par page), 3 requêtes à la fois. La bougie en cours n'est pas gardée.
+// Historique public par pages de 1000 bougies sources (poids 2 par page), 3 requêtes à la fois. La bougie en cours n'est pas gardée.
 async function historique(get,base,L,pages,etat){const D={},bad=[];let fait=0;const file=[...L];
   async function un(q){let all=[],end='';
-    for(let k=0;k<pages;k++){const r=await restGet(get,`${base}/api/v3/klines?symbol=${q}&interval=1h&limit=1000${end}`,etat);
+    for(let k=0;k<pages;k++){const r=await restGet(get,`${base}/api/v3/klines?symbol=${q}&interval=${TF.src}&limit=1000${end}`,etat);
       if(r.status===400){bad.push(q);return}if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();if(!j.length)break;all=j.concat(all);end=`&endTime=${j[0][0]-1}`;
       if(etat)etat(`Téléchargement : ${q} ${all.length} bougies (${fait}/${L.length} paires terminées)`);if(j.length<1000)break;await sleep(120)}
-    D[q]=all.map(kl).filter(x=>x.t+H1<=Date.now());fait++}
+    D[q]=agreger(all.map(kl).filter(x=>x.t+TF.srcMs<=Date.now()));fait++}
   await Promise.all([0,1,2].map(async()=>{while(file.length){const q=file.shift();try{await un(q)}catch(e){if(/418/.test(e.message))throw e}}}));
   return{D,bad}}
 // Garde les heures communes à toutes les paires (une paire trop récente est écartée).
@@ -202,7 +213,7 @@ function prep(D,newsOf){const Q=Object.keys(D),N=Math.min(...Q.map(q=>D[q].lengt
       let vs=0,hh=-Infinity,ll=Infinity;const w=Math.min(20,t);for(let i=t-w;i<t;i++){vs+=C[i].v;hh=Math.max(hh,C[i].h);ll=Math.min(ll,C[i].l)}
       vr.push(w&&vs?x.v/(vs/w):0);brk.push(w>=20?(x.c>hh?1:x.c<ll?-1:0):0);
       const r=t>=14?RSI(c.slice(t-14,t+1)):50;rr.push(r>50&&r<75?1:r<50&&r>25?-1:0);
-      if((x.t+H1)%H4===0&&t>=3&&C[t-3].t===x.t-3*H1){const cl=x.c;c4.push(cl);n4++;e20=e20===null?cl:cl*2/21+e20*19/21;e50=e50===null?cl:cl*2/51+e50*49/51}
+      if((x.t+TF.bar)%TF.conf===0&&t>=TF.kc-1&&C[t-TF.kc+1].t===x.t-(TF.kc-1)*TF.bar){const cl=x.c;c4.push(cl);n4++;e20=e20===null?cl:cl*2/21+e20*19/21;e50=e50===null?cl:cl*2/51+e50*49/51}
       tr4.push(n4>=50?(e20>e50*1.0005?1:e20<e50*.9995?-1:0):0);
       ns.push(.35*tr4[t]+.35*brk[t]+.15*rr[t]+.15*nv)}
     F.p[q]={C,c,A,atr,atrP,vr,brk,rr,tr4,ns}}
@@ -210,7 +221,7 @@ function prep(D,newsOf){const Q=Object.keys(D),N=Math.min(...Q.map(q=>D[q].lengt
 function sigAt(P,t,R){const sc=R.sig?P.ns[t]:(P.A[t]?P.A[t].sc:0);return{sc,dir:sgn(sc),pr:.5+.5*Math.abs(sc)}}
 function refusEntree(P,t,dir,c,R){const k=rt(c);
   if(R.excl&&P.atrP[t]<3*k)return'marché trop calme (ATR sous 3 × le coût aller-retour)';
-  if(R.mtf&&P.tr4[t]!==(dir==='long'?1:-1))return'tendance 4 h pas dans le même sens';
+  if(R.mtf&&P.tr4[t]!==(dir==='long'?1:-1))return`tendance ${TF.clab} pas dans le même sens`;
   if(R.vol&&!(P.vr[t]>=1))return'volume sous sa moyenne des 20 bougies';
   if(R.fee&&1.5*P.atrP[t]<3*k)return'mouvement attendu trop faible face aux frais';
   return''}
@@ -227,7 +238,7 @@ function ouvrir(F,q,t,dir,pr,c,R,px){const P=F.p[q];px=px??P.c[t];const s=c.slip
 function stopTick(P,lo,hi,R,ouv){if(P.side==='long'){if(lo<=P.stop)return Math.min(P.stop,ouv??P.stop);if(R.atr){P.best=Math.max(P.best,hi);P.stop=Math.max(P.stop,P.best-P.dist)}}
   else{if(hi>=P.stop)return Math.max(P.stop,ouv??P.stop);if(R.atr){P.best=Math.min(P.best,lo);P.stop=Math.min(P.stop,P.best+P.dist)}}return null}
 // Sortie évaluée à la fermeture d'une bougie (hors stop).
-function sortieCloture(F,P,t,c,R){const held=Math.round((F.T[t]-P.t0)/H1);if(R.hold&&held<c.hold)return'';const s=sigAt(F.p[P.q],t,R),od=s.dir&&s.dir!==P.side;
+function sortieCloture(F,P,t,c,R){const held=Math.round((F.T[t]-P.t0)/TF.bar);if(R.hold&&held<c.hold)return'';const s=sigAt(F.p[P.q],t,R),od=s.dir&&s.dir!==P.side;
   if(R.rev){P.rev=od&&s.pr>=.7?P.rev+1:0;return P.rev>=2?'inversion confirmée sur 2 bougies':''}
   return od&&s.pr>=.675?'signal inversé':''}
 function fermer(P,price,c){const s=c.slip/100,f=c.fee/100,fx=P.side==='long'?price*(1-s):price*(1+s),g=(P.side==='long'?1:-1)*P.n*(fx-P.fill),xf=P.n*fx*f;
@@ -237,16 +248,16 @@ function simuler(F,from,to,c,R){let cash=1e4,P=null,nT=0,lossD=0,pk=1e4,dd=0,day
   const sortir=(t,price)=>{const r=fermer(P,price,c);cash+=P.size+r.g-r.xf;fees+=P.fe+r.xf;slip+=r.slip;T.push(r.pnl);Du.push((F.T[t]-P.t0)/H1);H.push(P.p);lossD+=r.pnl;nT++;lastX=F.T[t];P=null};
   for(let t=from;t<to;t++){const dj=new Date(F.T[t]).toISOString().slice(0,10);if(dj!==day){day=dj;nT=0;lossD=0}
     if(P){const x=F.p[P.q].C[t],hit=stopTick(P,x.l,x.h,R,x.o);if(hit!==null)sortir(t,hit);else if(sortieCloture(F,P,t,c,R))sortir(t,x.c)}
-    else if(nT<c.maxTrades&&-lossD<1e4*c.maxLoss/100&&cash>=c.size*(1+c.fee/100)&&(!R.cool||(F.T[t]-lastX)/H1>=4)){const{b}=choisir(F,t,c,R);
+    else if(nT<c.maxTrades&&-lossD<1e4*c.maxLoss/100&&cash>=c.size*(1+c.fee/100)&&(!R.cool||(F.T[t]-lastX)/TF.bar>=4)){const{b}=choisir(F,t,c,R);
       if(b){P=ouvrir(F,b.q,t,b.dir,b.pr,c,R);cash-=P.size+P.fe;nT++}}
     const un=P?(P.side==='long'?1:-1)*P.n*(F.p[P.q].c[t]-P.fill):0,eq=cash+(P?P.size+un:0);pk=Math.max(pk,eq);dd=Math.max(dd,(pk-eq)/pk)}
   if(P)sortir(to-1,F.p[P.q].c[to-1]); // une position encore ouverte est clôturée au dernier prix pour être comptée
   const w=T.filter(x=>x>0);
   return{n:T.length,pnl:sum(T),gain:sum(w),loss:sum(T.filter(x=>x<=0)),fees,slip,wr:T.length?w.length/T.length:0,dd,conf:H.length?sum(H)/H.length:0,
-    dur:Du.length?sum(Du)/Du.length:0,jours:Math.round((to-from)/24),du:F.T[from],au:F.T[to-1]}}
+    dur:Du.length?sum(Du)/Du.length:0,jours:Math.round((to-from)*TF.bar/864e5),du:F.T[from],au:F.T[to-1]}}
 // Méthode : départ = règles d'avant. Chaque changement est ajouté seul ; il est gardé seulement s'il améliore le bilan
 // sur le TEST (1/3 final) et aussi sur le calibrage (2/3). Puis le seuil est choisi sur le calibrage seul et vérifié sur le test.
-function mesurer(F,c){const W=Math.min(220,Math.floor(F.N/4)),cut=W+Math.floor((F.N-W)*2/3),seg=(R,thr)=>({cal:simuler(F,W,cut,{...c,thr},R),test:simuler(F,cut,F.N,{...c,thr},R)});
+function mesurer(F,c){const W=Math.min(TF.W,Math.floor(F.N/4)),cut=W+Math.floor((F.N-W)*2/3),seg=(R,thr)=>({cal:simuler(F,W,cut,{...c,thr},R),test:simuler(F,cut,F.N,{...c,thr},R)});
   const base=seg({},c.thr);let R={},cur=base;const essais=[];
   for(const m of CHANGES){const R2={...R,[m.id]:1},r=seg(R2,c.thr),bc=r.cal.pnl>cur.cal.pnl+.005,bt=r.test.pnl>cur.test.pnl+.005,garde=bc&&bt;
     const pq=!r.cal.n&&!r.test.n?'aucun trade : rien à mesurer':garde?'améliore le test et le calibrage':bt?'améliore le test mais pas le calibrage : rien ne permettait de le choisir avant de voir le test'
@@ -254,18 +265,18 @@ function mesurer(F,c){const W=Math.min(220,Math.floor(F.N/4)),cut=W+Math.floor((
     essais.push({id:m.id,nom:m.nom,cal:r.cal,test:r.test,avantCal:cur.cal,avantTest:cur.test,garde,pq});if(garde){R=R2;cur=r}}
   const seuils=[70,75,80,85,90].map(thr=>({thr,cal:simuler(F,W,cut,{...c,thr},R)}));
   const best=seuils.reduce((a,b)=>b.cal.pnl>a.cal.pnl+.005?b:a).thr,tb=simuler(F,cut,F.N,{...c,thr:best},R),seuilOk=best!==c.thr&&tb.pnl>cur.test.pnl+.005;
-  return{v:3,base,fin:seuilOk?seg(R,best):cur,essais,avantSeuil:cur.test.pnl,seuils,best,testBest:tb,seuilOk,thr:c.thr,R,c:{fee:c.fee,slip:c.slip,hold:c.hold,atrK:c.atrK,sl:c.sl},
+  return{v:3,tf:TF.min,tfLab:TF.lab,base,fin:seuilOk?seg(R,best):cur,essais,avantSeuil:cur.test.pnl,seuils,best,testBest:tb,seuilOk,thr:c.thr,R,c:{fee:c.fee,slip:c.slip,hold:c.hold,atrK:c.atrK,sl:c.sl},
     pairs:F.Q.length,du:F.T[W],coupe:F.T[cut],au:F.T[F.N-1],quand:Date.now()}}
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 12:50';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 13:20';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
- cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
+ cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:10,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
 let S=D(),KEYS={k:'',s:''};
 try{const j=localStorage.getItem('tiq');if(j)S=Object.assign(D(),JSON.parse(j))}catch(e){}
-S.cfg=Object.assign(D().cfg,S.cfg);if(!S.cfg5){S.cfg.maxRuns=1440;S.cfg5=1}if(S.sim&&S.sim.v!==3){S.sim=0;S.rules={}}S.rules=S.rules||{};
+S.cfg=Object.assign(D().cfg,S.cfg);if(!S.cfg5){S.cfg.maxRuns=1440;S.cfg5=1}if(!S.cfg6){S.cfg.tf=10;S.cfg6=1}setTF(S.cfg.tf);if(S.sim&&S.sim.tf!==TF.min){S.sim=0;S.rules={}}if(S.sim&&S.sim.v!==3){S.sim=0;S.rules={}}S.rules=S.rules||{};
 if(S.pos&&(!S.pos.q||!S.pos.dist)){S.cash+=S.pos.size||0;S.pos=null} // position d'une ancienne version : remboursée au prix d'entrée
 const save=()=>{try{localStorage.setItem('tiq',JSON.stringify(S))}catch(e){}};
 const TAX=0.314,today=()=>new Date().toISOString().slice(0,10),hr=t=>new Date(t||Date.now()).toLocaleTimeString('fr-FR');
@@ -275,24 +286,25 @@ const logA=t=>{S.log.unshift(`${hr()} · ${t}`);S.log=S.log.slice(0,40)};
 
 /* ---------- Flux temps réel Binance (WebSocket public, lecture seule) ---------- */
 // Un flux combiné : @bookTicker (meilleur achat/vente en temps réel, sert au stop), @miniTicker (1 s, porte l'heure d'événement E),
-// @kline_1h et @kline_4h (toutes les 2 s, champ x = bougie fermée). Le serveur envoie un ping toutes les 20 s : le navigateur
+// @kline_5m ou @kline_1h selon la durée choisie, et la durée de confirmation (toutes les 2 s, champ x = bougie fermée). Le serveur envoie un ping toutes les 20 s : le navigateur
 // répond seul par un pong. Rien n'est envoyé au serveur (abonnement dans l'adresse), donc la limite de 5 messages entrants/s
 // n'est pas en jeu. Une connexion dure au plus 24 h : on en ouvre une nouvelle à 23 h 30 avant de fermer l'ancienne.
-const LV={ws:null,st:'DÉMARRAGE',last:0,lag:null,cnt:0,rate:0,bid:{},ask:{},px:{},C1:{},bad:new Set(),retry:0,sync:true,ready:false,ban:0,done:{},excl:[],note:''};
+const LV={CS:{},ws:null,st:'DÉMARRAGE',last:0,lag:null,cnt:0,rate:0,bid:{},ask:{},px:{},C1:{},bad:new Set(),retry:0,sync:true,ready:false,ban:0,done:{},excl:[],note:''};
 const fresh=()=>LV.ready&&!LV.sync&&LV.ws&&LV.ws.readyState===1&&Date.now()-LV.last<=5000;
 async function rest(path){return restGet(fetch,PUB+path,m=>{LV.note=m})}
-async function chargerInitial(){LV.sync=true;LV.note='Chargement des 1000 dernières bougies 1 h de chaque paire…';const L=[...WL.CRYPTO,...WL.FOREX];
-  for(let i=0;i<L.length;i+=4)await Promise.all(L.slice(i,i+4).map(async q=>{try{const r=await rest(`/api/v3/klines?symbol=${q}&interval=1h&limit=1000`);
-    if(r.status===400){LV.bad.add(q);return}if(!r.ok)throw 0;LV.C1[q]=(await r.json()).map(kl).filter(x=>x.t+H1<=Date.now())}catch(e){if(/418/.test(e&&e.message))throw e}}));
+async function chargerInitial(){LV.sync=true;LV.note=`Chargement des 1000 dernières bougies de ${TF.src} de chaque paire…`;const L=[...WL.CRYPTO,...WL.FOREX];
+  for(let i=0;i<L.length;i+=4)await Promise.all(L.slice(i,i+4).map(async q=>{try{const r=await rest(`/api/v3/klines?symbol=${q}&interval=${TF.src}&limit=1000`);
+    if(r.status===400){LV.bad.add(q);return}if(!r.ok)throw 0;LV.CS[q]=(await r.json()).map(kl).filter(x=>x.t+TF.srcMs<=Date.now());LV.C1[q]=agreger(LV.CS[q])}catch(e){if(/418/.test(e&&e.message))throw e}}));
   if(!Object.keys(LV.C1).length)throw new Error('Binance injoignable');LV.ready=true;LV.note=''}
-// Après une reconnexion : récupère les bougies 1 h fermées pendant la coupure. Aucune décision rétroactive n'est prise sur elles.
-async function resync(){LV.sync=true;let n=0;try{for(const q of Object.keys(LV.C1)){const a=LV.C1[q],t=a.length?a[a.length-1].t:0;
-      if(Date.now()-t<2*H1)continue;const r=await rest(`/api/v3/klines?symbol=${q}&interval=1h&startTime=${t+H1}&limit=1000`);if(!r.ok)continue;
-      for(const x of (await r.json()).map(kl))if(x.t>a[a.length-1].t&&x.t+H1<=Date.now()){a.push(x);n++}if(a.length>1200)a.splice(0,a.length-1200)}
-    if(n)logA(`Resynchronisation : ${n} bougies 1 h récupérées après la coupure (aucune décision rétroactive).`)}
+// Après une reconnexion : récupère les bougies fermées pendant la coupure. Aucune décision rétroactive n'est prise sur elles.
+async function resync(){LV.sync=true;let n=0;try{for(const q of Object.keys(LV.CS)){const a=LV.CS[q],t=a.length?a[a.length-1].t:0;
+      if(Date.now()-t<2*TF.srcMs)continue;const r=await rest(`/api/v3/klines?symbol=${q}&interval=${TF.src}&startTime=${t+TF.srcMs}&limit=1000`);if(!r.ok)continue;
+      for(const x of (await r.json()).map(kl))if(x.t>a[a.length-1].t&&x.t+TF.srcMs<=Date.now()){a.push(x);n++}if(a.length>2400)a.splice(0,a.length-2400);
+      LV.C1[q]=agreger(a);for(const b of LV.C1[q])LV.done[b.t]=1}
+    if(n)logA(`Resynchronisation : ${n} bougies de ${TF.src} récupérées après la coupure (aucune décision rétroactive).`)}
   catch(e){LV.note='Resynchronisation impossible : '+(e&&e.message||e)}LV.sync=false}
 function connecter(){const L=Object.keys(LV.C1);if(!L.length)return;
-  const url=WSB+L.flatMap(q=>{const s=q.toLowerCase();return[s+'@bookTicker',s+'@miniTicker',s+'@kline_1h',s+'@kline_4h']}).join('/');
+  const url=WSB+L.flatMap(q=>{const s=q.toLowerCase();return[s+'@bookTicker',s+'@miniTicker',s+'@kline_'+TF.src,s+'@kline_'+TF.ci]}).join('/');
   const ws=new WebSocket(url),ancien=LV.ws;let ouvert=false;
   ws.onopen=async()=>{ouvert=true;LV.ws=ws;LV.retry=0;LV.note='';LV.since=Date.now();if(ancien&&ancien!==ws)try{ancien.close()}catch(e){}
     clearTimeout(LV.t24);LV.t24=setTimeout(connecter,23.5*H1);await resync()};
@@ -303,23 +315,25 @@ function connecter(){const L=Object.keys(LV.C1);if(!L.length)return;
 function recu(txt){LV.last=Date.now();LV.cnt++;let m;try{m=JSON.parse(txt)}catch(e){return}const x=m&&m.data;if(!x)return;
   if(x.e==='serverShutdown'){logA('Binance annonce un redémarrage du serveur : nouvelle connexion.');connecter();return}
   if(x.e==='24hrMiniTicker'){LV.px[x.s]=+x.c;LV.lag=LV.last-x.E;return}
-  if(x.e==='kline'){LV.lag=LV.last-x.E;const k=x.k;LV.px[x.s]=+k.c;if(k.x){if(k.i==='1h')bougie1h(x.s,k);else if(k.i==='4h')LV.note4=`Bougie 4 h fermée à ${hr(k.T+1)}.`}return}
+  if(x.e==='kline'){LV.lag=LV.last-x.E;const k=x.k;LV.px[x.s]=+k.c;if(k.x){if(k.i===TF.src)bougieSource(x.s,k);else if(k.i===TF.ci)LV.note4=`Bougie ${TF.clab} fermée à ${hr(k.T+1)}.`}return}
   if(x.u!==undefined&&x.b!==undefined){LV.bid[x.s]=+x.b;LV.ask[x.s]=+x.a;if(S.pos&&S.pos.q===x.s)verifierStop()}}
-function bougie1h(s,k){const a=LV.C1[s];if(!a)return;const c={t:k.t,o:+k.o,h:+k.h,l:+k.l,c:+k.c,v:+k.v};
-  if(!a.length||c.t>a[a.length-1].t){if(a.length&&c.t>a[a.length-1].t+H1)resync();a.push(c);if(a.length>1200)a.shift()}
-  if(!LV.done[c.t]){LV.done[c.t]=1;setTimeout(()=>decider(c.t,false),3000)}} // 3 s pour recevoir la fermeture de toutes les paires
+function bougieSource(s,k){const a=LV.CS[s];if(!a)return;const c={t:k.t,o:+k.o,h:+k.h,l:+k.l,c:+k.c,v:+k.v};
+  if(!a.length||c.t>a[a.length-1].t){if(a.length&&c.t>a[a.length-1].t+TF.srcMs)resync();a.push(c);if(a.length>2400)a.shift()}
+  if((c.t+TF.srcMs)%TF.bar)return; // la bougie de décision n'est pas encore complète (première moitié des 10 min)
+  LV.C1[s]=agreger(a);const t=Math.floor(c.t/TF.bar)*TF.bar;
+  if(!LV.done[t]){LV.done[t]=1;setTimeout(()=>decider(t,false),3000)}} // 3 s pour recevoir la fermeture de toutes les paires
 // Garde-fou : chaque seconde, état de la connexion, messages par seconde, et pause si plus rien n'arrive depuis 5 s.
 setInterval(()=>{LV.rate=LV.cnt;LV.cnt=0;const o=LV.ws&&LV.ws.readyState===1,age=Date.now()-LV.last;
   LV.st=!LV.ready?(LV.note?'HORS LIGNE':'DÉMARRAGE'):!o?'RECONNEXION…':LV.sync?'RESYNCHRONISATION…':age>5000?'DONNÉES FIGÉES':'EN DIRECT';
   if(o&&age>15000){LV.note='Aucun message depuis 15 s : nouvelle connexion.';try{LV.ws.close()}catch(e){}}},1000);
 
 /* ---------- Décisions ---------- */
-function marche(){const C={};for(const q of Object.keys(LV.C1))if(LV.C1[q].length>230)C[q]=LV.C1[q];const al=aligner(C);
+function marche(){const C={};for(const q of Object.keys(LV.C1))if(LV.C1[q].length>=TF.W)C[q]=LV.C1[q];const al=aligner(C);
   return al&&Object.keys(al.D).length?prep(al.D,q=>newsFor(q,RA.news)):null}
 function verifierStop(){const P=S.pos;if(!P||!fresh())return;const px=P.side==='long'?LV.bid[P.q]:LV.ask[P.q];if(!px)return;
   const hit=stopTick(P,px,px,S.rules,px);if(hit!==null)cloturer(hit,'stop touché au tick',false)}
 async function cloturer(price,raison,manuel){const P=S.pos,c=S.cfg,r=fermer(P,price,c);
-  S.cash+=P.size+r.g-r.xf;S.trades.push(r.pnl);S.hist.push({p:P.p,side:P.side,pnl:r.pnl,dur:(Date.now()-P.t0-H1)/H1});S.lossToday+=r.pnl;S.nToday++;S.lastX=Math.floor(Date.now()/H1)*H1;
+  S.cash+=P.size+r.g-r.xf;S.trades.push(r.pnl);S.hist.push({p:P.p,side:P.side,pnl:r.pnl,dur:(Date.now()-P.t0-TF.bar)/H1});S.lossToday+=r.pnl;S.nToday++;S.lastX=Math.floor(Date.now()/TF.bar)*TF.bar;
   let ex=`${P.q} : sortie fictive à ${fp(r.fx)} (${raison}) : ${fmt(r.pnl)} frais et glissement compris.`;
   if(c.tn==='1'&&manuel&&P.side==='long'&&TNP.includes(P.q))ex+=' '+await testnetOrder('SELL',(Math.floor(P.n*1e4)/1e4).toFixed(4),0,P.q);
   logA(`${P.q} : sortie à ${fp(r.fx)} : ${fmt(r.pnl)} (${raison})`);S.pos=null;S.ags=S.ags.map(a=>a.n==='Exécuteur fictif'?{...a,t:ex,s:'Position fermée'}:a);save();render();return ex}
@@ -333,11 +347,11 @@ async function decider0(t,manuel){const c=S.cfg,A=[],d0=today(),R=S.rules,W=v=>v
   A.push({n:'Actualités',s:RA.s,t:RA.t});
   const ord=F.Q.slice().sort((x,y)=>Math.abs(sigAt(F.p[y],i,R).sc)-Math.abs(sigAt(F.p[x],i,R).sc));S.scan=ord.slice(0,8).map(q=>({q,sc:sigAt(F.p[q],i,R).sc}));
   const P=S.pos,{b,refus}=choisir(F,i,c,R),q=P?P.q:b?b.q:ord[0],Pq=F.p[q],s=sigAt(Pq,i,R),pc=Math.round(s.pr*100);
-  A.push({n:'Analyste technique',s:`${q.replace('USDT','')} : ${W(s.sc)}`,t:`Bougie 1 h fermée à ${hr(tb+H1)}. ${F.Q.length} marchés lus, retenu : ${q}. Tendance 4 h (EMA 20/50) : ${W(Pq.tr4[i])}. Cassure 20 bougies : ${W(Pq.brk[i])}. Régime RSI : ${W(Pq.rr[i])}. Volume ${Pq.vr[i].toFixed(1)} × la moyenne. ATR ${(Pq.atrP[i]*100).toFixed(2)} %. Signaux utilisés : ${R.sig?'nouveaux':'ceux de départ'}.${LV.excl.length?` Marchés trop calmes (ATR sous 3 × le coût aller-retour) : ${LV.excl.map(x=>x.replace('USDT','')).join(', ')}${R.excl?' : exclus.':' : signalés, exclusion non gardée par la mesure.'}`:''}`});
+  A.push({n:'Analyste technique',s:`${q.replace('USDT','')} : ${W(s.sc)}`,t:`Bougie de ${TF.lab} fermée à ${hr(tb+TF.bar)}. ${F.Q.length} marchés lus, retenu : ${q}. Tendance ${TF.clab} (EMA 20/50) : ${W(Pq.tr4[i])}. Cassure 20 bougies : ${W(Pq.brk[i])}. Régime RSI : ${W(Pq.rr[i])}. Volume ${Pq.vr[i].toFixed(1)} × la moyenne. ATR ${(Pq.atrP[i]*100).toFixed(2)} %. Signaux utilisés : ${R.sig?'nouveaux':'ceux de départ'}.${LV.excl.length?` Marchés trop calmes (ATR sous 3 × le coût aller-retour) : ${LV.excl.map(x=>x.replace('USDT','')).join(', ')}${R.excl?' : exclus.':' : signalés, exclusion non gardée par la mesure.'}`:''}`});
   let d='ATTENDRE',why=`Indice ${pc} % : sous le seuil de ${c.thr} %.`,act=null;
-  if(P){const r=sortieCloture(F,P,i,c,R),h=Math.round((tb-P.t0)/H1);
+  if(P){const r=sortieCloture(F,P,i,c,R),h=Math.round((tb-P.t0)/TF.bar);
     if(r){d='SORTIR';act='close';why=r[0].toUpperCase()+r.slice(1)+'.'}else why=R.hold&&h<c.hold?`Détention minimale : ${h}/${c.hold} bougies, seul le stop peut fermer.`:'Position ouverte, rien à changer.'}
-  else if(R.cool&&(tb-S.lastX)/H1<4)why='Repos après la dernière sortie (4 bougies).';
+  else if(R.cool&&(tb-S.lastX)/TF.bar<4)why='Repos après la dernière sortie (4 bougies).';
   else if(b){act='open';d=b.dir==='long'?'ENTRER EN HAUSSE':'ENTRER EN BAISSE';const bs=sigAt(F.p[b.q],i,R);why=`${b.q} : indice ${Math.round(bs.pr*100)} %, au-dessus du seuil de ${c.thr} %.`}
   else if(refus.length)why=`${refus[0].q} passe le seuil mais est refusé : ${refus[0].r}.`;
   A.push({n:'Chef',s:`${d}`,t:`${d} : ${why} L’indice de confiance est une note du bot, pas une probabilité. Changements actifs : ${RULES().join(', ')||'aucun (version de départ)'}.`});
@@ -356,7 +370,7 @@ async function decider0(t,manuel){const c=S.cfg,A=[],d0=today(),R=S.rules,W=v=>v
   A.push({n:'Exécuteur fictif',s:act==='open'&&ok&&S.pos?'Ordre passé':act==='close'?'Position fermée':'Aucun ordre',t:ex+(c.tn==='1'&&manuel?' Le testnet ne reçoit que BTC et ETH, en hausse.':'')});
   const L=S.trades.length,w=S.trades.filter(x=>x>0).length;
   A.push({n:'Journal',s:`${L} trades notés`,t:L?`${L} trades, ${w} gagnants. Compare l’indice annoncé à la réussite réelle dans l’accueil.`:'Pas encore de trade clôturé.'});
-  S.ags=A;house.play(A,q);S.dec={d,why,conf:pc+' %',rr};S.eq=(S.eq||[]).concat(valeur()).slice(-300);save();render();$('msg').textContent=manuel?'Évaluation terminée.':`Décision prise à la fermeture de ${hr(tb+H1)}.`}
+  S.ags=A;house.play(A,q);S.dec={d,why,conf:pc+' %',rr};S.eq=(S.eq||[]).concat(valeur()).slice(-300);save();render();$('msg').textContent=manuel?'Évaluation terminée.':`Décision prise à la fermeture de ${hr(tb+TF.bar)}.`}
 const valeur=()=>{const P=S.pos;if(!P)return S.cash;const px=(P.side==='long'?LV.bid[P.q]:LV.ask[P.q])||LV.px[P.q]||P.px;return S.cash+P.size+(P.side==='long'?1:-1)*P.n*(px-P.fill)};
 
 const AG=[{n:'Actualités',who:'Radar',job:'Surveille les nouvelles du marché',c:'#d9902f',sh:'50%'},
@@ -454,12 +468,12 @@ const house=(()=>{const cv=$('house'),W=320,H=240,cx=cv.getContext('2d'),RM=matc
     if(cur){if(cur.k==='go'&&!P[cur.a].path.length)next();else if(cur.k==='say'&&(wait-=dt*1000)<=0)next()}else if(Q.length)next();
     $('hst').textContent=st||'Les agents attendent dans leur maison.';draw(now);requestAnimationFrame(loop)}
   requestAnimationFrame(loop);return{play}})();
-const prochaine=()=>{const t=Math.ceil((Date.now()+1)/H1)*H1;return{h:hr(t).slice(0,5),m:Math.max(0,Math.ceil((t-Date.now())/6e4))}};
+const prochaine=()=>{const t=Math.ceil((Date.now()+1)/TF.bar)*TF.bar;return{h:hr(t).slice(0,5),m:Math.max(0,Math.ceil((t-Date.now())/6e4))}};
 const attente=()=>{const n=prochaine();return timer?`En service : prochaine décision à la fermeture de ${n.h} (dans ${n.m} min).`:'À l’arrêt : touche « Démarrer les agents » ou « Évaluer maintenant ».'};
 function renderAgents(){delete PV.fst;
   $('live').textContent=timer?'Agents en service':"À l'arrêt";$('live').classList.toggle('on',!!timer);
   $('scan').innerHTML=(S.scan||[]).map(x=>`<span>${x.q.replace('USDT','')} <b class="${x.sc>0?'u':x.sc<0?'d':''}">${x.sc>0?'▲':x.sc<0?'▼':'–'} ${Math.round((.5+.5*Math.abs(x.sc))*100)} %</b></span>`).join('');
-  $('exclu').textContent=LV.excl.length?`Trop calmes pour couvrir les frais (ATR 1 h sous 3 × le coût aller-retour) : ${LV.excl.map(x=>x.replace('USDT','')).join(', ')}. Le forex y est souvent : c’est normal.`:'';
+  $('exclu').textContent=LV.excl.length?`Trop calmes pour couvrir les frais (ATR sous 3 × le coût aller-retour) : ${LV.excl.map(x=>x.replace('USDT','')).join(', ')}. Le forex y est souvent : c’est normal.`:'';
   $('reps').innerHTML=AG.map(g=>{const a=S.ags.find(x=>x.n===g.n);return `<div class="rep"><i style="background:${g.c}"></i><div><b>${g.who}</b> <em>· ${g.job}</em><p>${a?a.t:attente()}${g.n==='Journal'&&S.sim?'<br>'+simLine(S.sim):''}</p></div></div>`}).join('')}
 function render(){
   const pnl=S.trades.reduce((a,b)=>a+b,0),w=S.trades.filter(x=>x>0).length,L=S.trades.length,P=S.pos,eq=valeur(),H=S.hist,n=H.length;
@@ -497,7 +511,7 @@ const simLine=M=>M&&M.v===3?`Mesure : départ ${fmt(M.base.test.pnl)} sur le tes
 function simHTML(M){if(!M||M.v!==3)return'<span class="mut">Pas encore lancée. Va dans l’onglet Agents et touche « Mesurer sur l’historique réel ».</span>';
   const peu=r=>r.n<30,row=(n,r)=>`<tr><th>${n}</th><td>${peu(r)?'<span class="mut">trop peu de trades</span>':sg$(r.pnl)}</td><td>${r.n}</td><td>${r.dur.toFixed(1)} h</td><td>${r.n?Math.round(r.wr*100)+' %':'–'}</td><td class="up">${fmt(r.gain)}</td><td class="dn">${fmt(r.loss)}</td><td>${fmt(r.fees)}</td><td>${fmt(r.slip)}</td><td>${pct(r.dd)}</td></tr>`;
   const ft=M.fin.test;
-  return`<div class="mut">${M.pairs} marchés, bougies d’1 h. Calibrage du ${dt(M.du)} au ${dt(M.coupe)} (${M.base.cal.jours} j), test du ${dt(M.coupe)} au ${dt(M.au)} (${M.base.test.jours} j). Frais ${String(M.c.fee).replace('.',',')} % et glissement ${String(M.c.slip).replace('.',',')} % par côté.</div>
+  return`<div class="mut">${M.pairs} marchés, bougies de ${M.tfLab}. Calibrage du ${dt(M.du)} au ${dt(M.coupe)} (${M.base.cal.jours} j), test du ${dt(M.coupe)} au ${dt(M.au)} (${M.base.test.jours} j). Frais ${String(M.c.fee).replace('.',',')} % et glissement ${String(M.c.slip).replace('.',',')} % par côté.</div>
   <div class="tw"><table class="st"><thead><tr><th></th><th>Bilan</th><th>Trades</th><th>Durée moy.</th><th>Réussite</th><th>Gagné</th><th>Perdu</th><th>Frais</th><th>Glissement</th><th>Pire baisse</th></tr></thead><tbody>
   ${row('Départ · calibrage',M.base.cal)}${row('Départ · test',M.base.test)}${row('Après · calibrage',M.fin.cal)}${row('Après · test',ft)}</tbody></table></div>
   <p class="mut">Le bilan inclut frais et glissement. Moins de 30 trades : bilan affiché comme « trop peu de trades », il ne permet pas de conclure (il reste visible dans le détail ci-dessous).</p>
@@ -513,21 +527,22 @@ function stopAuto(m){clearTimeout(timer);timer=null;$('auto').textContent=$('aut
 $('auto').onclick=()=>{if(timer){stopAuto();return}
   if(S.stop){$('msg').textContent='Arrêt d\'urgence actif. Remets-le en marche avant de démarrer.';return}
   timer=setTimeout(()=>stopAuto('Durée maximale atteinte : agents arrêtés.'),S.cfg.maxRuns*60000);$('auto').textContent=$('auto2').textContent='Arrêter les agents';$('auto').classList.add('stop');
-  $('auto-st').textContent=`Agents en service : ils décident à chaque fermeture de bougie 1 h (prochaine à ${hr(Math.ceil(Date.now()/H1)*H1)}). Stops vérifiés à chaque prix reçu. Arrêt automatique après ${S.cfg.maxRuns} min.`;renderAgents();decider(0,false)};
+  $('auto-st').textContent=`Agents en service : ils décident à chaque fermeture de bougie de ${TF.lab} (prochaine à ${hr(Math.ceil(Date.now()/TF.bar)*TF.bar)}). Stops vérifiés à chaque prix reçu. Arrêt automatique après ${S.cfg.maxRuns} min.`;renderAgents();decider(0,false)};
 $('go').onclick=()=>decider(0,true);
 $('kill').onclick=()=>{S.stop=!S.stop;if(S.stop&&timer)stopAuto('Arrêt d\'urgence actif : agents arrêtés, aucune nouvelle entrée. Un stop ouvert reste surveillé.');save();render();$('msg').textContent=S.stop?'Tout est suspendu : aucun nouvel ordre.':'Reprise possible.'};
 const NUM={size:[10,1e6],maxLoss:[.5,100],maxTrades:[1,1000],sl:[.5,50],thr:[50,99],hold:[0,200],atrK:[.5,10],fee:[0,2],slip:[0,2],maxRuns:[1,100000]};
 $('save').onclick=()=>{for(const k in NUM){const v=parseFloat(String($(k).value).replace(',','.'));if(isFinite(v))S.cfg[k]=Math.min(NUM[k][1],Math.max(NUM[k][0],v))}
-  S.cfg.news=$('news').value;S.cfg.rsrc=$('rsrc').value;S.cfg.tn=$('tn').value;KEYS={k:$('k').value.trim(),s:$('s').value.trim()};RD.at=0;
-  $('k').value='';$('s').value='';fillCfg();S.sim=0;S.rules={};save();render();$('setmsg').textContent='Réglages enregistrés. Relance la mesure : les changements gardés dépendent de ces réglages.'+(KEYS.k?' Clés gardées en mémoire pour cette session.':'')};
+  const tf0=S.cfg.tf;S.cfg.tf=+$('tf').value;S.cfg.news=$('news').value;S.cfg.rsrc=$('rsrc').value;S.cfg.tn=$('tn').value;KEYS={k:$('k').value.trim(),s:$('s').value.trim()};RD.at=0;
+  $('k').value='';$('s').value='';fillCfg();S.sim=0;S.rules={};save();render();$('setmsg').textContent='Réglages enregistrés. Relance la mesure : les changements gardés dépendent de ces réglages.'+(KEYS.k?' Clés gardées en mémoire pour cette session.':'');
+  if(S.cfg.tf!==tf0){if(S.pos){S.cfg.tf=tf0;save();$('setmsg').textContent='Ferme d’abord la position ouverte avant de changer la durée des bougies.';fillCfg();return}$('setmsg').textContent='Durée des bougies changée : rechargement des prix…';setTimeout(()=>location.reload(),600)}};
 let RZ=0;$('reset').onclick=()=>{const b=$('reset');
   if(!RZ){RZ=setTimeout(()=>{RZ=0;b.textContent='Remettre la simulation à zéro'},4000);b.textContent='Touche encore pour confirmer';return}
   clearTimeout(RZ);RZ=0;b.textContent='Remettre la simulation à zéro';if(timer)stopAuto();S=D();save();fillCfg();render();$('setmsg').textContent='Simulation remise à zéro.'};
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
   document.querySelectorAll('.sec').forEach((s,i)=>s.classList.toggle('on',i==b.dataset.t))});
 $('auto2').onclick=()=>$('auto').onclick();
-$('simgo').onclick=async()=>{const b=$('simgo');b.disabled=true;const st=m=>$('simst').textContent=m;st('Téléchargement d’environ 12 mois de bougies d’1 h…');
-  try{const{D:H,bad}=await historique(fetch,PUB,pairs(),9,st);const al=aligner(H);
+$('simgo').onclick=async()=>{const b=$('simgo');b.disabled=true;const st=m=>$('simst').textContent=m;st(TF.min===10?'Téléchargement d’environ 2 mois de bougies de 5 min…':'Téléchargement d’environ 12 mois de bougies d’1 h…');
+  try{const{D:H,bad}=await historique(fetch,PUB,pairs(),TF.pages,st);const al=aligner(H);
     if(!al||!Object.keys(al.D).length){st('Binance injoignable : impossible de mesurer sur l’historique réel. Aucun résultat inventé.');b.disabled=false;return}
     st('Calcul des indicateurs et des essais…');await sleep(30);
     const M=mesurer(prep(al.D),S.cfg);S.sim=M;S.rules=M.R;save();render();

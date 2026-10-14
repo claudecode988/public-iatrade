@@ -3,18 +3,18 @@
 // le fonctionnement de l'appli (flux, coupure, reconnexion, stop au tick…), pas les résultats de la stratégie.
 //   Usage : node tools/test-navigateur.cjs      (CHROMIUM=/chemin/chromium et SORTIE=dossier facultatifs)
 const { chromium } = require('playwright'),path=require('path');
-const H=36e5,BAD=['GBPUSDT','AUDUSDT'],ok=(c,m)=>{console.log((c?'OK   ':'ÉCHEC ')+m);if(!c)process.exitCode=1};
+const H=36e5,IV={'5m':3e5,'1h':36e5,'4h':144e5},BAD=['GBPUSDT','AUDUSDT'],ok=(c,m)=>{console.log((c?'OK   ':'ÉCHEC ')+m);if(!c)process.exitCode=1};
 const px=(s,t)=>{const k=s.charCodeAt(0)+s.charCodeAt(1)*3,b=s.startsWith('BTC')?60000:s.startsWith('ETH')?3000:10+k%50;return b*(1+.06*Math.sin(t/H/60+k)+.02*Math.sin(t/H/9+k*2)+.004*Math.sin(t/H*1.7+k))};
-const bar=(s,t)=>{const o=px(s,t),c=px(s,t+H);return[t,String(o),String(Math.max(o,c)*1.004),String(Math.min(o,c)*.996),String(c),String(100+60*Math.abs(Math.sin(t/H/5))),t+H-1]};
+const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math.max(o,c)*1.002),String(Math.min(o,c)*.998),String(c),String(100+60*Math.abs(Math.sin(t/H/5))),t+d-1]};
 (async()=>{
   const b=await chromium.launch(process.env.CHROMIUM?{executablePath:process.env.CHROMIUM}:{});
   const p=await b.newPage({viewport:{width:400,height:900}}),errs=[],net=[];
   p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&(/Failed to load resource/.test(m.text())?net:errs).push(m.text()));
-  const now=Math.floor(Date.now()/H)*H;let restCalls=0;
+  let restCalls=0;
   await p.route('https://api.binance.com/**',r=>{restCalls++;const u=new URL(r.request().url()),s=u.searchParams.get('symbol');
     if(BAD.includes(s))return r.fulfill({status:400,body:'{"code":-1121,"msg":"Invalid symbol."}'});
-    const lim=+u.searchParams.get('limit')||500,st=u.searchParams.get('startTime'),en=u.searchParams.get('endTime');let a=[];
-    if(st){for(let t=+st;t<=now&&a.length<lim;t+=H)a.push(bar(s,t))}else{const e=en?Math.floor(+en/H)*H:now,t0=now-9000*H;for(let t=e;t>=Math.max(t0,e-(lim-1)*H);t-=H)a.unshift(bar(s,t))}
+    const d=IV[u.searchParams.get('interval')]||H,now=Math.floor(Date.now()/d)*d,lim=+u.searchParams.get('limit')||500,st=u.searchParams.get('startTime'),en=u.searchParams.get('endTime');let a=[];
+    if(st){for(let t=+st;t<=now&&a.length<lim;t+=d)a.push(bar(s,t,d))}else{const e=en?Math.floor(+en/d)*d:now,t0=now-18000*d;for(let t=e;t>=Math.max(t0,e-(lim-1)*d);t-=d)a.unshift(bar(s,t,d))}
     r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(a)})});
   await p.route('https://api.alternative.me/**',r=>r.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:JSON.stringify({data:[{value:'55',value_classification:'Greed',timestamp:String(Math.floor((Date.now()-H)/1000))}]})}));
   // Faux flux WebSocket : bookTicker toutes les 100 ms par paire, miniTicker et kline toutes les secondes.
@@ -24,7 +24,7 @@ const bar=(s,t)=>{const o=px(s,t),c=px(s,t+H);return[t,String(o),String(Math.max
     let i=0;const iv=setInterval(()=>{if(mode!=='live'||cur!==ws)return;i++;const t=Date.now();
       for(const s of ss){const c=px(s,t)*(1+(shift[s]||0));ws.send(JSON.stringify({stream:s.toLowerCase()+'@bookTicker',data:{u:i,s,b:String(c*.9999),B:'1',a:String(c*1.0001),A:'1'}}));sent++;
         if(i%10===0){ws.send(JSON.stringify({stream:s.toLowerCase()+'@miniTicker',data:{e:'24hrMiniTicker',E:t-40,s,c:String(c),o:'1',h:'1',l:'1',v:'1',q:'1'}}));
-          ws.send(JSON.stringify({stream:s.toLowerCase()+'@kline_1h',data:{e:'kline',E:t-40,s,k:{t:now,T:now+H-1,s,i:'1h',o:String(c),c:String(c),h:String(c),l:String(c),v:'10',x:false}}}));sent+=2}}},100);
+          const k0=Math.floor(t/3e5)*3e5;ws.send(JSON.stringify({stream:s.toLowerCase()+'@kline_5m',data:{e:'kline',E:t-40,s,k:{t:k0,T:k0+3e5-1,s,i:'5m',o:String(c),c:String(c),h:String(c),l:String(c),v:'10',x:false}}}));sent+=2}}},100);
     ws.onClose(()=>clearInterval(iv))});
   await p.goto('file://'+path.join(__dirname,'..','index.html'));
   for(const t of ['1','2','0']){await p.click(`nav button[data-t="${t}"]`);ok(await p.isVisible(`#t${t}`),`onglet ${t} visible`)}
@@ -41,8 +41,11 @@ const bar=(s,t)=>{const o=px(s,t),c=px(s,t+H);return[t,String(o),String(Math.max
     ok(/stop touché au tick/.test(lg),`stop déclenché au tick (sortie ${dt} ms après le saut de prix)`);shift={}}
   // Démarrage, fermeture de bougie 1 h reçue par le flux, puis arrêt d'urgence
   await p.click('#auto');ok(/Agents en service/.test(await p.textContent('#auto-st')),'démarrage des agents');
-  for(const s of SY){const c=px(s,Date.now());cur.send(JSON.stringify({stream:s.toLowerCase()+'@kline_1h',data:{e:'kline',E:Date.now(),s,k:{t:now,T:now+H-1,s,i:'1h',o:String(c),c:String(c),h:String(c*1.001),l:String(c*.999),v:'150',x:true}}}))}
-  await p.waitForFunction(()=>/Décision prise à la fermeture/.test(document.getElementById('msg').textContent),null,{timeout:10000}).then(()=>ok(true,'décision prise à la fermeture d’une bougie 1 h du flux')).catch(()=>ok(false,'décision à la fermeture de bougie'));
+  // Fermeture d'une bougie de 10 min : deux bougies de 5 min fermées de suite, la seconde complète la tranche de 10 min.
+  const last=await p.evaluate(()=>Math.max(...Object.values(LV.CS).map(a=>a[a.length-1].t)));await p.evaluate(()=>{LV.done={}});
+  for(const dt of [3e5,6e5])for(const s of SY){const t=last+dt,c=px(s,t);if((t+3e5)%6e5&&dt===6e5)continue;
+    cur.send(JSON.stringify({stream:s.toLowerCase()+'@kline_5m',data:{e:'kline',E:Date.now(),s,k:{t,T:t+3e5-1,s,i:'5m',o:String(c),c:String(c),h:String(c*1.001),l:String(c*.999),v:'150',x:true}}}))}
+  await p.waitForFunction(()=>/Décision prise à la fermeture/.test(document.getElementById('msg').textContent),null,{timeout:10000}).then(()=>ok(true,'décision prise à la fermeture d’une bougie de 10 min (2 bougies de 5 min) du flux')).catch(()=>ok(false,'décision à la fermeture de bougie'));
   await p.click('#kill');ok(/Arrêt d'urgence actif/.test(await p.textContent('#auto-st')),'arrêt d’urgence stoppe les agents');await p.click('#kill');
   // Coupure : plus aucun message -> données figées ; puis connexion fermée et refusée -> reconnexion avec délai croissant
   mode='silent';await p.waitForFunction(()=>document.getElementById('cst').textContent==='DONNÉES FIGÉES',null,{timeout:9000}).then(()=>ok(true,'silence de plus de 5 s : « DONNÉES FIGÉES »')).catch(()=>ok(false,'données figées'));
