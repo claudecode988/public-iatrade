@@ -248,8 +248,11 @@ async function historique(get,base,L,pages,etat){const D={},bad=[];let fait=0;co
   await Promise.all([0,1,2].map(async()=>{while(file.length){const q=file.shift();try{await un(q)}catch(e){if(/418/.test(e.message))throw e}}}));
   return{D,bad}}
 // Garde les heures communes à toutes les paires (une paire trop récente est écartée).
-function aligner(D){let Q=Object.keys(D).filter(q=>D[q].length);if(!Q.length)return null;const mx=Math.max(...Q.map(q=>D[q].length));
-  const ecartees=Object.keys(D).filter(q=>!(D[q].length>=mx*.8));Q=Q.filter(q=>D[q].length>=mx*.8);
+// Une paire qui ne s'échange plus (Binance renvoie alors ses anciennes bougies, par exemple GBPUSDT arrêtée en 2023)
+// est écartée si sa dernière bougie a plus d'un jour de retard sur les autres.
+function aligner(D){let Q=Object.keys(D).filter(q=>D[q].length);if(!Q.length)return null;const fin=Math.max(...Q.map(q=>D[q][D[q].length-1].t));
+  Q=Q.filter(q=>D[q][D[q].length-1].t>=fin-864e5);if(!Q.length)return null;const mx=Math.max(...Q.map(q=>D[q].length));
+  const ecartees=Object.keys(D).filter(q=>!Q.includes(q)||!(D[q].length>=mx*.8));Q=Q.filter(q=>D[q].length>=mx*.8);
   const sets=Q.map(q=>new Set(D[q].map(x=>x.t))),T=D[Q[0]].map(x=>x.t).filter(t=>sets.every(z=>z.has(t))),ok=new Set(T),o={};
   for(const q of Q)o[q]=D[q].filter(x=>ok.has(x.t));return{D:o,ecartees}}
 // Indicateurs par paire et par heure, calculés une fois. Les bougies de 4 h sont reconstruites à partir des bougies d'1 h
@@ -415,7 +418,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 16:49';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 16:52';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({pk:10000,cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
  cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:.5,ddMax:15,hb:5,npT1:30,npJ1:30,npT2:100,npJ2:90,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
