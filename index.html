@@ -9,7 +9,9 @@
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1018;--card:#111a26;--ink:#e7edf5;--mut:#8a98ab;--line:#1f2c3d;--up:#3fcf99;--dn:#ff7b72;--warn:#2b2414;--acc:#86b2ff;--acc2:#15233a;--chip:#18222f;--shadow:none;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#0a1018;--card:#111a26;--ink:#e7edf5;--mut:#8a98ab;--line:#1f2c3d;--up:#3fcf99;--dn:#ff7b72;--warn:#2b2414;--acc:#86b2ff;--acc2:#15233a;--chip:#18222f;--shadow:none;color-scheme:dark}
 [hidden]{display:none!important}*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-body{padding:env(safe-area-inset-top) 0 calc(72px + env(safe-area-inset-bottom))}
+body{padding:env(safe-area-inset-top) 0 calc(124px + env(safe-area-inset-bottom))}
+.rbar{position:fixed;left:0;right:0;bottom:calc(50px + env(safe-area-inset-bottom));display:flex;gap:8px;align-items:center;justify-content:space-between;padding:6px max(12px,env(safe-area-inset-left,0px)) 6px max(12px,env(safe-area-inset-left,0px));background:var(--card);border-top:1px solid var(--line);font-size:12px;z-index:5}
+.rbar span{min-width:0}.rbar.bloque{background:var(--warn)}.rbar button{flex:none;border:0;border-radius:99px;padding:8px 12px;background:var(--dn);color:var(--card);font-weight:800;font-size:13px}.rbar.stopon button{background:var(--ink)}
 .warn{background:var(--warn);padding:6px max(16px,env(safe-area-inset-left,0px));font-size:12px;text-align:center}
 main{max-width:600px;margin:0 auto;padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 h2{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:22px 0 8px}
@@ -141,6 +143,13 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 <label>Glissement par côté (%)<input id="slip" type="number" min="0" step="0.01"></label>
 <div class="mut">Le stop fixe ci-dessus reste un plafond : le stop ATR ne peut jamais être plus large.</div>
 <label>Arrêt automatique des agents après (minutes)<input id="maxRuns" type="number" min="1"></label>
+<h2>Couche de risque</h2>
+<div class="mut">Règles en code pur, sans agent ni modèle, avec droit de veto. Elles peuvent seulement réduire ou bloquer une entrée, jamais l'agrandir.</div>
+<label>Risque maximal par trade (% du capital)<input id="riskPct" type="number" min="0.05" max="5" step="0.05"></label>
+<div class="mut">La taille est calculée pour qu'un stop à N × ATR (ou le stop réel s'il est plus large) ne fasse perdre que ce pourcentage. Elle ne dépasse jamais « taille d'un achat × achats par décision ».</div>
+<label>Coupe-circuit : baisse maximale depuis le plus haut (%)<input id="ddMax" type="number" min="1" max="50" step="1"></label>
+<div class="mut">Barème : baisse sous 5 % → taille normale ; de 5 à 10 % → moitié ; au-delà → quart ; à ce seuil → plus aucune nouvelle entrée.</div>
+<label>Heartbeat : délai sans prix frais avant blocage (secondes)<input id="hb" type="number" min="2" max="60" step="1"></label>
 <h2>Testnet Binance (facultatif)</h2>
 <div class="mut">Compte fictif uniquement. Les clés restent en mémoire et disparaissent si tu fermes la page. Ne mets jamais les clés de ton vrai compte.</div>
 <label>Clé d'API testnet<input id="k" autocomplete="off"></label>
@@ -160,6 +169,7 @@ nav button{flex:1;padding:14px 4px;border:0;background:none;font-weight:600;colo
 <div class="mut" id="setmsg" role="status"></div>
 </section>
 </main>
+<div class="rbar" id="rbar"><span id="rbst">Entrées : vérification…</span><button id="kill2" type="button">Arrêt d'urgence</button></div>
 <nav><button class="on" data-t="0">Accueil</button><button data-t="1">Agents</button><button data-t="2">Réglages</button></nav>
 
 <script>
@@ -254,9 +264,21 @@ function choisir(F,t,c,R){let b=null;const refus=[];
     if(r){refus.push({q,r,pr:s.pr});continue}if(!b||Math.abs(s.sc)>Math.abs(b.sc))b={q,...s}}
   return{b,refus}}
 // Éclair passe nb achats identiques d'un coup : la position totale vaut nb × la taille d'une position.
-function ouvrir(F,q,t,dir,pr,c,R,px){const P=F.p[q],nb=c.nb||1,sz=c.size*nb;px=px??P.c[t];const s=c.slip/100,fill=dir==='long'?px*(1+s):px*(1-s),n=sz/fill;
+function ouvrir(F,q,t,dir,pr,c,R,px,taille){const P=F.p[q],nb=c.nb||1,sz=taille||c.size*nb;px=px??P.c[t];const s=c.slip/100,fill=dir==='long'?px*(1+s):px*(1-s),n=sz/fill;
   const dist=R.atr?Math.min(c.atrK*P.atr[t],c.sl/100*px):c.sl/100*px;
   return{q,side:dir,n,nb,size:sz,fill,px,dist,stop:dir==='long'?px-dist:px+dist,best:px,t0:F.T[t],p:pr,rev:0,fe:sz*c.fee/100}}
+// ---------- Couche de risque : code pur, aucun appel à un agent ni à un modèle. Elle a un droit de veto. ----------
+// 1. Taille selon l'ATR : la position est dimensionnée pour qu'un stop à N × ATR (ou le stop réel s'il est plus large)
+//    ne fasse perdre que c.riskPct % du capital. Elle ne dépasse jamais la taille maximale configurée (taille d'un achat × achats).
+// 2. Barème selon la baisse depuis le plus haut du capital : moins de 5 % → taille normale ; 5 à 10 % → moitié ; au-delà → quart.
+// 3. Coupe-circuit : à partir de c.ddMax % de baisse depuis le plus haut, aucune nouvelle entrée.
+const BAREME_DD=[[.05,1],[.10,.5],[Infinity,.25]];
+function distanceStop(F,q,t,c,R){const P=F.p[q],reel=R.atr?Math.min(c.atrK*P.atrP[t],c.sl/100):c.sl/100;return Math.max(reel,c.atrK*P.atrP[t])}
+function risque(c,eq,pk,dist){const dd=pk>0?Math.max(0,(pk-eq)/pk):0;
+  if(dd>=c.ddMax/100)return{ok:false,regle:`coupe-circuit : baisse de ${(dd*100).toFixed(1).replace('.',',')} % depuis le plus haut (maximum ${c.ddMax} %)`,dd,taille:0};
+  const f=BAREME_DD.find(x=>dd<x[0])[1],max=c.size*(c.nb||1),brute=dist>0?eq*c.riskPct/100/dist:max,taille=Math.min(max,brute)*f;
+  if(taille<10)return{ok:false,regle:'taille de risque trop petite (moins de 10 $)',dd,taille:0};
+  return{ok:true,dd,f,taille,brute,max}}
 // Vérifie le stop avec le plus bas et le plus haut connus (une bougie, ou le prix d'un tick), puis fait suivre le stop.
 // Renvoie le prix de sortie si le stop est touché (au pire entre le stop et l'ouverture si le prix a sauté par-dessus).
 function stopTick(P,lo,hi,R,ouv){if(P.side==='long'){if(lo<=P.stop)return Math.min(P.stop,ouv??P.stop);if(R.atr){P.best=Math.max(P.best,hi);P.stop=Math.max(P.stop,P.best-P.dist)}}
@@ -277,7 +299,7 @@ function simuler(F,from,to,c,R){let cash=1e4,P=null,nT=0,lossD=0,pk=1e4,dd=0,day
   for(let t=from;t<to;t++){const dj=new Date(F.T[t]).toISOString().slice(0,10);if(dj!==day){day=dj;nT=0;lossD=0}
     if(P){const x=F.p[P.q].C[t],hit=stopTick(P,x.l,x.h,R,x.o);if(hit!==null)sortir(t,hit);else if(sortieCloture(F,P,t,c,R))sortir(t,x.c)}
     else if(nT+(c.nb||1)<=c.maxTrades&&-lossD<1e4*c.maxLoss/100&&cash>=c.size*(c.nb||1)*(1+c.fee/100)&&(!R.cool||(F.T[t]-lastX)/TF.bar>=4)){const{b}=choisir(F,t,c,R);
-      if(b){P=ouvrir(F,b.q,t,b.dir,b.pr,c,R);cash-=P.size+P.fe;nT+=P.nb}}
+      if(b){const rk=risque(c,cash,pk,distanceStop(F,b.q,t,c,R));if(rk.ok){P=ouvrir(F,b.q,t,b.dir,b.pr,c,R,undefined,rk.taille);cash-=P.size+P.fe;nT+=P.nb}}}
     const un=P?(P.side==='long'?1:-1)*P.n*(F.p[P.q].c[t]-P.fill):0,eq=cash+(P?P.size+un:0);pk=Math.max(pk,eq);dd=Math.max(dd,(pk-eq)/pk);m++;st+=m;se+=eq;stt+=m*m;see+=eq*eq;ste+=m*eq;if(m%ech===0)EQ.push(+eq.toFixed(2))}
   if(P)sortir(to-1,F.p[P.q].c[to-1]); // une position encore ouverte est clôturée au dernier prix pour être comptée
   const w=T.filter(x=>x>0);
@@ -369,10 +391,10 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-14 16:01';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-14 16:05';const TNP=['BTCUSDT','ETHUSDT'];
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n).toFixed(2)+' $',fp=n=>n.toFixed(n<10?5:2);
-const D=()=>({cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
- cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
+const D=()=>({pk:10000,cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
+ cfg:{size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:.5,ddMax:15,hb:5,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
 let S=D(),KEYS={k:'',s:''};
 try{const j=localStorage.getItem('tiq');if(j)S=Object.assign(D(),JSON.parse(j))}catch(e){}
 S.cfg=Object.assign(D().cfg,S.cfg);if(!S.cfg5){S.cfg.maxRuns=1440;S.cfg5=1}if(!S.cfg6){S.cfg.tf=10;S.cfg6=1}if(!S.cfg7){S.cfg.tf=5;S.cfg.nb=3;S.cfg7=1}setTF(S.cfg.tf);if(S.sim&&S.sim.tf!==TF.min){S.sim=0;S.rules={}}if(S.sim&&S.sim.v!==6){S.sim=0;S.rules={}}S.rules=S.rules||{};
@@ -391,7 +413,7 @@ const logA=t=>{S.log.unshift(`${hr()} · ${t}`);S.log=S.log.slice(0,40)};
 // répond seul par un pong. Rien n'est envoyé au serveur (abonnement dans l'adresse), donc la limite de 5 messages entrants/s
 // n'est pas en jeu. Une connexion dure au plus 24 h : on en ouvre une nouvelle à 23 h 30 avant de fermer l'ancienne.
 const LV={CS:{},ws:null,st:'DÉMARRAGE',last:0,lag:null,cnt:0,rate:0,bid:{},ask:{},px:{},C1:{},bad:new Set(),retry:0,sync:true,ready:false,ban:0,done:{},excl:[],note:''};
-const fresh=()=>LV.ready&&!LV.sync&&LV.ws&&LV.ws.readyState===1&&Date.now()-LV.last<=5000;
+const fresh=()=>LV.ready&&!LV.sync&&LV.ws&&LV.ws.readyState===1&&Date.now()-LV.last<=(S.cfg.hb||5)*1e3;
 async function rest(path){return restGet(fetch,PUB+path,m=>{LV.note=m})}
 async function chargerInitial(){LV.sync=true;LV.note=`Chargement des 1000 dernières bougies de ${TF.src} de chaque paire…`;const L=[...WL.CRYPTO,...WL.FOREX];
   for(let i=0;i<L.length;i+=4)await Promise.all(L.slice(i,i+4).map(async q=>{try{const r=await rest(`/api/v3/klines?symbol=${q}&interval=${TF.src}&limit=1000`);
@@ -425,7 +447,7 @@ function bougieSource(s,k){const a=LV.CS[s];if(!a)return;const c={t:k.t,o:+k.o,h
   if(!LV.done[t]){LV.done[t]=1;setTimeout(()=>decider(t,false),3000)}} // 3 s pour recevoir la fermeture de toutes les paires
 // Garde-fou : chaque seconde, état de la connexion, messages par seconde, et pause si plus rien n'arrive depuis 5 s.
 setInterval(()=>{LV.rate=LV.cnt;LV.cnt=0;const o=LV.ws&&LV.ws.readyState===1,age=Date.now()-LV.last;
-  LV.st=!LV.ready?(LV.note?'HORS LIGNE':'DÉMARRAGE'):!o?'RECONNEXION…':LV.sync?'RESYNCHRONISATION…':age>5000?'DONNÉES FIGÉES':'EN DIRECT';
+  LV.st=!LV.ready?(LV.note?'HORS LIGNE':'DÉMARRAGE'):!o?'RECONNEXION…':LV.sync?'RESYNCHRONISATION…':age>(S.cfg.hb||5)*1e3?'DONNÉES FIGÉES':'EN DIRECT';
   if(o&&age>15000){LV.note='Aucun message depuis 15 s : nouvelle connexion.';try{LV.ws.close()}catch(e){}}},1000);
 
 /* ---------- Décisions ---------- */
@@ -498,10 +520,12 @@ async function decider0(t,manuel){const c=S.cfg,A=[],d0=today(),R=S.rules,W=v=>v
   else if(b){act='open';d=b.dir==='long'?'ENTRER EN HAUSSE':'ENTRER EN BAISSE';const bs=sigAt(F.p[b.q],i,R);why=`${b.q} : indice ${Math.round(bs.pr*100)} %, au-dessus du seuil de ${c.thr} %.`}
   else if(refus.length)why=`${refus[0].q} passe le seuil mais est refusé : ${refus[0].r}.`;
   A.push({n:'Chef',s:`${d}`,t:`${d} : ${why} L’indice de confiance est une note du bot, pas une probabilité. Changements actifs : ${RULES().join(', ')||'aucun (version de départ)'}.`});
-  let ok=true,rr=act==='close'?'Sortie toujours autorisée.':act?`Validé : ${c.nb} achat${c.nb>1?'s':''} de ${fmt(c.size)}.`:'Rien à valider.';
+  let RK=null,ok=true,rr=act==='close'?'Sortie toujours autorisée.':act?`Validé : ${c.nb} achat${c.nb>1?'s':''} de ${fmt(c.size)}.`:'Rien à valider.';
   if(act==='open'){if(S.stop){ok=false;rr='Bloqué : arrêt d’urgence actif.'}else if(S.nToday+c.nb>c.maxTrades){ok=false;rr=`Bloqué : ${c.nb} achats dépasseraient le maximum de ${c.maxTrades} trades par jour.`}
     else if(-S.lossToday>=S.start*c.maxLoss/100){ok=false;rr='Bloqué : perte maximale du jour atteinte.'}else if(S.cash<c.size*c.nb*(1+c.fee/100)){ok=false;rr=`Bloqué : solde fictif insuffisant pour ${c.nb} achats de ${fmt(c.size)}.`}
-    else if(!fresh()){ok=false;rr='Bloqué : données figées.'}}
+    else if(!fresh()){ok=false;rr=`Bloqué : règle heartbeat (aucun prix frais depuis plus de ${c.hb} s).`}
+    else{RK=risque(c,valeur(),Math.max(S.pk||S.start,valeur()),distanceStop(F,b.q,i,c,R));if(!RK.ok){ok=false;rr=`Bloqué : règle ${RK.regle}.`}
+      else rr=`Validé : ${c.nb} achat${c.nb>1?'s':''}, taille de risque ${fmt(RK.taille)} (${String(c.riskPct).replace('.',',')} % du capital au stop${RK.f<1?`, réduite à ${RK.f*100} % par le barème de baisse`:''}${RK.brute>RK.max?', plafonnée à la taille maximale':''}).`}}
   A.push({n:'Risque',s:ok?'Feu vert':'Veto',t:rr+' Le Chef ne peut pas contourner ce veto.'});
   // Journal : la décision de Boussole (et le veto éventuel de Bouclier) est écrite ici, avant tout ordre et tout résultat.
   const jq=act==='open'?b.q:q,jid=await jrAjouter({agent:'Boussole',type:act==='open'?'entrée':act==='close'?'sortie':'abstention',paire:jq,sens:act==='open'?b.dir:P?P.side:s.dir,raison:why,confiance:act==='open'?Math.round(b.pr*100):pc,prix:jrPrix(jq),entrees:jrEntrees(F,i,jq,RA),trade:act==='close'?P.jid||null:null});
@@ -509,10 +533,10 @@ async function decider0(t,manuel){const c=S.cfg,A=[],d0=today(),R=S.rules,W=v=>v
   if(act==='close'&&P)P.jsx=jid;
   let ex='Aucun ordre.';
   if(act==='open'&&ok){const px=b.dir==='long'?LV.ask[b.q]:LV.bid[b.q];if(!px)ex='Aucun prix d’achat/vente reçu : ordre annulé.';else{
-    const N=ouvrir(F,b.q,i,b.dir,b.pr,c,R,px);N.t0=tb;N.te=Date.now();N.jid=jid;S.pos=N;S.cash-=N.size+N.fe;S.nToday+=N.nb;
-    ex=`${b.q} : ${N.nb} achat${N.nb>1?'s':''} fictif${N.nb>1?'s':''} de ${fmt(c.size)} (${fmt(N.size)} au total), en ${b.dir==='long'?'hausse':'baisse'} à ${fp(N.fill)} (prix ${b.dir==='long'?'vendeur':'acheteur'} + glissement), stop ${fp(N.stop)}${R.atr?' suiveur':''}.`;
-    if(c.tn==='1'&&manuel&&b.dir==='long'&&TNP.includes(b.q))for(let k=0;k<N.nb;k++)ex+=' '+await testnetOrder('BUY',0,c.size,b.q);
-    logA(`${b.q} : ${N.nb} × ${fmt(c.size)} en ${b.dir==='long'?'hausse':'baisse'} à ${fp(N.fill)} (indice ${Math.round(b.pr*100)} %)`)}}
+    const N=ouvrir(F,b.q,i,b.dir,b.pr,c,R,px,RK.taille);N.t0=tb;N.te=Date.now();N.jid=jid;S.pos=N;S.cash-=N.size+N.fe;S.nToday+=N.nb;
+    ex=`${b.q} : ${N.nb} achat${N.nb>1?'s':''} fictif${N.nb>1?'s':''} de ${fmt(N.size/N.nb)} (${fmt(N.size)} au total, taille de risque), en ${b.dir==='long'?'hausse':'baisse'} à ${fp(N.fill)} (prix ${b.dir==='long'?'vendeur':'acheteur'} + glissement), stop ${fp(N.stop)}${R.atr?' suiveur':''}.`;
+    if(c.tn==='1'&&manuel&&b.dir==='long'&&TNP.includes(b.q))for(let k=0;k<N.nb;k++)ex+=' '+await testnetOrder('BUY',0,Math.floor(N.size/N.nb),b.q);
+    logA(`${b.q} : ${N.nb} × ${fmt(N.size/N.nb)} en ${b.dir==='long'?'hausse':'baisse'} à ${fp(N.fill)} (indice ${Math.round(b.pr*100)} %)`)}}
   else if(act==='close'){const px=P.side==='long'?LV.bid[P.q]:LV.ask[P.q];ex=px?await cloturer(px,why.replace(/\.$/,'').toLowerCase(),manuel):'Aucun prix reçu : sortie reportée.'}
   A.push({n:'Exécuteur fictif',s:act==='open'&&ok&&S.pos?'Ordre passé':act==='close'?'Position fermée':'Aucun ordre',t:ex+(c.tn==='1'&&manuel?' Le testnet ne reçoit que BTC et ETH, en hausse.':'')});
   const L=S.trades.length,w=S.trades.filter(x=>x>0).length;
@@ -659,8 +683,11 @@ function paint(){const st=LV.st,cl=st==='EN DIRECT'?'ok':st==='DONNÉES FIGÉES'
   put('src',st==='EN DIRECT'?'Prix Binance en direct (lecture seule). Ordres seulement au testnet.':st==='DONNÉES FIGÉES'?'Données figées : aucun nouveau trade.':st==='HORS LIGNE'?'Binance injoignable : aucun prix, aucun trade.':'Connexion aux prix Binance…');
   put('stock',SAVEERR||(SAVED?`Dernière sauvegarde automatique : ${hr(SAVED)} · ${S.hist.length} trades enregistrés.`:'Aucune sauvegarde pour l’instant.'));
   if(JR.db&&PV.jn!==JR.n+'|'+JR.integre){PV.jn=JR.n+'|'+JR.integre;fwdHTML()}
+  {const c=S.cfg,v=valeur(),pk=Math.max(S.pk||S.start,v),dd=(pk-v)/pk,f=BAREME_DD.find(x=>dd<x[0])[1],o=!S.stop&&fresh()&&dd<c.ddMax/100;
+    const t=S.stop?'Arrêt d’urgence actif : aucune nouvelle entrée.':!fresh()?`Entrées bloquées : aucun prix frais depuis plus de ${c.hb} s (heartbeat).`:dd>=c.ddMax/100?`Entrées bloquées : coupe-circuit (baisse de ${(dd*100).toFixed(1).replace('.',',')} %).`:`Entrées autorisées · baisse ${(dd*100).toFixed(1).replace('.',',')} % · taille ${f*100} %`;
+    put('rbst',t);const cl='rbar'+(o?'':' bloque')+(S.stop?' stopon':'');if(PV.rcl!==cl){PV.rcl=cl;$('rbar').className=cl}put('kill2',S.stop?'Remettre en marche':'Arrêt d’urgence')}
   const n=prochaine();put('fst',timer?`EN SERVICE · décision dans ${n.m} min`:"AGENTS À L'ARRÊT");
-  const v=valeur();put('bal',fmt(v));put('f1',fmt(v));
+  const v=valeur();if(v>(S.pk||0))S.pk=v;put('bal',fmt(v));put('f1',fmt(v));
   const P=S.pos;if(P){const px=(P.side==='long'?LV.bid[P.q]:LV.ask[P.q])||P.px;put('plat',fmt((P.side==='long'?1:-1)*P.n*(px-P.fill)));put('pstop',fp(P.stop))}}
 setInterval(()=>{paint();if(S.pos)save()},250);
 const dt=x=>new Date(x).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'2-digit'}),pct=x=>(x*100).toFixed(1).replace('.',',')+' %',sg$=x=>`<b class="${x>=0?'up':'dn'}">${fmt(x)}</b>`;
@@ -722,8 +749,9 @@ $('auto').onclick=()=>{if(timer){stopAuto();return}
   timer=setTimeout(()=>stopAuto('Durée maximale atteinte : agents arrêtés.'),S.cfg.maxRuns*60000);$('auto').textContent=$('auto2').textContent='Arrêter les agents';$('auto').classList.add('stop');
   $('auto-st').textContent=`Agents en service : ils décident à chaque fermeture de bougie de ${TF.lab} (prochaine à ${hr(Math.ceil(Date.now()/TF.bar)*TF.bar)}). Stops vérifiés à chaque prix reçu. Arrêt automatique après ${S.cfg.maxRuns} min.`;renderAgents();decider(0,false)};
 $('go').onclick=()=>decider(0,true);
+$('kill2').onclick=()=>$('kill').onclick();
 $('kill').onclick=()=>{S.stop=!S.stop;if(S.stop&&timer)stopAuto('Arrêt d\'urgence actif : agents arrêtés, aucune nouvelle entrée. Un stop ouvert reste surveillé.');save();render();$('msg').textContent=S.stop?'Tout est suspendu : aucun nouvel ordre.':'Reprise possible.'};
-const NUM={nb:[1,10],size:[10,1e6],maxLoss:[.5,100],maxTrades:[1,1000],sl:[.5,50],thr:[50,99],hold:[0,200],atrK:[.5,10],fee:[0,2],slip:[0,2],maxRuns:[1,100000]};
+const NUM={riskPct:[.05,5],ddMax:[1,50],hb:[2,60],nb:[1,10],size:[10,1e6],maxLoss:[.5,100],maxTrades:[1,1000],sl:[.5,50],thr:[50,99],hold:[0,200],atrK:[.5,10],fee:[0,2],slip:[0,2],maxRuns:[1,100000]};
 $('save').onclick=()=>{for(const k in NUM){const v=parseFloat(String($(k).value).replace(',','.'));if(isFinite(v))S.cfg[k]=Math.min(NUM[k][1],Math.max(NUM[k][0],v))}
   const tf0=S.cfg.tf;S.cfg.tf=+$('tf').value;S.cfg.news=$('news').value;S.cfg.rsrc=$('rsrc').value;S.cfg.tn=$('tn').value;KEYS={k:$('k').value.trim(),s:$('s').value.trim()};RD.at=0;
   $('k').value='';$('s').value='';fillCfg();S.sim=0;S.rules={};save();render();$('setmsg').textContent='Réglages enregistrés. Relance la mesure : les changements gardés dépendent de ces réglages.'+(KEYS.k?' Clés gardées en mémoire pour cette session.':'');

@@ -27,7 +27,7 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
           const k0=Math.floor(t/3e5)*3e5;ws.send(JSON.stringify({stream:s.toLowerCase()+'@kline_5m',data:{e:'kline',E:t-40,s,k:{t:k0,T:k0+3e5-1,s,i:'5m',o:String(c),c:String(c),h:String(c),l:String(c),v:'10',x:false}}}));sent+=2}}},100);
     ws.onClose(()=>clearInterval(iv))});
   await p.goto('file://'+path.join(__dirname,'..','index.html'));
-  for(const t of ['1','2','0']){await p.click(`nav button[data-t="${t}"]`);ok(await p.isVisible(`#t${t}`),`onglet ${t} visible`)}
+  for(const t of ['1','2','0']){await p.click(`nav button[data-t="${t}"]`);ok(await p.isVisible(`#t${t}`)&&await p.isVisible('#kill2'),`onglet ${t} visible, arrêt d’urgence visible`)}
   await p.waitForFunction(()=>document.getElementById('cst').textContent==='EN DIRECT',null,{timeout:20000});ok(true,'prix en continu : état « EN DIRECT »');
   await p.waitForTimeout(2500);const rate=parseInt(await p.textContent('#crate')),lag=await p.textContent('#clag');
   console.log(`     ${rate} messages/s affichés, ${lag}`);ok(rate>100&&/délai \d+ ms/.test(lag),'débit et délai affichés');
@@ -36,7 +36,7 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   await p.click('nav button[data-t="2"]');await p.fill('#thr','50');await p.click('#save');await p.click('nav button[data-t="0"]');
   await p.click('#go');await p.waitForFunction(()=>/Évaluation terminée|Historique|figées/.test(document.getElementById('msg').textContent),null,{timeout:15000});
   const pos=await p.evaluate(()=>S.pos&&{q:S.pos.q,side:S.pos.side,stop:S.pos.stop,px:S.pos.px,nb:S.pos.nb,size:S.pos.size,day:S.nToday});ok(!!pos,'entrée fictive à l’évaluation manuelle'+(pos?` (${pos.q} en ${pos.side==='long'?'hausse':'baisse'}, stop ${pos.stop.toFixed(4)})`:''));
-  if(pos)ok(pos.nb===3&&Math.abs(pos.size-3000)<1e-6&&pos.day===3,`3 achats par décision (${pos.nb} × 1000 $ = ${pos.size} $, ${pos.day} trades comptés)`);
+  if(pos)ok(pos.nb===3&&pos.size>0&&pos.size<=3000+1e-6&&pos.day===3,`3 achats par décision, taille de risque plafonnée (${pos.nb} achats, ${pos.size.toFixed(2)} $ ≤ 3000 $, ${pos.day} trades comptés)`);
   if(pos){const t0=Date.now();shift[pos.q]=pos.side==='long'?-.05:.05;
     await p.waitForFunction(()=>!S.pos,null,{timeout:5000}).catch(()=>{});const dt=Date.now()-t0,lg=await p.textContent('#log');
     ok(/stop touché au tick/.test(lg),`stop déclenché au tick (sortie ${dt} ms après le saut de prix)`);shift={}}
@@ -58,6 +58,11 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   await p.waitForEvent('load');await p.waitForFunction(()=>typeof S!=='undefined');ok(Math.abs(await p.evaluate(()=>S.cash)-avant)<1e-6,'restauration du JSON après rechargement');
   ok(/Dernière sauvegarde automatique|Aucune sauvegarde/.test(await p.textContent('#stock')),'état de la sauvegarde affiché');
   await p.waitForFunction(()=>document.getElementById('cst').textContent==='EN DIRECT',null,{timeout:20000});await p.click('nav button[data-t="0"]');
+  // Coupe-circuit : plus haut fictif à 20 000 $ → baisse de 50 % → veto de la couche de risque, écrit au journal
+  await p.evaluate(()=>{S.pk=20000;S.cfg.thr=50});await p.click('#go');await p.waitForFunction(()=>/Évaluation terminée/.test(document.getElementById('msg').textContent),null,{timeout:15000});
+  const cc=await p.evaluate(async()=>{await JR.file;const L=await jrTout();return{pos:!!S.pos,veto:L.some(r=>r.agent==='Bouclier'&&/coupe-circuit/.test(r.raison))}});
+  ok(!cc.pos&&cc.veto&&/coupe-circuit/.test(await p.textContent('#rbst')),'coupe-circuit : aucune entrée, veto écrit au journal avec la règle');
+  await p.evaluate(()=>{S.pk=S.cash;save()});
   // Démarrage, fermeture de bougie 1 h reçue par le flux, puis arrêt d'urgence
   await p.click('#auto');ok(/Agents en service/.test(await p.textContent('#auto-st')),'démarrage des agents');
   // Fermeture de bougies de 5 min reçues par le flux.
@@ -71,7 +76,7 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   await p.click('#kill');ok(/Arrêt d'urgence actif/.test(await p.textContent('#auto-st')),'arrêt d’urgence stoppe les agents');await p.click('#kill');
   // Coupure : plus aucun message -> données figées ; puis connexion fermée et refusée -> reconnexion avec délai croissant
   mode='silent';await p.waitForFunction(()=>document.getElementById('cst').textContent==='DONNÉES FIGÉES',null,{timeout:9000}).then(()=>ok(true,'silence de plus de 5 s : « DONNÉES FIGÉES »')).catch(()=>ok(false,'données figées'));
-  ok(await p.evaluate(()=>!fresh()),'aucun trade possible pendant les données figées');
+  ok(await p.evaluate(()=>!fresh())&&/heartbeat/.test(await p.textContent('#rbst')),'heartbeat : entrées bloquées et état affiché pendant les données figées');
   const c0=conns;mode='refuse';cur.close();await p.waitForFunction(()=>document.getElementById('cst').textContent==='RECONNEXION…',null,{timeout:5000}).then(()=>ok(true,'coupure : « RECONNEXION… »')).catch(()=>ok(false,'état reconnexion'));
   await p.waitForTimeout(4500);console.log(`     ${conns-c0} tentatives refusées en 4,5 s (attendu : délais 1 s, 2 s…)`);ok(conns-c0>=2&&conns-c0<=4,'délai de reconnexion croissant');
   mode='live';await p.waitForFunction(()=>document.getElementById('cst').textContent==='EN DIRECT',null,{timeout:20000}).then(()=>ok(true,'retour du réseau : reconnexion puis « EN DIRECT »')).catch(()=>ok(false,'reconnexion'));
