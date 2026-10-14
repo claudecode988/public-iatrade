@@ -54,6 +54,7 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   ok(/Familles sur 12 mois/.test(sv)&&/Suivi de tendance lent/.test(sv)&&/Acheter et garder/.test(sv)&&/(Candidate|Aucune stratégie ne bat)/.test(sv),'comparatif des familles de stratégies affiché');
   ok(/Pistes pour des résultats plus réguliers/.test(sv)&&/Régime du bitcoin/.test(sv)&&/annonces de la Fed/.test(sv)&&/Taux de financement/.test(sv)&&/Volatilité cible|volatilité cible/.test(sv),'pistes de régularité (sources des pros) et familles prudentes affichées');
   ok(/Familles sur 3 ans/.test(sv)&&/Élan sur 4 semaines/.test(sv)&&/Cassures de Donchian/.test(sv)&&/Forward test des familles/.test(sv),'familles sur 3 ans, élan, Donchian et forward test des familles affichés');
+  {const ab=await p.textContent('#abs');ok(/Le serveur travaille|Serveur en retard/.test(ab)&&/Gaston/.test(ab)&&/décisions depuis/.test(ab),'onglet Agents : décisions du serveur pendant l’absence, avec les noms des animaux');}
   await p.click('nav button[data-t="2"]');await p.click('#gelgo');await p.waitForFunction(()=>!!S.gel);
   ok(await p.isDisabled('#thr')&&/Gelée le/.test(await p.textContent('#gelst')),'geler la configuration : réglages de stratégie verrouillés');
   await p.click('#gelgo');await p.click('#gelgo');ok(await p.evaluate(()=>!S.gel)&&!(await p.isDisabled('#thr')),'dégeler avec confirmation');
