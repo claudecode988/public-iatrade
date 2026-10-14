@@ -34,4 +34,10 @@ Ce que regardent les traders professionnels, en version gratuite, publique et sa
 
 Ces sources sont des **règles à essayer** (`regime`, `macro`, `fund`), désactivées dans la configuration gelée. La mesure longue les ajoute une par une aux agents (tableau « Pistes pour des résultats plus réguliers ») et compare aussi trois familles prudentes : tendance + régime, tendance + volatilité cible (2,5 % par jour, ne fait que réduire l'exposition), et la combinaison des deux avec la pause Fed. Rien n'est adopté automatiquement.
 
+## Autres familles et forward test des familles
+
+- **Élan sur 4 semaines** (momentum « série temporelle », l'effet le plus solide dans les études sur les cryptos) et **cassures de Donchian** 10/20/40 jours (méthode des « tortues »), toutes deux avec volatilité cible et revue quotidienne. Le momentum « en coupe » (acheter les meilleures paires du moment) n'est pas testé : les études le trouvent fragile une fois les frais comptés.
+- **Familles sur 3 ans** (bougies d'1 h, `MOIS3=36`) dans la mesure longue, pour voir plusieurs phases de marché.
+- **`tools/familles-fw.cjs`** : forward test 24 h/24 de toutes les familles, 10 000 $ fictifs chacune, une décision par heure fermée, journal `familles.jsonl` chaîné par SHA-256.
+
 Version en ligne : https://claudecode988.github.io/public-iatrade/
