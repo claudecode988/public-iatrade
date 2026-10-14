@@ -40,6 +40,16 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   if(pos){const t0=Date.now();shift[pos.q]=pos.side==='long'?-.05:.05;
     await p.waitForFunction(()=>!S.pos,null,{timeout:5000}).catch(()=>{});const dt=Date.now()-t0,lg=await p.textContent('#log');
     ok(/stop touché au tick/.test(lg),`stop déclenché au tick (sortie ${dt} ms après le saut de prix)`);shift={}}
+  // Sauvegarde et export
+  await p.click('nav button[data-t="2"]');
+  const [dl]=await Promise.all([p.waitForEvent('download'),p.click('#excsv')]);const csv=require('fs').readFileSync(await dl.path(),'utf8');
+  ok(/^\ufeff?entree;sortie;paire/.test(csv)&&csv.split('\r\n').length>=2&&/stop touché au tick/.test(csv),`export CSV des trades (${csv.split('\r\n').length-1} ligne(s))`);
+  const [dj]=await Promise.all([p.waitForEvent('download'),p.click('#exjson')]);const js=JSON.parse(require('fs').readFileSync(await dj.path(),'utf8'));
+  ok(js.etat&&js.etat.hist.length>=1&&!JSON.stringify(js).includes('"k":')&&js.argentFictif===true,'export JSON complet, sans clés testnet');
+  const avant=await p.evaluate(()=>S.cash);await p.evaluate(()=>{S.cash=1;save()});await p.setInputFiles('#imjson',{name:'s.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(js))});
+  await p.waitForEvent('load');await p.waitForFunction(()=>typeof S!=='undefined');ok(Math.abs(await p.evaluate(()=>S.cash)-avant)<1e-6,'restauration du JSON après rechargement');
+  ok(/Dernière sauvegarde automatique|Aucune sauvegarde/.test(await p.textContent('#stock')),'état de la sauvegarde affiché');
+  await p.waitForFunction(()=>document.getElementById('cst').textContent==='EN DIRECT',null,{timeout:20000});await p.click('nav button[data-t="0"]');
   // Démarrage, fermeture de bougie 1 h reçue par le flux, puis arrêt d'urgence
   await p.click('#auto');ok(/Agents en service/.test(await p.textContent('#auto-st')),'démarrage des agents');
   // Fermeture de bougies de 5 min reçues par le flux.
