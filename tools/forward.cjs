@@ -45,7 +45,19 @@ const BASES=['https://data-api.binance.vision','https://api.binance.com'],FNG='h
   const resultat=(cible,res)=>ajout({k:'resultat',cible,resultat:res});
   const d0=new Date(now).toISOString().slice(0,10);if(S.day!==d0){S.day=d0;S.nToday=0;S.lossToday=0}
   const cloturer=(price,raison,jid,t)=>{const P=S.pos,r=E.fermer(P,price,c);S.frais=(S.frais||0)+P.fe+r.xf;S.gliss=(S.gliss||0)+r.slip;S.cash+=P.size+r.g-r.xf;S.trades.push(+r.pnl.toFixed(4));S.lossToday+=r.pnl;S.nToday+=P.nb;S.lastX=t;
-    const res={statut:'trade clos',net:+r.pnl.toFixed(4),frais:+(P.fe+r.xf).toFixed(4),glissement:+r.slip.toFixed(4),prixSortie:r.fx,raison};resultat(P.jid,res);resultat(jid,res);S.pos=null};
+    const res={statut:'trade clos',net:+r.pnl.toFixed(4),frais:+(P.fe+r.xf).toFixed(4),glissement:+r.slip.toFixed(4),prixSortie:r.fx,raison};
+    if(r.pnl<0)Object.assign(res,analysePerte(P,r,price,raison,t));resultat(P.jid,res);resultat(jid,res);S.pos=null};
+  // Analyse automatique de chaque perte (demandée par l'utilisateur) : cause principale et contexte, écrite dans le journal.
+  // Elle ne modifie jamais les règles : une correction n'est proposée que si la même cause revient, testée sur 5 ans, et appliquée avec accord.
+  const analysePerte=(P,r,price,raison,t)=>{const sg=P.side==='long'?1:-1,mv=sg*(price/P.px-1),brut=sg*P.n*(price-P.px),couts=brut-r.pnl,min=Math.round((t-P.t0)/6e4),
+      X=F.p[P.q],tend=X?X.tr4[i]:0,pc=x=>(x*100).toFixed(2).replace('.',',')+' %',dist=P.dist/P.px;
+    let cause,txt;
+    if(/stop/.test(raison)){cause='stop touché';txt=`le prix est parti contre la position de ${pc(Math.abs(mv))} (stop placé à ${pc(dist)}) ; l'entrée était trop tôt ou dans le mauvais sens`}
+    else if(brut>0){cause='frais plus grands que le gain';txt=`le trade était gagnant avant frais (${pc(mv)}), mais les frais et le glissement (${(couts).toFixed(2)} sur ${P.size.toFixed(0)}) ont tout repris`}
+    else if(min<=60){cause='sortie trop rapide sur un signal inversé';txt=`sortie après ${min} min seulement, sur un signal inversé, alors que le prix n'avait bougé que de ${pc(mv)} : le marché n'a pas eu le temps de donner raison à l'entrée`}
+    else{cause='mauvaise entrée';txt=`le prix est allé contre la position (${pc(mv)}) pendant ${min} min avant la sortie sur signal inversé`}
+    if(tend&&tend!==sg)txt+=` ; à l'entrée, la tendance d'une heure allait dans l'autre sens (trade à contre-tendance)`;
+    return{cause,analyse:`Perte de ${(-r.pnl/100).toFixed(2)} € (base 100 €) : ${txt}.`,dureeMin:min}};
   // 1. Stops sur chaque bougie écoulée depuis le passage précédent (plus bas / plus haut), dans l'ordre.
   if(S.pos){const k0=F.T.findIndex(t=>t>Math.max(S.lastBar,S.pos.t0));for(let k=k0<0?i+1:k0;k<=i&&S.pos;k++){const x=F.p[S.pos.q]&&F.p[S.pos.q].C[k];if(!x)continue;
       const hit=E.stopTick(S.pos,x.l,x.h,R,x.o);if(hit!==null){const jid=ajout({k:'decision',agent:'Bouclier',type:'sortie',paire:S.pos.q,sens:S.pos.side,raison:`stop touché dans la bougie de ${new Date(F.T[k]).toISOString().slice(11,16)} UTC (vérifié au passage suivant)`,confiance:null,prix:{stop:S.pos.stop},trade:S.pos.jid});cloturer(hit,'stop',jid,F.T[k])}}}

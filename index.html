@@ -774,7 +774,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-15 13:27';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-15 13:46';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;
@@ -1135,7 +1135,7 @@ const court=t=>{t=String(t||'');const m=t.match(/^.{20,140}?[.!?](\s|$)/),c=m?m[
 function absHTML(){const e=$('abs');if(!e)return;const r=SV.res,L=SV.der;
   if(!r){e.innerHTML=`<div>${SV.at?SV.err||'Pas encore de données du serveur.':'Lecture du serveur…'}</div>`;return}
   const age=Math.round((Date.now()-r.maj)/6e4),ok=age<20,qui=a=>{const n=NOM_JOURNAL[a]||a,g=AG.find(x=>x.who===n);return g?`<b style="color:${g.c}">● ${n}</b>`:n};
-  const lg=(L||[]).slice(-8).reverse().map(x=>{const v=x.resultat&&typeof x.resultat.net==='number'?` → <b class="${x.resultat.net>=0?'up':'dn'}">${fmt(x.resultat.net)}</b>`:'';
+  const lg=(L||[]).slice(-8).reverse().map(x=>{const v=x.resultat&&typeof x.resultat.net==='number'?` → <b class="${x.resultat.net>=0?'up':'dn'}">${fmt(x.resultat.net)}</b>${x.resultat.analyse?`<br><span class="mut">Pourquoi : ${x.resultat.analyse.replace(/^Perte de [^:]+: /,'')}</span>`:''}`:'';
     return`<div><span class="mut">${new Date(x.ts).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span> · ${qui(x.agent)} · <b>${x.type}</b>${x.paire?' '+x.paire.replace('USDT',''):''} : ${x.raison}${v}</div>`}).join('');
   e.innerHTML=`<div><b class="${ok?'up':'dn'}">${ok?'● Le serveur travaille':'● Serveur en retard'}</b> · dernier passage il y a ${age<1?'moins d’une minute':age+' min'} · ${r.decisions} décisions depuis le ${new Date(r.debut).toLocaleDateString('fr-FR')} · valeur fictive ${fmt(r.valeur)}${r.position?` · position ouverte ${r.position.paire.replace('USDT','')}`:''}</div>`+
     (lg||'<div>Les dernières décisions apparaîtront ici après le prochain passage du serveur.</div>')+`<div class="mut">Les personnages de cette maison ne travaillent que lorsque la page est ouverte. Ceux du serveur ne s’arrêtent jamais.</div>`}
