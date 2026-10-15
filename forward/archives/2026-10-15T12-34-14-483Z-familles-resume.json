@@ -1,0 +1,316 @@
+{
+ "maj": 1792047662813,
+ "debut": 1792016028396,
+ "heure": "2026-10-15T06:00:00.000Z",
+ "pairs": 16,
+ "dernierHash": "5f862bc4c8266c3a2c24bad17ae250722dfab3b1b903636c5f4c60da1d3d91a2",
+ "faux": false,
+ "lignes": [
+  {
+   "id": "tendance",
+   "nom": "Suivi de tendance lent",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0,
+   "debut": 1792016028396,
+   "jours": 0.37,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "retour",
+   "nom": "Retour à la moyenne",
+   "valeur": 9982.05,
+   "dd": 0.0059,
+   "investi": 0.511,
+   "n": 12,
+   "frais": 7.66,
+   "debut": 1792016028396,
+   "jours": 0.37,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "reeq",
+   "nom": "Rééquilibrage hebdomadaire",
+   "valeur": 9847.95,
+   "dd": 0.0184,
+   "investi": 0.543,
+   "n": 11,
+   "frais": 8.23,
+   "debut": 1792016028396,
+   "jours": 0.37,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "bh",
+   "nom": "Acheter et garder",
+   "valeur": 9712.18,
+   "dd": 0.0338,
+   "investi": 1.002,
+   "n": 16,
+   "frais": 15,
+   "debut": 1792016028396,
+   "jours": 0.37,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "regime",
+   "nom": "Tendance lente + régime du bitcoin",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0,
+   "debut": 1792016028396,
+   "jours": 0.37,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null,
+   "hist": [
+    [
+     "2026-10-14",
+     10000
+    ],
+    [
+     "2026-10-15",
+     10000
+    ]
+   ],
+   "ouvertes": [],
+   "trades": [],
+   "nTrades": 0,
+   "demo": {
+    "valeur": 10000,
+    "dd": 0,
+    "frais": 0,
+    "hist": [
+     [
+      "2026-10-15",
+      10000
+     ]
+    ],
+    "nTrades": 0,
+    "trades": [],
+    "ouvertes": []
+   }
+  },
+  {
+   "id": "volcible",
+   "nom": "Tendance lente + volatilité cible",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0,
+   "debut": 1792016028396,
+   "jours": 0.37,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "prudente",
+   "nom": "Prudente (tendance + régime + volatilité cible + pause Fed)",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0,
+   "debut": 1792016028396,
+   "jours": 0.37,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null,
+   "hist": [
+    [
+     "2026-10-14",
+     10000
+    ],
+    [
+     "2026-10-15",
+     10000
+    ]
+   ],
+   "ouvertes": [],
+   "trades": [],
+   "nTrades": 0,
+   "demo": {
+    "valeur": 10000,
+    "dd": 0,
+    "frais": 0,
+    "hist": [
+     [
+      "2026-10-15",
+      10000
+     ]
+    ],
+    "nTrades": 0,
+    "trades": [],
+    "ouvertes": []
+   }
+  },
+  {
+   "id": "elan",
+   "nom": "Élan sur 4 semaines",
+   "valeur": 9848.23,
+   "dd": 0.0184,
+   "investi": 0.538,
+   "n": 12,
+   "frais": 8.16,
+   "debut": 1792016028396,
+   "jours": 0.37,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "donchian",
+   "nom": "Cassures de Donchian (10, 20, 40 jours)",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0,
+   "debut": 1792016028396,
+   "jours": 0.37,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "S1",
+   "nom": "S1 · Suivi de tendance (MM50/MM200)",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0,
+   "debut": 1792016028396,
+   "jours": 0.37,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "S2",
+   "nom": "S2 · Retour à la moyenne (RSI 2)",
+   "valeur": 9961.84,
+   "dd": 0.0044,
+   "investi": 0.093,
+   "n": 4,
+   "frais": 1.45,
+   "debut": 1792016028396,
+   "jours": 0.37,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "S3",
+   "nom": "S3 · Cassure de Donchian (20 jours, filtre volume)",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0,
+   "debut": 1792016028396,
+   "jours": 0.37,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "S4",
+   "nom": "S4 · Pullback dans une tendance",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0,
+   "debut": 1792016028396,
+   "jours": 0.37,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  },
+  {
+   "id": "A2",
+   "nom": "Agents version 2 (règles du dossier)",
+   "valeur": 10000,
+   "dd": 0,
+   "investi": 0,
+   "n": 0,
+   "frais": 0,
+   "debut": 1792016028396,
+   "jours": 0.37,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null,
+   "hist": [
+    [
+     "2026-10-14",
+     10000
+    ],
+    [
+     "2026-10-15",
+     10000
+    ]
+   ],
+   "ouvertes": [],
+   "trades": [],
+   "nTrades": 0,
+   "demo": {
+    "valeur": 10000,
+    "dd": 0,
+    "frais": 0,
+    "hist": [
+     [
+      "2026-10-15",
+      10000
+     ]
+    ],
+    "nTrades": 0,
+    "trades": [],
+    "ouvertes": []
+   }
+  },
+  {
+   "id": "S5",
+   "nom": "S5 · Rotation momentum mensuelle",
+   "valeur": 9610.83,
+   "dd": 0.0451,
+   "investi": 1.002,
+   "n": 2,
+   "frais": 15,
+   "debut": 1792016028396,
+   "jours": 0.37,
+   "nT": 0,
+   "n30": 0,
+   "esp30": null,
+   "arret": null
+  }
+ ]
+}
