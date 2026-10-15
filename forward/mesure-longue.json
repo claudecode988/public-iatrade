@@ -1,5 +1,5 @@
 {
- "maj": 1792048136904,
+ "maj": 1792050908568,
  "tf": "5 min",
  "mois": 12,
  "pairs": 16,
@@ -849,11 +849,11 @@
      "dd95": 0.21271279770873597
     },
     "dsr": {
-     "dsr": 2.942082505397181e-8,
+     "dsr": 1.8649884525601124e-8,
      "sr": -0.1581951691962048,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -889,11 +889,11 @@
      "dd95": 0.2222397954070564
     },
     "dsr": {
-     "dsr": 3.712503082731189e-10,
+     "dsr": 2.0617285656499007e-10,
      "sr": -0.15610514137940024,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -929,11 +929,11 @@
      "dd95": 0.3692519007608033
     },
     "dsr": {
-     "dsr": 0.003638222160435911,
+     "dsr": 0.00285656069547513,
      "sr": -0.014952041953188897,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -969,11 +969,11 @@
      "dd95": 0.46416680637409335
     },
     "dsr": {
-     "dsr": 5.874856157106478e-12,
+     "dsr": 2.69606559299973e-12,
      "sr": -0.13143504451706567,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1009,11 +1009,11 @@
      "dd95": 0.5607266310650509
     },
     "dsr": {
-     "dsr": 0.00036315056162949944,
+     "dsr": 0.00026776186232624344,
      "sr": -0.045724329376008815,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1049,11 +1049,11 @@
      "dd95": 0.6907518069600971
     },
     "dsr": {
-     "dsr": 0.0009043931388255655,
+     "dsr": 0.0006838476221843748,
      "sr": -0.035173991110186376,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1089,11 +1089,11 @@
      "dd95": 0.2294734954095947
     },
     "dsr": {
-     "dsr": 0.024143551873421987,
+     "dsr": 0.019810079481196174,
      "sr": 0.026883588691918408,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1129,11 +1129,11 @@
      "dd95": 0.3764813195503346
     },
     "dsr": {
-     "dsr": 0.0018490198918958978,
+     "dsr": 0.0014383695315031142,
      "sr": -0.030918155892903604,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1169,11 +1169,11 @@
      "dd95": 0.22743702533703644
     },
     "dsr": {
-     "dsr": 0.01440653328382141,
+     "dsr": 0.011630122604173565,
      "sr": 0.016290060525872844,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1209,11 +1209,11 @@
      "dd95": 0.29731570659991263
     },
     "dsr": {
-     "dsr": 0.004258780016779484,
+     "dsr": 0.0033516796531992132,
      "sr": -0.011206846878269509,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1249,11 +1249,11 @@
      "dd95": 0.26062378364204203
     },
     "dsr": {
-     "dsr": 0.0031385582156677194,
+     "dsr": 0.00245636271477917,
      "sr": -0.01781909468411647,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1289,11 +1289,11 @@
      "dd95": 0.07553698180427929
     },
     "dsr": {
-     "dsr": 0.014184201075466807,
+     "dsr": 0.011487455102212385,
      "sr": 0.01403625747470703,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1329,11 +1329,11 @@
      "dd95": 0.061250184902678924
     },
     "dsr": {
-     "dsr": 0.0037257212348544844,
+     "dsr": 0.0029297029981600886,
      "sr": -0.015075782989741954,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1369,11 +1369,11 @@
      "dd95": 0.25212762229195557
     },
     "dsr": {
-     "dsr": 0.010821657051027223,
+     "dsr": 0.008701422463779751,
      "sr": 0.008287444381220511,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1409,11 +1409,11 @@
      "dd95": 0.12059619877670832
     },
     "dsr": {
-     "dsr": 0.01875982509152535,
+     "dsr": 0.01515445975800378,
      "sr": 0.02533437593718041,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1449,11 +1449,51 @@
      "dd95": 0.0766476478087986
     },
     "dsr": {
-     "dsr": 0.26899213370877456,
+     "dsr": 0.24029737988096916,
      "sr": 0.09954609065738942,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
+    }
+   },
+   {
+    "id": "A3",
+    "nom": "Agents version 3 (hausse et baisse)",
+    "txt": "La version 2 dans les deux sens : achat quand la tendance de fond monte, vente à découvert quand elle baisse (bitcoin du même côté de sa moyenne 50 jours), déclencheur cassure 20 jours avec volume ou reprise / rebond raté, sortie seulement après deux clôtures de suite de l’autre côté de la MM50 (une journée contraire ne suffit pas) ou sur le stop suiveur, 1 % risqué par trade.",
+    "pnl": 1697.6898133497016,
+    "dd": 0.13000913949196405,
+    "fees": 98.69444576655393,
+    "n": 34,
+    "sharpe": 0.0744017789962508,
+    "jours": 356,
+    "trimPos": 2,
+    "trim": [
+     0,
+     0,
+     807.1971642535609,
+     1047.4999835997496
+    ],
+    "cout2": 1590.293091226633,
+    "sansFrais": 1805.8030870830517,
+    "test": 1243.5674093073867,
+    "ent": 797.8533810912413,
+    "nT": 16,
+    "expR": -0.2070587389502001,
+    "wrT": 0.3125,
+    "arret": null,
+    "pro": true,
+    "mc": {
+     "pPerte": 0.123,
+     "r5": -0.062361562161765804,
+     "r50": 0.17150571432184392,
+     "dd95": 0.15320234799082172
+    },
+    "dsr": {
+     "dsr": 0.1296926611242324,
+     "sr": 0.0744017789962508,
+     "sr0": 0.13333249867294322,
+     "T": 356,
+     "N": 18
     }
    },
    {
@@ -1489,11 +1529,11 @@
      "dd95": 0.3963385064582065
     },
     "dsr": {
-     "dsr": 0.20609407269844549,
+     "dsr": 0.18243813488369098,
      "sr": 0.08820523841202059,
-     "sr0": 0.1290462589896111,
+     "sr0": 0.13333249867294322,
      "T": 356,
-     "N": 17
+     "N": 18
     }
    }
   ],
@@ -1536,11 +1576,11 @@
      "dd95": 0.26095477086424435
     },
     "dsr": {
-     "dsr": 6.137021875129989e-7,
+     "dsr": 7.578590088264114e-7,
      "sr": -0.04741135849645052,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1576,11 +1616,11 @@
      "dd95": 0.2351446199435441
     },
     "dsr": {
-     "dsr": 0.00012216497584727204,
+     "dsr": 0.00014515524922537049,
      "sr": -0.012764115922947076,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1616,11 +1656,11 @@
      "dd95": 0.5535427050017421
     },
     "dsr": {
-     "dsr": 0.07282281749197361,
+     "dsr": 0.07941273392368625,
      "sr": 0.04136629124923714,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1658,9 +1698,9 @@
     "dsr": {
      "dsr": 0,
      "sr": -0.11631074560548783,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1696,11 +1736,11 @@
      "dd95": 0.708339572303453
     },
     "dsr": {
-     "dsr": 0.011938269309953953,
+     "dsr": 0.013417404533810295,
      "sr": 0.0219021076968737,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1736,11 +1776,11 @@
      "dd95": 0.943740258432371
     },
     "dsr": {
-     "dsr": 0.0033566890107402103,
+     "dsr": 0.0038411168774640236,
      "sr": 0.01106288895517324,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1776,11 +1816,11 @@
      "dd95": 0.3566339558996683
     },
     "dsr": {
-     "dsr": 0.3514307363768007,
+     "dsr": 0.3690451755760623,
      "sr": 0.06623681976748706,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1816,11 +1856,11 @@
      "dd95": 0.5459516916291738
     },
     "dsr": {
-     "dsr": 0.017472758488096096,
+     "dsr": 0.01954273454943173,
      "sr": 0.025964386246892873,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1856,11 +1896,11 @@
      "dd95": 0.33745353503611
     },
     "dsr": {
-     "dsr": 0.144943244907485,
+     "dsr": 0.15585475348898925,
      "sr": 0.05083801214486581,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1896,11 +1936,11 @@
      "dd95": 0.47159323016712007
     },
     "dsr": {
-     "dsr": 0.01531436475707132,
+     "dsr": 0.017151873985134958,
      "sr": 0.024383162843992154,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1936,11 +1976,11 @@
      "dd95": 0.4415336003821594
     },
     "dsr": {
-     "dsr": 0.013602875084471056,
+     "dsr": 0.015263060879255386,
      "sr": 0.02326798848778671,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -1976,11 +2016,11 @@
      "dd95": 0.3976412461335715
     },
     "dsr": {
-     "dsr": 0.0037943742821586746,
+     "dsr": 0.004340177578996018,
      "sr": 0.012625535310494094,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -2016,11 +2056,11 @@
      "dd95": 0.4256199449411141
     },
     "dsr": {
-     "dsr": 0.00005995820503318372,
+     "dsr": 0.00007172679619593669,
      "sr": -0.017379715231124526,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -2056,11 +2096,11 @@
      "dd95": 0.4808270652282813
     },
     "dsr": {
-     "dsr": 0.02577669114147141,
+     "dsr": 0.028633874399505654,
      "sr": 0.029600911206324233,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -2096,11 +2136,11 @@
      "dd95": 0.3887040346515477
     },
     "dsr": {
-     "dsr": 0.009775356310950556,
+     "dsr": 0.011076878240967591,
      "sr": 0.022380277667935915,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
     }
    },
    {
@@ -2136,11 +2176,51 @@
      "dd95": 0.39525774334830366
     },
     "dsr": {
-     "dsr": 0.0252256441785223,
+     "dsr": 0.02851862363385288,
      "sr": 0.035811233070945345,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
+    }
+   },
+   {
+    "id": "A3",
+    "nom": "Agents version 3 (hausse et baisse)",
+    "txt": "La version 2 dans les deux sens : achat quand la tendance de fond monte, vente à découvert quand elle baisse (bitcoin du même côté de sa moyenne 50 jours), déclencheur cassure 20 jours avec volume ou reprise / rebond raté, sortie seulement après deux clôtures de suite de l’autre côté de la MM50 (une journée contraire ne suffit pas) ou sur le stop suiveur, 1 % risqué par trade.",
+    "pnl": 2416.3657832611825,
+    "dd": 0.352104514696928,
+    "fees": 939.5437084847055,
+    "n": 408,
+    "sharpe": 0.01591071842722741,
+    "jours": 1816,
+    "trimPos": 3,
+    "trim": [
+     413.8781336991342,
+     1845.4267403885078,
+     -704.5250748548133,
+     1946.896144572991
+    ],
+    "cout2": 1317.3750525827,
+    "sansFrais": 3738.316358535487,
+    "test": 964.1502563039285,
+    "ent": 1095.393295161657,
+    "nT": 203,
+    "expR": 0.019431787539355212,
+    "wrT": 0.27586206896551724,
+    "arret": "2023-02-09T23:00:00.000Z",
+    "pro": true,
+    "mc": {
+     "pPerte": 0.332,
+     "r5": -0.3213594370492252,
+     "r50": 0.22194406674638345,
+     "dd95": 0.5098839668526836
+    },
+    "dsr": {
+     "dsr": 0.004428653116049008,
+     "sr": 0.01591071842722741,
+     "sr0": 0.07375603230281008,
+     "T": 1816,
+     "N": 18
     }
    },
    {
@@ -2176,11 +2256,11 @@
      "dd95": 0.9270378816680452
     },
     "dsr": {
-     "dsr": 0.014367174212476574,
+     "dsr": 0.01610230430210302,
      "sr": 0.023647804224058988,
-     "sr0": 0.07481465051624041,
+     "sr0": 0.07375603230281008,
      "T": 1816,
-     "N": 17
+     "N": 18
     }
    }
   ],
@@ -2256,7 +2336,7 @@
       "pnl": 2952.6629223083773,
       "frais": 9.628545064495288,
       "variation": 1.7139227642276422,
-      "pourquoi": "Gain : le prix a monté de +171,4 % en 40 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+      "pourquoi": "Gain : le prix a monté de 171,4 % en 40 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
      },
      {
       "paire": "BNBUSDT",
@@ -2269,7 +2349,7 @@
       "pnl": 110.88825473796629,
       "frais": 6.049996683124567,
       "variation": 0.05971732422305487,
-      "pourquoi": "Gain : le prix a monté de +6,0 % en 14 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+      "pourquoi": "Gain : le prix a monté de 6,0 % en 14 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
      },
      {
       "paire": "TRXUSDT",
@@ -2282,7 +2362,7 @@
       "pnl": -25.916082811766536,
       "frais": 13.640366630299503,
       "variation": -0.002696225284601561,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,3 % en 10 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,3 % en 10 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "BNBUSDT",
@@ -2295,7 +2375,7 @@
       "pnl": -178.3929947306014,
       "frais": 6.576849213145515,
       "variation": -0.07541779186724584,
-      "pourquoi": "Perte : le prix a baissé de −7,5 % juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière)."
+      "pourquoi": "Perte : le prix est parti dans le mauvais sens (il a baissé de 7,5 %) juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière)."
      },
      {
       "paire": "TRXUSDT",
@@ -2308,7 +2388,7 @@
       "pnl": -171.43948023504618,
       "frais": 21.539329073519195,
       "variation": -0.020662412640534922,
-      "pourquoi": "Perte : le prix a baissé de −2,1 % juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière)."
+      "pourquoi": "Perte : le prix est parti dans le mauvais sens (il a baissé de 2,1 %) juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière)."
      },
      {
       "paire": "TRXUSDT",
@@ -2321,7 +2401,7 @@
       "pnl": -118.85935105853666,
       "frais": 19.839362077906728,
       "variation": -0.014861995753715496,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,5 % en 7 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,5 % en 7 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
      },
      {
       "paire": "TRXUSDT",
@@ -2334,7 +2414,7 @@
       "pnl": 324.64457276674307,
       "frais": 12.696283121616688,
       "variation": 0.08301886792452828,
-      "pourquoi": "Gain : le prix a monté de +8,3 % en 51 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : stop touché (clôture journalière). Le marché du bitcoin était baissier."
+      "pourquoi": "Gain : le prix a monté de 8,3 % en 51 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : stop touché (clôture journalière). Le marché du bitcoin était baissier."
      },
      {
       "paire": "BNBUSDT",
@@ -2347,7 +2427,7 @@
       "pnl": 72.93011190477115,
       "frais": 5.004625181387597,
       "variation": 0.04783499548451631,
-      "pourquoi": "Gain : le prix a monté de +4,8 % en 31 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+      "pourquoi": "Gain : le prix a monté de 4,8 % en 31 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
      },
      {
       "paire": "BCHUSDT",
@@ -2360,7 +2440,7 @@
       "pnl": -12.66618560813808,
       "frais": 3.871027031450099,
       "variation": -0.006792992491955641,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,7 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,7 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "BTCUSDT",
@@ -2373,7 +2453,7 @@
       "pnl": -16.084286441844284,
       "frais": 6.941699284730616,
       "variation": -0.0039433691168074825,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,4 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,4 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "BTCUSDT",
@@ -2386,7 +2466,7 @@
       "pnl": -61.56026488082208,
       "frais": 11.165203693053094,
       "variation": -0.013449686279545903,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,3 % en 11 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,3 % en 11 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
      },
      {
       "paire": "EURUSDT",
@@ -2399,7 +2479,7 @@
       "pnl": -69.36929214620585,
       "frais": 22.30088438523188,
       "variation": -0.0063118389628114,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,6 % en 8 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,6 % en 8 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "AVAXUSDT",
@@ -2412,7 +2492,7 @@
       "pnl": -90.80543967074966,
       "frais": 4.779438142946519,
       "variation": -0.05257801899592951,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −5,3 % en 27 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 5,3 % en 27 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "SOLUSDT",
@@ -2425,7 +2505,7 @@
       "pnl": -29.34456453162728,
       "frais": 3.9450122754286783,
       "variation": -0.019130434782608674,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,9 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,9 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "DOGEUSDT",
@@ -2438,7 +2518,7 @@
       "pnl": -217.82599624074243,
       "frais": 4.626039827430805,
       "variation": -0.12932078272077485,
-      "pourquoi": "Perte : le prix a baissé de −12,9 % juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière). Le marché du bitcoin était baissier."
+      "pourquoi": "Perte : le prix est parti dans le mauvais sens (il a baissé de 12,9 %) juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière). Le marché du bitcoin était baissier."
      },
      {
       "paire": "ETHUSDT",
@@ -2451,7 +2531,7 @@
       "pnl": 913.0222738937834,
       "frais": 6.72071351834168,
       "variation": 0.5166032202373645,
-      "pourquoi": "Gain : le prix a monté de +51,7 % en 75 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : stop touché (clôture journalière). Le marché du bitcoin était baissier."
+      "pourquoi": "Gain : le prix a monté de 51,7 % en 75 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : stop touché (clôture journalière). Le marché du bitcoin était baissier."
      },
      {
       "paire": "TRXUSDT",
@@ -2464,7 +2544,7 @@
       "pnl": -35.1588405855754,
       "frais": 7.67561830819559,
       "variation": -0.010684377707190218,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,1 % en 10 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,1 % en 10 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "LINKUSDT",
@@ -2477,7 +2557,7 @@
       "pnl": -107.30076735244091,
       "frais": 4.8280917267483705,
       "variation": -0.06170821413976291,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −6,2 % en 10 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 6,2 % en 10 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "BCHUSDT",
@@ -2490,7 +2570,7 @@
       "pnl": 299.90038622201365,
       "frais": 4.778710233072323,
       "variation": 0.21149988856697144,
-      "pourquoi": "Gain : le prix a monté de +21,1 % en 73 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+      "pourquoi": "Gain : le prix a monté de 21,1 % en 73 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
      },
      {
       "paire": "BTCUSDT",
@@ -2503,7 +2583,7 @@
       "pnl": -45.04521679173138,
       "frais": 9.152149399040699,
       "variation": -0.011696646843325609,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,2 % en 16 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,2 % en 16 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
      },
      {
       "paire": "BTCUSDT",
@@ -2516,7 +2596,7 @@
       "pnl": 59.80096976183353,
       "frais": 11.661367993115675,
       "variation": 0.018554939906407997,
-      "pourquoi": "Gain : le prix a monté de +1,9 % en 23 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : stop touché (clôture journalière)."
+      "pourquoi": "Gain : le prix a monté de 1,9 % en 23 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : stop touché (clôture journalière)."
      },
      {
       "paire": "EURUSDT",
@@ -2529,7 +2609,7 @@
       "pnl": 121.63129208457133,
       "frais": 21.536058051602474,
       "variation": 0.020144264602392603,
-      "pourquoi": "Gain : le prix a monté de +2,0 % en 60 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : stop touché (clôture journalière)."
+      "pourquoi": "Gain : le prix a monté de 2,0 % en 60 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : stop touché (clôture journalière)."
      },
      {
       "paire": "ETHUSDT",
@@ -2542,7 +2622,7 @@
       "pnl": -36.081092775311554,
       "frais": 3.9271777267521717,
       "variation": -0.024264611482214815,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −2,4 % en 2 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 2,4 % en 2 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "BTCUSDT",
@@ -2555,7 +2635,7 @@
       "pnl": 0.6684084763112974,
       "frais": 6.894244106602118,
       "variation": 0.003296278796395491,
-      "pourquoi": "Gain : le prix a monté de +0,3 % en 8 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Gain : le prix a monté de 0,3 % en 8 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "TRXUSDT",
@@ -2568,7 +2648,7 @@
       "pnl": -28.164575196763728,
       "frais": 6.362957771424356,
       "variation": -0.010226442658874957,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,0 % en 2 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,0 % en 2 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "TRXUSDT",
@@ -2581,7 +2661,7 @@
       "pnl": 129.95970722260503,
       "frais": 6.912970713938778,
       "variation": 0.06121627064035451,
-      "pourquoi": "Gain : le prix a monté de +6,1 % en 61 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : stop touché (clôture journalière). Le marché du bitcoin était baissier."
+      "pourquoi": "Gain : le prix a monté de 6,1 % en 61 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : stop touché (clôture journalière). Le marché du bitcoin était baissier."
      },
      {
       "paire": "BTCUSDT",
@@ -2594,7 +2674,7 @@
       "pnl": -66.92786788475914,
       "frais": 8.16645412697707,
       "variation": -0.021355889008419005,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −2,1 % en 13 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 2,1 % en 13 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "BTCUSDT",
@@ -2607,7 +2687,7 @@
       "pnl": -100.62013607938384,
       "frais": 7.033879334321644,
       "variation": -0.03913418531651858,
-      "pourquoi": "Perte : le prix a baissé de −3,9 % juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière)."
+      "pourquoi": "Perte : le prix est parti dans le mauvais sens (il a baissé de 3,9 %) juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière)."
      },
      {
       "paire": "XRPUSDT",
@@ -2620,7 +2700,7 @@
       "pnl": -67.4676333099987,
       "frais": 5.148533709300594,
       "variation": -0.03566517703678229,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −3,6 % en 21 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 3,6 % en 21 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "EURUSDT",
@@ -2633,7 +2713,7 @@
       "pnl": -26.479931343418087,
       "frais": 21.398630054203153,
       "variation": -0.0007121239095602139,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,1 % en 9 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,1 % en 9 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "EURUSDT",
@@ -2646,7 +2726,7 @@
       "pnl": -187.13974365434703,
       "frais": 20.935317980088683,
       "variation": -0.023536564182733977,
-      "pourquoi": "Perte : le prix a baissé de −2,4 % juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière)."
+      "pourquoi": "Perte : le prix est parti dans le mauvais sens (il a baissé de 2,4 %) juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière)."
      },
      {
       "paire": "XRPUSDT",
@@ -2659,7 +2739,7 @@
       "pnl": -22.747304216929372,
       "frais": 3.8166174881495256,
       "variation": -0.014770314829034792,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,5 % en 3 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,5 % en 3 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "TRXUSDT",
@@ -2672,7 +2752,7 @@
       "pnl": -74.71191042096929,
       "frais": 5.882486473704724,
       "variation": -0.034496753246753276,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −3,4 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 3,4 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
      },
      {
       "paire": "LTCUSDT",
@@ -2685,7 +2765,7 @@
       "pnl": -132.5152440748842,
       "frais": 2.2236006787021623,
       "variation": -0.16158278908951207,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −16,2 % en 3 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 16,2 % en 3 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
      },
      {
       "paire": "XRPUSDT",
@@ -2698,7 +2778,7 @@
       "pnl": -1.9631093485742253,
       "frais": 3.6723904531232887,
       "variation": 0.0013972985561248041,
-      "pourquoi": "Perte malgré une hausse de +0,1 % : la hausse n’a pas couvert les frais et le glissement (0,30 % de la mise). Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+      "pourquoi": "Perte malgré un mouvement favorable (le prix a monté de 0,1 %) : il n’a pas couvert les frais et le glissement (0,30 % de la mise). Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
      },
      {
       "paire": "TRXUSDT",
@@ -2711,7 +2791,7 @@
       "pnl": -53.91204376236689,
       "frais": 3.9688870297120236,
       "variation": -0.03705163579030346,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −3,7 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 3,7 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "LINKUSDT",
@@ -2724,7 +2804,7 @@
       "pnl": -48.29868477592711,
       "frais": 2.2157188224650994,
       "variation": -0.06050695012264928,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −6,1 % en 2 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 6,1 % en 2 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "LTCUSDT",
@@ -2737,7 +2817,7 @@
       "pnl": -76.4259945097363,
       "frais": 3.524141832813984,
       "variation": -0.0601915184678522,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −6,0 % en 13 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 6,0 % en 13 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "ADAUSDT",
@@ -2750,7 +2830,7 @@
       "pnl": -68.83516676507811,
       "frais": 2.494993603363761,
       "variation": -0.07670850767085069,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −7,7 % en 4 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 7,7 % en 4 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
      },
      {
       "paire": "BNBUSDT",
@@ -2763,7 +2843,7 @@
       "pnl": -79.87122556621796,
       "frais": 4.350751997286459,
       "variation": -0.05075263456718315,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −5,1 % en 12 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 5,1 % en 12 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
      }
     ],
     "sansFrais": {
@@ -2789,7 +2869,7 @@
        "pnl": 3136.8943152727943,
        "frais": 0,
        "variation": 1.7139227642276422,
-       "pourquoi": "Gain : le prix a monté de +171,4 % en 40 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+       "pourquoi": "Gain : le prix a monté de 171,4 % en 40 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
       },
       {
        "paire": "BNBUSDT",
@@ -2802,7 +2882,7 @@
        "pnl": 124.10736251069011,
        "frais": 0,
        "variation": 0.05971732422305487,
-       "pourquoi": "Gain : le prix a monté de +6,0 % en 14 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+       "pourquoi": "Gain : le prix a monté de 6,0 % en 14 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
       },
       {
        "paire": "TRXUSDT",
@@ -2815,7 +2895,7 @@
        "pnl": -13.011130268478155,
        "frais": 0,
        "variation": -0.002696225284601561,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,3 % en 10 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,3 % en 10 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "BNBUSDT",
@@ -2828,7 +2908,7 @@
        "pnl": -182.10931390967016,
        "frais": 0,
        "variation": -0.07541779186724584,
-       "pourquoi": "Perte : le prix a baissé de −7,5 % juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière)."
+       "pourquoi": "Perte : le prix est parti dans le mauvais sens (il a baissé de 7,5 %) juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière)."
       },
       {
        "paire": "TRXUSDT",
@@ -2841,7 +2921,7 @@
        "pnl": -158.6217405832649,
        "frais": 0,
        "variation": -0.020662412640534922,
-       "pourquoi": "Perte : le prix a baissé de −2,1 % juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière)."
+       "pourquoi": "Perte : le prix est parti dans le mauvais sens (il a baissé de 2,1 %) juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière)."
       },
       {
        "paire": "TRXUSDT",
@@ -2854,7 +2934,7 @@
        "pnl": -104.64156793364691,
        "frais": 0,
        "variation": -0.014861995753715496,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,5 % en 7 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,5 % en 7 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
       },
       {
        "paire": "TRXUSDT",
@@ -2867,7 +2947,7 @@
        "pnl": 356.19059557009314,
        "frais": 0,
        "variation": 0.08301886792452828,
-       "pourquoi": "Gain : le prix a monté de +8,3 % en 51 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : stop touché (clôture journalière). Le marché du bitcoin était baissier."
+       "pourquoi": "Gain : le prix a monté de 8,3 % en 51 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : stop touché (clôture journalière). Le marché du bitcoin était baissier."
       },
       {
        "paire": "BNBUSDT",
@@ -2880,7 +2960,7 @@
        "pnl": 81.97790055322548,
        "frais": 0,
        "variation": 0.04783499548451631,
-       "pourquoi": "Gain : le prix a monté de +4,8 % en 31 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+       "pourquoi": "Gain : le prix a monté de 4,8 % en 31 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
       },
       {
        "paire": "BCHUSDT",
@@ -2893,7 +2973,7 @@
        "pnl": -9.277975277613677,
        "frais": 0,
        "variation": -0.006792992491955641,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,7 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,7 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "BTCUSDT",
@@ -2906,7 +2986,7 @@
        "pnl": -9.644476205573937,
        "frais": 0,
        "variation": -0.0039433691168074825,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,4 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,4 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "BTCUSDT",
@@ -2919,7 +2999,7 @@
        "pnl": -53.00949831725666,
        "frais": 0,
        "variation": -0.013449686279545903,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,3 % en 11 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,3 % en 11 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
       },
       {
        "paire": "EURUSDT",
@@ -2932,7 +3012,7 @@
        "pnl": -49.51026198191539,
        "frais": 0,
        "variation": -0.0063118389628114,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,6 % en 8 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,6 % en 8 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "AVAXUSDT",
@@ -2945,7 +3025,7 @@
        "pnl": -90.34466203440934,
        "frais": 0,
        "variation": -0.05257801899592951,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −5,3 % en 27 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 5,3 % en 27 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "SOLUSDT",
@@ -2958,7 +3038,7 @@
        "pnl": -26.717251469689472,
        "frais": 0,
        "variation": -0.019130434782608674,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,9 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,9 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "DOGEUSDT",
@@ -2971,7 +3051,7 @@
        "pnl": -223.93624472099668,
        "frais": 0,
        "variation": -0.12932078272077485,
-       "pourquoi": "Perte : le prix a baissé de −12,9 % juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière). Le marché du bitcoin était baissier."
+       "pourquoi": "Perte : le prix est parti dans le mauvais sens (il a baissé de 12,9 %) juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière). Le marché du bitcoin était baissier."
       },
       {
        "paire": "ETHUSDT",
@@ -2984,7 +3064,7 @@
        "pnl": 963.5860086216348,
        "frais": 0,
        "variation": 0.5166032202373645,
-       "pourquoi": "Gain : le prix a monté de +51,7 % en 75 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : stop touché (clôture journalière). Le marché du bitcoin était baissier."
+       "pourquoi": "Gain : le prix a monté de 51,7 % en 75 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : stop touché (clôture journalière). Le marché du bitcoin était baissier."
       },
       {
        "paire": "TRXUSDT",
@@ -2997,7 +3077,7 @@
        "pnl": -28.867217860474284,
        "frais": 0,
        "variation": -0.010684377707190218,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,1 % en 10 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,1 % en 10 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "LINKUSDT",
@@ -3010,7 +3090,7 @@
        "pnl": -107.63297775560886,
        "frais": 0,
        "variation": -0.06170821413976291,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −6,2 % en 10 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 6,2 % en 10 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "BCHUSDT",
@@ -3023,7 +3103,7 @@
        "pnl": 318.6026190434627,
        "frais": 0,
        "variation": 0.21149988856697144,
-       "pourquoi": "Gain : le prix a monté de +21,1 % en 73 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+       "pourquoi": "Gain : le prix a monté de 21,1 % en 73 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
       },
       {
        "paire": "BTCUSDT",
@@ -3036,7 +3116,7 @@
        "pnl": -37.66831805760012,
        "frais": 0,
        "variation": -0.011696646843325609,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,2 % en 16 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,2 % en 16 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
       },
       {
        "paire": "BTCUSDT",
@@ -3049,7 +3129,7 @@
        "pnl": 74.86885982986723,
        "frais": 0,
        "variation": 0.018554939906407997,
-       "pourquoi": "Gain : le prix a monté de +1,9 % en 23 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : stop touché (clôture journalière)."
+       "pourquoi": "Gain : le prix a monté de 1,9 % en 23 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : stop touché (clôture journalière)."
       },
       {
        "paire": "EURUSDT",
@@ -3062,7 +3142,7 @@
        "pnl": 149.45252204377812,
        "frais": 0,
        "variation": 0.020144264602392603,
-       "pourquoi": "Gain : le prix a monté de +2,0 % en 60 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : stop touché (clôture journalière)."
+       "pourquoi": "Gain : le prix a monté de 2,0 % en 60 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : stop touché (clôture journalière)."
       },
       {
        "paire": "ETHUSDT",
@@ -3075,7 +3155,7 @@
        "pnl": -33.67714847261459,
        "frais": 0,
        "variation": -0.024264611482214815,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −2,4 % en 2 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 2,4 % en 2 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "BTCUSDT",
@@ -3088,7 +3168,7 @@
        "pnl": 7.913857258872213,
        "frais": 0,
        "variation": 0.003296278796395491,
-       "pourquoi": "Gain : le prix a monté de +0,3 % en 8 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Gain : le prix a monté de 0,3 % en 8 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "TRXUSDT",
@@ -3101,7 +3181,7 @@
        "pnl": -22.819628011563054,
        "frais": 0,
        "variation": -0.010226442658874957,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,0 % en 2 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,0 % en 2 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "TRXUSDT",
@@ -3114,7 +3194,7 @@
        "pnl": 142.46508727561695,
        "frais": 0,
        "variation": 0.06121627064035451,
-       "pourquoi": "Gain : le prix a monté de +6,1 % en 61 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : stop touché (clôture journalière). Le marché du bitcoin était baissier."
+       "pourquoi": "Gain : le prix a monté de 6,1 % en 61 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : stop touché (clôture journalière). Le marché du bitcoin était baissier."
       },
       {
        "paire": "BTCUSDT",
@@ -3127,7 +3207,7 @@
        "pnl": -61.42653527992843,
        "frais": 0,
        "variation": -0.021355889008419005,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −2,1 % en 13 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 2,1 % en 13 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "BTCUSDT",
@@ -3140,7 +3220,7 @@
        "pnl": -97.78655058046706,
        "frais": 0,
        "variation": -0.03913418531651858,
-       "pourquoi": "Perte : le prix a baissé de −3,9 % juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière)."
+       "pourquoi": "Perte : le prix est parti dans le mauvais sens (il a baissé de 3,9 %) juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière)."
       },
       {
        "paire": "XRPUSDT",
@@ -3153,7 +3233,7 @@
        "pnl": -64.89846150042376,
        "frais": 0,
        "variation": -0.03566517703678229,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −3,6 % en 21 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 3,6 % en 21 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "EURUSDT",
@@ -3166,7 +3246,7 @@
        "pnl": -5.296404957320192,
        "frais": 0,
        "variation": -0.0007121239095602139,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,1 % en 9 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,1 % en 9 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "EURUSDT",
@@ -3179,7 +3259,7 @@
        "pnl": -172.86612086360492,
        "frais": 0,
        "variation": -0.023536564182733977,
-       "pourquoi": "Perte : le prix a baissé de −2,4 % juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière)."
+       "pourquoi": "Perte : le prix est parti dans le mauvais sens (il a baissé de 2,4 %) juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu. Sortie : stop touché (clôture journalière)."
       },
       {
        "paire": "XRPUSDT",
@@ -3192,7 +3272,7 @@
        "pnl": -19.704165781382244,
        "frais": 0,
        "variation": -0.014770314829034792,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,5 % en 3 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,5 % en 3 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "TRXUSDT",
@@ -3205,7 +3285,7 @@
        "pnl": -71.55872365044002,
        "frais": 0,
        "variation": -0.034496753246753276,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −3,4 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 3,4 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
       },
       {
        "paire": "LTCUSDT",
@@ -3218,7 +3298,7 @@
        "pnl": -135.36028711977588,
        "frais": 0,
        "variation": -0.16158278908951207,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −16,2 % en 3 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 16,2 % en 3 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
       },
       {
        "paire": "XRPUSDT",
@@ -3231,7 +3311,7 @@
        "pnl": 1.7748395480605268,
        "frais": 0,
        "variation": 0.0013972985561248041,
-       "pourquoi": "Gain : le prix a monté de +0,1 % en 22 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+       "pourquoi": "Gain : le prix a monté de 0,1 % en 22 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
       },
       {
        "paire": "TRXUSDT",
@@ -3244,7 +3324,7 @@
        "pnl": -51.89437688527937,
        "frais": 0,
        "variation": -0.03705163579030346,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −3,7 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 3,7 % en 1 jour avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "LINKUSDT",
@@ -3257,7 +3337,7 @@
        "pnl": -47.8756990102886,
        "frais": 0,
        "variation": -0.06050695012264928,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −6,1 % en 2 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 6,1 % en 2 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "LTCUSDT",
@@ -3270,7 +3350,7 @@
        "pnl": -75.70721606421853,
        "frais": 0,
        "variation": -0.0601915184678522,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −6,0 % en 13 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 6,0 % en 13 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "ADAUSDT",
@@ -3283,7 +3363,7 @@
        "pnl": -68.89303411189337,
        "frais": 0,
        "variation": -0.07670850767085069,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −7,7 % en 4 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 7,7 % en 4 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue."
       },
       {
        "paire": "BNBUSDT",
@@ -3296,7 +3376,7 @@
        "pnl": -78.34700442187955,
        "frais": 0,
        "variation": -0.05075263456718315,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −5,1 % en 12 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 5,1 % en 12 jours avant la sortie. Sortie : clôture sous la MM50 : tendance perdue. Le marché du bitcoin était baissier."
       }
      ]
     }
@@ -3324,7 +3404,7 @@
       "pnl": 738.0507805202428,
       "frais": 3.209488389697566,
       "variation": 1.8289194915254239,
-      "pourquoi": "Gain : le prix a monté de +182,9 % en 30 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+      "pourquoi": "Gain : le prix a monté de 182,9 % en 30 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
      },
      {
       "paire": "DOTUSDT",
@@ -3337,7 +3417,7 @@
       "pnl": 88.16225896361317,
       "frais": 2.1337060219183908,
       "variation": 0.13556174558960077,
-      "pourquoi": "Gain : le prix a monté de +13,6 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+      "pourquoi": "Gain : le prix a monté de 13,6 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
      },
      {
       "paire": "LINKUSDT",
@@ -3350,7 +3430,7 @@
       "pnl": 149.98728377935748,
       "frais": 3.3110512525127627,
       "variation": 0.18005585674388036,
-      "pourquoi": "Gain : le prix a monté de +18,0 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+      "pourquoi": "Gain : le prix a monté de 18,0 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
      },
      {
       "paire": "AVAXUSDT",
@@ -3363,7 +3443,7 @@
       "pnl": 319.1915474079329,
       "frais": 3.2677529425273573,
       "variation": 0.43023407872368247,
-      "pourquoi": "Gain : le prix a monté de +43,0 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+      "pourquoi": "Gain : le prix a monté de 43,0 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
      },
      {
       "paire": "LTCUSDT",
@@ -3376,7 +3456,7 @@
       "pnl": 171.41936231334455,
       "frais": 3.5980723526021183,
       "variation": 0.22875936415128817,
-      "pourquoi": "Gain : le prix a monté de +22,9 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+      "pourquoi": "Gain : le prix a monté de 22,9 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
      },
      {
       "paire": "DOGEUSDT",
@@ -3389,7 +3469,7 @@
       "pnl": -21.560494756206865,
       "frais": 2.0294963620184934,
       "variation": -0.02845987876297129,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −2,8 % en 1 jour avant la sortie. Sortie : fin de la période mesurée."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 2,8 % en 1 jour avant la sortie. Sortie : fin de la période mesurée."
      },
      {
       "paire": "ADAUSDT",
@@ -3402,7 +3482,7 @@
       "pnl": 112.30424409620649,
       "frais": 2.7118454607227847,
       "variation": 0.1358820819898665,
-      "pourquoi": "Gain : le prix a monté de +13,6 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+      "pourquoi": "Gain : le prix a monté de 13,6 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
      },
      {
       "paire": "XRPUSDT",
@@ -3415,7 +3495,7 @@
       "pnl": 0.7225051827505854,
       "frais": 0.04666532889239759,
       "variation": 0.05070164304350899,
-      "pourquoi": "Gain : le prix a monté de +5,1 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+      "pourquoi": "Gain : le prix a monté de 5,1 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
      },
      {
       "paire": "SOLUSDT",
@@ -3428,7 +3508,7 @@
       "pnl": 118.73725691344634,
       "frais": 3.261747894684958,
       "variation": 0.118878469262101,
-      "pourquoi": "Gain : le prix a monté de +11,9 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+      "pourquoi": "Gain : le prix a monté de 11,9 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
      },
      {
       "paire": "BTCUSDT",
@@ -3441,7 +3521,7 @@
       "pnl": 17.307732626374886,
       "frais": 1.6092047201622246,
       "variation": 0.0358993925099349,
-      "pourquoi": "Gain : le prix a monté de +3,6 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+      "pourquoi": "Gain : le prix a monté de 3,6 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
      },
      {
       "paire": "BCHUSDT",
@@ -3454,7 +3534,7 @@
       "pnl": 246.75718213178817,
       "frais": 2.7605466342496947,
       "variation": 0.22417934347477986,
-      "pourquoi": "Gain : le prix a monté de +22,4 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 22,4 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "DOGEUSDT",
@@ -3467,7 +3547,7 @@
       "pnl": -57.60964640552636,
       "frais": 2.3951456203815957,
       "variation": -0.06684652278177461,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −6,7 % en 8 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 6,7 % en 8 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BNBUSDT",
@@ -3480,7 +3560,7 @@
       "pnl": 39.30871412567682,
       "frais": 3.61215263020484,
       "variation": 0.03629394013538878,
-      "pourquoi": "Gain : le prix a monté de +3,6 % en 11 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 3,6 % en 11 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "XRPUSDT",
@@ -3493,7 +3573,7 @@
       "pnl": -119.55270161505432,
       "frais": 2.5879166502316338,
       "variation": -0.12698087431693983,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −12,7 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 12,7 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "TRXUSDT",
@@ -3506,7 +3586,7 @@
       "pnl": -8.352849021948746,
       "frais": 3.63054424100736,
       "variation": -0.0038945476333133167,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,4 % en 10 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,4 % en 10 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "ETHUSDT",
@@ -3519,7 +3599,7 @@
       "pnl": -91.687847604894,
       "frais": 3.2337879059951513,
       "variation": -0.07882507738760725,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −7,9 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 7,9 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "LTCUSDT",
@@ -3532,7 +3612,7 @@
       "pnl": 70.5710782522308,
       "frais": 4.639982808767384,
       "variation": 0.04458598726114649,
-      "pourquoi": "Gain : le prix a monté de +4,5 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 4,5 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "DOTUSDT",
@@ -3545,7 +3625,7 @@
       "pnl": 130.88966253370245,
       "frais": 2.751886185363233,
       "variation": 0.1753171856978084,
-      "pourquoi": "Gain : le prix a monté de +17,5 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 17,5 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BNBUSDT",
@@ -3558,7 +3638,7 @@
       "pnl": -18.047228929964074,
       "frais": 3.5506756250862677,
       "variation": -0.012173723799290048,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,2 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,2 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "ATOMUSDT",
@@ -3571,7 +3651,7 @@
       "pnl": -91.2728451555789,
       "frais": 2.065513300629493,
       "variation": 0.06192358366271411,
-      "pourquoi": "Perte malgré une hausse de +6,2 % : la hausse n’a pas couvert les frais et le glissement (0,28 % de la mise). Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte malgré un mouvement favorable (le prix a monté de 6,2 %) : il n’a pas couvert les frais et le glissement (0,28 % de la mise). Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "EURUSDT",
@@ -3584,7 +3664,7 @@
       "pnl": -6.575576512766862,
       "frais": 3.644770852915531,
       "variation": -0.0024094312021339936,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,2 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,2 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "ETHUSDT",
@@ -3597,7 +3677,7 @@
       "pnl": -35.82644140275473,
       "frais": 3.5450514797303976,
       "variation": -0.02695001591849744,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −2,7 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 2,7 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "ADAUSDT",
@@ -3610,7 +3690,7 @@
       "pnl": -43.03749093034642,
       "frais": 2.3036082594664125,
       "variation": -0.05167724388032635,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −5,2 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 5,2 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BNBUSDT",
@@ -3623,7 +3703,7 @@
       "pnl": 14.006031598929436,
       "frais": 3.5852257130634415,
       "variation": 0.014828930024643139,
-      "pourquoi": "Gain : le prix a monté de +1,5 % en 7 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 1,5 % en 7 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "LINKUSDT",
@@ -3636,7 +3716,7 @@
       "pnl": -55.81737650036346,
       "frais": 2.069737201635779,
       "variation": -0.07498419721871052,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −7,5 % en 2 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 7,5 % en 2 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "DOGEUSDT",
@@ -3649,7 +3729,7 @@
       "pnl": -59.74219249815005,
       "frais": 1.9531651343584981,
       "variation": -0.08499016823246663,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −8,5 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 8,5 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "XRPUSDT",
@@ -3662,7 +3742,7 @@
       "pnl": -3.743148680450263,
       "frais": 0.17585046117715764,
       "variation": -0.05906076970401264,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −5,9 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 5,9 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BCHUSDT",
@@ -3675,7 +3755,7 @@
       "pnl": -7.900662145136041,
       "frais": 0.6189081784390864,
       "variation": -0.03468433359314116,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −3,5 % en 6 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 3,5 % en 6 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "SOLUSDT",
@@ -3688,7 +3768,7 @@
       "pnl": -30.106233339143028,
       "frais": 2.945342227094539,
       "variation": -0.02728747256941133,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −2,7 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 2,7 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BTCUSDT",
@@ -3701,7 +3781,7 @@
       "pnl": -26.245647966008896,
       "frais": 3.6574438250761947,
       "variation": -0.0183577960907938,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,8 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,8 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BTCUSDT",
@@ -3714,7 +3794,7 @@
       "pnl": 6.275362371943917,
       "frais": 3.574645326065077,
       "variation": 0.008300870673157101,
-      "pourquoi": "Gain : le prix a monté de +0,8 % en 6 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 0,8 % en 6 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "EURUSDT",
@@ -3727,7 +3807,7 @@
       "pnl": -0.8674845806090801,
       "frais": 0.5051419129639854,
       "variation": -0.002149613069647449,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,2 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,2 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BTCUSDT",
@@ -3740,7 +3820,7 @@
       "pnl": 206.53243005906154,
       "frais": 4.146295837836412,
       "variation": 0.20123568523777213,
-      "pourquoi": "Gain : le prix a monté de +20,1 % en 16 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 20,1 % en 16 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "SOLUSDT",
@@ -3753,7 +3833,7 @@
       "pnl": 295.4256833076283,
       "frais": 3.6147037568157785,
       "variation": 0.3116285188108392,
-      "pourquoi": "Gain : le prix a monté de +31,2 % en 16 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 31,2 % en 16 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "ETHUSDT",
@@ -3766,7 +3846,7 @@
       "pnl": 214.9785556998451,
       "frais": 4.594287384375853,
       "variation": 0.24250104515050186,
-      "pourquoi": "Gain : le prix a monté de +24,3 % en 16 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 24,3 % en 16 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "LINKUSDT",
@@ -3779,7 +3859,7 @@
       "pnl": 150.15701107750877,
       "frais": 3.67828904226823,
       "variation": 0.16556638373677046,
-      "pourquoi": "Gain : le prix a monté de +16,6 % en 15 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 16,6 % en 15 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BNBUSDT",
@@ -3792,7 +3872,7 @@
       "pnl": 107.67894653127114,
       "frais": 4.097574179216915,
       "variation": 0.10153591912122084,
-      "pourquoi": "Gain : le prix a monté de +10,2 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 10,2 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "XRPUSDT",
@@ -3805,7 +3885,7 @@
       "pnl": 269.7145176385983,
       "frais": 4.948916829537753,
       "variation": 0.27413019079685763,
-      "pourquoi": "Gain : le prix a monté de +27,4 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 27,4 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "NEARUSDT",
@@ -3818,7 +3898,7 @@
       "pnl": -14.949024639452748,
       "frais": 1.9158732537049203,
       "variation": -0.02020202020202022,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −2,0 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 2,0 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "TRXUSDT",
@@ -3831,7 +3911,7 @@
       "pnl": -20.75930542494301,
       "frais": 3.5676246180575935,
       "variation": -0.014352665495020345,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,4 % en 2 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,4 % en 2 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      }
     ],
     "sansFrais": {
@@ -3857,7 +3937,7 @@
        "pnl": 884.4379770257464,
        "frais": 0,
        "variation": 1.8289194915254239,
-       "pourquoi": "Gain : le prix a monté de +182,9 % en 30 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+       "pourquoi": "Gain : le prix a monté de 182,9 % en 30 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
       },
       {
        "paire": "DOTUSDT",
@@ -3870,7 +3950,7 @@
        "pnl": 107.97870060244156,
        "frais": 0,
        "variation": 0.13556174558960077,
-       "pourquoi": "Gain : le prix a monté de +13,6 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+       "pourquoi": "Gain : le prix a monté de 13,6 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
       },
       {
        "paire": "LINKUSDT",
@@ -3883,7 +3963,7 @@
        "pnl": 183.46784775081937,
        "frais": 0,
        "variation": 0.18005585674388036,
-       "pourquoi": "Gain : le prix a monté de +18,0 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+       "pourquoi": "Gain : le prix a monté de 18,0 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
       },
       {
        "paire": "AVAXUSDT",
@@ -3896,7 +3976,7 @@
        "pnl": 385.710820413826,
        "frais": 0,
        "variation": 0.43023407872368247,
-       "pourquoi": "Gain : le prix a monté de +43,0 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+       "pourquoi": "Gain : le prix a monté de 43,0 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
       },
       {
        "paire": "LTCUSDT",
@@ -3909,7 +3989,7 @@
        "pnl": 209.25154647606632,
        "frais": 0,
        "variation": 0.22875936415128817,
-       "pourquoi": "Gain : le prix a monté de +22,9 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+       "pourquoi": "Gain : le prix a monté de 22,9 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
       },
       {
        "paire": "DOGEUSDT",
@@ -3922,7 +4002,7 @@
        "pnl": -23.478887010016933,
        "frais": 0,
        "variation": -0.02845987876297129,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −2,8 % en 1 jour avant la sortie. Sortie : fin de la période mesurée."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 2,8 % en 1 jour avant la sortie. Sortie : fin de la période mesurée."
       },
       {
        "paire": "ADAUSDT",
@@ -3935,7 +4015,7 @@
        "pnl": 137.59986297594457,
        "frais": 0,
        "variation": 0.1358820819898665,
-       "pourquoi": "Gain : le prix a monté de +13,6 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+       "pourquoi": "Gain : le prix a monté de 13,6 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
       },
       {
        "paire": "XRPUSDT",
@@ -3948,7 +4028,7 @@
        "pnl": 0.9287386876261365,
        "frais": 0,
        "variation": 0.05070164304350899,
-       "pourquoi": "Gain : le prix a monté de +5,1 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+       "pourquoi": "Gain : le prix a monté de 5,1 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
       },
       {
        "paire": "SOLUSDT",
@@ -3961,7 +4041,7 @@
        "pnl": 145.93342671635696,
        "frais": 0,
        "variation": 0.118878469262101,
-       "pourquoi": "Gain : le prix a monté de +11,9 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+       "pourquoi": "Gain : le prix a monté de 11,9 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
       },
       {
        "paire": "BTCUSDT",
@@ -3974,7 +4054,7 @@
        "pnl": 23.109961857669077,
        "frais": 0,
        "variation": 0.0358993925099349,
-       "pourquoi": "Gain : le prix a monté de +3,6 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+       "pourquoi": "Gain : le prix a monté de 3,6 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
       },
       {
        "paire": "BCHUSDT",
@@ -3987,7 +4067,7 @@
        "pnl": 298.4696622767468,
        "frais": 0,
        "variation": 0.22417934347477986,
-       "pourquoi": "Gain : le prix a monté de +22,4 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 22,4 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "DOGEUSDT",
@@ -4000,7 +4080,7 @@
        "pnl": -66.07127900841772,
        "frais": 0,
        "variation": -0.06684652278177461,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −6,7 % en 8 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 6,7 % en 8 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BNBUSDT",
@@ -4013,7 +4093,7 @@
        "pnl": 51.328681902467,
        "frais": 0,
        "variation": 0.03629394013538878,
-       "pourquoi": "Gain : le prix a monté de +3,6 % en 11 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 3,6 % en 11 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "XRPUSDT",
@@ -4026,7 +4106,7 @@
        "pnl": -139.81092831316573,
        "frais": 0,
        "variation": -0.12698087431693983,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −12,7 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 12,7 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "TRXUSDT",
@@ -4039,7 +4119,7 @@
        "pnl": -5.635693961859715,
        "frais": 0,
        "variation": -0.0038945476333133167,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,4 % en 10 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,4 % en 10 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "ETHUSDT",
@@ -4052,7 +4132,7 @@
        "pnl": -105.69089997121318,
        "frais": 0,
        "variation": -0.07882507738760725,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −7,9 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 7,9 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "LTCUSDT",
@@ -4065,7 +4145,7 @@
        "pnl": 89.65634970752467,
        "frais": 0,
        "variation": 0.04458598726114649,
-       "pourquoi": "Gain : le prix a monté de +4,5 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 4,5 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "DOTUSDT",
@@ -4078,7 +4158,7 @@
        "pnl": 159.36795136269382,
        "frais": 0,
        "variation": 0.1753171856978084,
-       "pourquoi": "Gain : le prix a monté de +17,5 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 17,5 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BNBUSDT",
@@ -4091,7 +4171,7 @@
        "pnl": -17.32311012650007,
        "frais": 0,
        "variation": -0.012173723799290048,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,2 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,2 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "ATOMUSDT",
@@ -4104,7 +4184,7 @@
        "pnl": -106.47704357325676,
        "frais": 0,
        "variation": 0.06192358366271411,
-       "pourquoi": "Perte malgré une hausse de +6,2 % : la hausse n’a pas couvert les frais et le glissement (0,00 % de la mise). Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte malgré un mouvement favorable (le prix a monté de 6,2 %) : il n’a pas couvert les frais et le glissement (0,00 % de la mise). Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "EURUSDT",
@@ -4117,7 +4197,7 @@
        "pnl": -3.4981954280160608,
        "frais": 0,
        "variation": -0.0024094312021339936,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,2 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,2 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "ETHUSDT",
@@ -4130,7 +4210,7 @@
        "pnl": -38.518237647776004,
        "frais": 0,
        "variation": -0.02695001591849744,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −2,7 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 2,7 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "ADAUSDT",
@@ -4143,7 +4223,7 @@
        "pnl": -48.60078659457247,
        "frais": 0,
        "variation": -0.05167724388032635,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −5,2 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 5,2 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BNBUSDT",
@@ -4156,7 +4236,7 @@
        "pnl": 20.985109148949277,
        "frais": 0,
        "variation": 0.014828930024643139,
-       "pourquoi": "Gain : le prix a monté de +1,5 % en 7 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 1,5 % en 7 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "LINKUSDT",
@@ -4169,7 +4249,7 @@
        "pnl": -64.15900437596383,
        "frais": 0,
        "variation": -0.07498419721871052,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −7,5 % en 2 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 7,5 % en 2 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "DOGEUSDT",
@@ -4182,7 +4262,7 @@
        "pnl": -68.96307118915615,
        "frais": 0,
        "variation": -0.08499016823246663,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −8,5 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 8,5 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "XRPUSDT",
@@ -4195,7 +4275,7 @@
        "pnl": -4.394876503714784,
        "frais": 0,
        "variation": -0.05906076970401264,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −5,9 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 5,9 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BCHUSDT",
@@ -4208,7 +4288,7 @@
        "pnl": -8.720884183963676,
        "frais": 0,
        "variation": -0.03468433359314116,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −3,5 % en 6 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 3,5 % en 6 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "SOLUSDT",
@@ -4221,7 +4301,7 @@
        "pnl": -32.403957922233076,
        "frais": 0,
        "variation": -0.02728747256941133,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −2,7 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 2,7 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BTCUSDT",
@@ -4234,7 +4314,7 @@
        "pnl": -26.970244667824318,
        "frais": 0,
        "variation": -0.0183577960907938,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,8 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,8 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BTCUSDT",
@@ -4247,7 +4327,7 @@
        "pnl": 11.749249097994607,
        "frais": 0,
        "variation": 0.008300870673157101,
-       "pourquoi": "Gain : le prix a monté de +0,8 % en 6 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 0,8 % en 6 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "EURUSDT",
@@ -4260,7 +4340,7 @@
        "pnl": -0.4324052524751778,
        "frais": 0,
        "variation": -0.002149613069647449,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,2 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,2 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BTCUSDT",
@@ -4273,7 +4353,7 @@
        "pnl": 250.44860842769276,
        "frais": 0,
        "variation": 0.20123568523777213,
-       "pourquoi": "Gain : le prix a monté de +20,1 % en 16 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 20,1 % en 16 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "SOLUSDT",
@@ -4286,7 +4366,7 @@
        "pnl": 355.4012207643668,
        "frais": 0,
        "variation": 0.3116285188108392,
-       "pourquoi": "Gain : le prix a monté de +31,2 % en 16 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 31,2 % en 16 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "ETHUSDT",
@@ -4299,7 +4379,7 @@
        "pnl": 260.8999291636551,
        "frais": 0,
        "variation": 0.24250104515050186,
-       "pourquoi": "Gain : le prix a monté de +24,3 % en 16 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 24,3 % en 16 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "LINKUSDT",
@@ -4312,7 +4392,7 @@
        "pnl": 182.64557212519048,
        "frais": 0,
        "variation": 0.16556638373677046,
-       "pourquoi": "Gain : le prix a monté de +16,6 % en 15 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 16,6 % en 15 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BNBUSDT",
@@ -4325,7 +4405,7 @@
        "pnl": 132.89495183681743,
        "frais": 0,
        "variation": 0.10153591912122084,
-       "pourquoi": "Gain : le prix a monté de +10,2 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 10,2 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "XRPUSDT",
@@ -4338,7 +4418,7 @@
        "pnl": 326.7052792049608,
        "frais": 0,
        "variation": 0.27413019079685763,
-       "pourquoi": "Gain : le prix a monté de +27,4 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 27,4 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "NEARUSDT",
@@ -4351,7 +4431,7 @@
        "pnl": -15.531032866541864,
        "frais": 0,
        "variation": -0.02020202020202022,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −2,0 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 2,0 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "TRXUSDT",
@@ -4364,7 +4444,7 @@
        "pnl": -20.477344099700986,
        "frais": 0,
        "variation": -0.014352665495020345,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,4 % en 2 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,4 % en 2 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       }
      ]
     }
@@ -4392,7 +4472,7 @@
       "pnl": 2857.951747079741,
       "frais": 9.003135031617305,
       "variation": 1.8289194915254239,
-      "pourquoi": "Gain : le prix a monté de +182,9 % en 30 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+      "pourquoi": "Gain : le prix a monté de 182,9 % en 30 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
      },
      {
       "paire": "DOTUSDT",
@@ -4405,7 +4485,7 @@
       "pnl": 211.56698573496362,
       "frais": 5.1203514611407925,
       "variation": 0.13556174558960077,
-      "pourquoi": "Gain : le prix a monté de +13,6 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+      "pourquoi": "Gain : le prix a monté de 13,6 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
      },
      {
       "paire": "AVAXUSDT",
@@ -4418,7 +4498,7 @@
       "pnl": 756.811397014991,
       "frais": 6.4672202844496045,
       "variation": 0.43023407872368247,
-      "pourquoi": "Gain : le prix a monté de +43,0 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+      "pourquoi": "Gain : le prix a monté de 43,0 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
      },
      {
       "paire": "LTCUSDT",
@@ -4431,7 +4511,7 @@
       "pnl": 405.79142779427514,
       "frais": 6.018276484982064,
       "variation": 0.22875936415128817,
-      "pourquoi": "Gain : le prix a monté de +22,9 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+      "pourquoi": "Gain : le prix a monté de 22,9 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
      },
      {
       "paire": "SOLUSDT",
@@ -4444,7 +4524,7 @@
       "pnl": 208.45171284937962,
       "frais": 5.726230782184565,
       "variation": 0.118878469262101,
-      "pourquoi": "Gain : le prix a monté de +11,9 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+      "pourquoi": "Gain : le prix a monté de 11,9 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
      },
      {
       "paire": "BCHUSDT",
@@ -4457,7 +4537,7 @@
       "pnl": 71.73447619640434,
       "frais": 1.0836903572466527,
       "variation": 0.22417934347477986,
-      "pourquoi": "Gain : le prix a monté de +22,4 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 22,4 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BNBUSDT",
@@ -4470,7 +4550,7 @@
       "pnl": 58.86617402803199,
       "frais": 5.409324880626398,
       "variation": 0.03629394013538878,
-      "pourquoi": "Gain : le prix a monté de +3,6 % en 11 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 3,6 % en 11 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "XRPUSDT",
@@ -4483,7 +4563,7 @@
       "pnl": -229.10511029844412,
       "frais": 4.959360362290955,
       "variation": -0.12698087431693983,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −12,7 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 12,7 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "TRXUSDT",
@@ -4496,7 +4576,7 @@
       "pnl": -12.207535624304118,
       "frais": 5.305973811003132,
       "variation": -0.0038945476333133167,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,4 % en 10 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,4 % en 10 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "ETHUSDT",
@@ -4509,7 +4589,7 @@
       "pnl": -145.78418751342247,
       "frais": 5.141740751705367,
       "variation": -0.07882507738760725,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −7,9 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 7,9 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "LTCUSDT",
@@ -4522,7 +4602,7 @@
       "pnl": 71.75612037758364,
       "frais": 5.300386892967166,
       "variation": 0.04458598726114649,
-      "pourquoi": "Gain : le prix a monté de +4,5 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 4,5 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "DOTUSDT",
@@ -4535,7 +4615,7 @@
       "pnl": 190.131239303575,
       "frais": 3.6058032458709652,
       "variation": 0.1753171856978084,
-      "pourquoi": "Gain : le prix a monté de +17,5 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 17,5 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BNBUSDT",
@@ -4548,7 +4628,7 @@
       "pnl": -26.70335928283282,
       "frais": 5.253713314183757,
       "variation": -0.012173723799290048,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,2 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,2 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "ATOMUSDT",
@@ -4561,7 +4641,7 @@
       "pnl": 0.7647605522819897,
       "frais": 0.040205484496544625,
       "variation": 0.06192358366271411,
-      "pourquoi": "Gain : le prix a monté de +6,2 % en 9 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 6,2 % en 9 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "EURUSDT",
@@ -4574,7 +4654,7 @@
       "pnl": -9.62216780222739,
       "frais": 5.333463412575023,
       "variation": -0.0024094312021339936,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,2 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,2 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "ADAUSDT",
@@ -4587,7 +4667,7 @@
       "pnl": -83.29512593290555,
       "frais": 4.458423015014564,
       "variation": -0.05167724388032635,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −5,2 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 5,2 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BNBUSDT",
@@ -4600,7 +4680,7 @@
       "pnl": 20.38752930137185,
       "frais": 5.218744064714421,
       "variation": 0.014828930024643139,
-      "pourquoi": "Gain : le prix a monté de +1,5 % en 7 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 1,5 % en 7 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BCHUSDT",
@@ -4613,7 +4693,7 @@
       "pnl": -10.354364748558424,
       "frais": 0.8111220183449463,
       "variation": -0.03468433359314116,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −3,5 % en 6 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 3,5 % en 6 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "SOLUSDT",
@@ -4626,7 +4706,7 @@
       "pnl": -52.63446574558402,
       "frais": 5.149316183618065,
       "variation": -0.02728747256941133,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −2,7 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 2,7 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BTCUSDT",
@@ -4639,7 +4719,7 @@
       "pnl": -38.465644303630214,
       "frais": 5.360352825660659,
       "variation": -0.0183577960907938,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,8 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,8 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BTCUSDT",
@@ -4652,7 +4732,7 @@
       "pnl": 9.135333895490861,
       "frais": 5.203775762426245,
       "variation": 0.008300870673157101,
-      "pourquoi": "Gain : le prix a monté de +0,8 % en 6 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 0,8 % en 6 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "EURUSDT",
@@ -4665,7 +4745,7 @@
       "pnl": -1.6013938280789854,
       "frais": 0.9325020407355307,
       "variation": -0.002149613069647449,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,2 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,2 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BTCUSDT",
@@ -4678,7 +4758,7 @@
       "pnl": 308.8727755522202,
       "frais": 5.15249290535963,
       "variation": 0.20123568523777213,
-      "pourquoi": "Gain : le prix a monté de +20,1 % en 16 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 20,1 % en 16 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "SOLUSDT",
@@ -4691,7 +4771,7 @@
       "pnl": 481.21808559299564,
       "frais": 5.41468830885003,
       "variation": 0.3116285188108392,
-      "pourquoi": "Gain : le prix a monté de +31,2 % en 16 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 31,2 % en 16 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "ETHUSDT",
@@ -4704,7 +4784,7 @@
       "pnl": 373.43194699777996,
       "frais": 5.252766217820663,
       "variation": 0.24250104515050186,
-      "pourquoi": "Gain : le prix a monté de +24,3 % en 16 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 24,3 % en 16 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "LINKUSDT",
@@ -4717,7 +4797,7 @@
       "pnl": 253.47254968692175,
       "frais": 5.072556807739254,
       "variation": 0.16556638373677046,
-      "pourquoi": "Gain : le prix a monté de +16,6 % en 15 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 16,6 % en 15 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BNBUSDT",
@@ -4730,7 +4810,7 @@
       "pnl": 156.13611570126295,
       "frais": 5.002748495408001,
       "variation": 0.10153591912122084,
-      "pourquoi": "Gain : le prix a monté de +10,2 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 10,2 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "XRPUSDT",
@@ -4743,7 +4823,7 @@
       "pnl": 430.1727537244223,
       "frais": 5.420392710110345,
       "variation": 0.27413019079685763,
-      "pourquoi": "Gain : le prix a monté de +27,4 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 27,4 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "AVAXUSDT",
@@ -4756,7 +4836,7 @@
       "pnl": 72.00688860793291,
       "frais": 5.01452455113902,
       "variation": 0.047165665738977625,
-      "pourquoi": "Gain : le prix a monté de +4,7 % en 11 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 4,7 % en 11 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "DOGEUSDT",
@@ -4769,7 +4849,7 @@
       "pnl": 298.515489955136,
       "frais": 5.175773117970504,
       "variation": 0.19301444802917644,
-      "pourquoi": "Gain : le prix a monté de +19,3 % en 11 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 19,3 % en 11 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BCHUSDT",
@@ -4782,7 +4862,7 @@
       "pnl": 1.427194059013169,
       "frais": 0.03047861035961273,
       "variation": 0.1545667447306791,
-      "pourquoi": "Gain : le prix a monté de +15,5 % en 9 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 15,5 % en 9 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "NEARUSDT",
@@ -4795,7 +4875,7 @@
       "pnl": 70.87242795449586,
       "frais": 4.949486053285649,
       "variation": 0.04703832752613235,
-      "pourquoi": "Gain : le prix a monté de +4,7 % en 9 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 4,7 % en 9 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "DOTUSDT",
@@ -4808,7 +4888,7 @@
       "pnl": 109.53129986896491,
       "frais": 5.039049471902876,
       "variation": 0.07061790668348045,
-      "pourquoi": "Gain : le prix a monté de +7,1 % en 9 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 7,1 % en 9 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "LTCUSDT",
@@ -4821,7 +4901,7 @@
       "pnl": 106.63907116865322,
       "frais": 4.931270505290635,
       "variation": 0.07025965524765443,
-      "pourquoi": "Gain : le prix a monté de +7,0 % en 9 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 7,0 % en 9 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "ATOMUSDT",
@@ -4834,7 +4914,7 @@
       "pnl": -3.7822549688412384,
       "frais": 4.868953710066984,
       "variation": 0.0006697923643670389,
-      "pourquoi": "Perte malgré une hausse de +0,1 % : la hausse n’a pas couvert les frais et le glissement (0,30 % de la mise). Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte malgré un mouvement favorable (le prix a monté de 0,1 %) : il n’a pas couvert les frais et le glissement (0,30 % de la mise). Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "EURUSDT",
@@ -4847,7 +4927,7 @@
       "pnl": 3.1154821813704228,
       "frais": 4.6964570568546,
       "variation": 0.0050025875452821555,
-      "pourquoi": "Gain : le prix a monté de +0,5 % en 9 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 0,5 % en 9 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "TRXUSDT",
@@ -4860,7 +4940,7 @@
       "pnl": 4.208016541279722,
       "frais": 4.684960966571179,
       "variation": 0.005710850616170715,
-      "pourquoi": "Gain : le prix a monté de +0,6 % en 8 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Gain : le prix a monté de 0,6 % en 8 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "BNBUSDT",
@@ -4873,7 +4953,7 @@
       "pnl": -16.550180163215764,
       "frais": 4.666914249126128,
       "variation": -0.007609772202046727,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,8 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,8 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "ATOMUSDT",
@@ -4886,7 +4966,7 @@
       "pnl": -12.398280791089157,
       "frais": 4.673151453991616,
       "variation": -0.004946996466431153,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,5 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,5 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
      },
      {
       "paire": "EURUSDT",
@@ -4899,7 +4979,7 @@
       "pnl": -5.671043509993355,
       "frais": 4.7185101373884795,
       "variation": -0.0006054315862307202,
-      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,1 % en 3 jours avant la sortie. Sortie : le bitcoin est passé sous sa moyenne 50 jours : sortie par prudence. Le marché du bitcoin était baissier."
+      "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,1 % en 3 jours avant la sortie. Sortie : le bitcoin est passé sous sa moyenne 50 jours : sortie par prudence. Le marché du bitcoin était baissier."
      }
     ],
     "sansFrais": {
@@ -4925,7 +5005,7 @@
        "pnl": 3374.7499959966362,
        "frais": 0,
        "variation": 1.8289194915254239,
-       "pourquoi": "Gain : le prix a monté de +182,9 % en 30 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+       "pourquoi": "Gain : le prix a monté de 182,9 % en 30 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
       },
       {
        "paire": "DOTUSDT",
@@ -4938,7 +5018,7 @@
        "pnl": 255.8067917757537,
        "frais": 0,
        "variation": 0.13556174558960077,
-       "pourquoi": "Gain : le prix a monté de +13,6 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+       "pourquoi": "Gain : le prix a monté de 13,6 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
       },
       {
        "paire": "AVAXUSDT",
@@ -4951,7 +5031,7 @@
        "pnl": 901.2259908198498,
        "frais": 0,
        "variation": 0.43023407872368247,
-       "pourquoi": "Gain : le prix a monté de +43,0 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+       "pourquoi": "Gain : le prix a monté de 43,0 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
       },
       {
        "paire": "LTCUSDT",
@@ -4964,7 +5044,7 @@
        "pnl": 486.2662098285291,
        "frais": 0,
        "variation": 0.22875936415128817,
-       "pourquoi": "Gain : le prix a monté de +22,9 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+       "pourquoi": "Gain : le prix a monté de 22,9 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
       },
       {
        "paire": "SOLUSDT",
@@ -4977,7 +5057,7 @@
        "pnl": 252.92606894866913,
        "frais": 0,
        "variation": 0.118878469262101,
-       "pourquoi": "Gain : le prix a monté de +11,9 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : fin de la période mesurée."
+       "pourquoi": "Gain : le prix a monté de 11,9 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : fin de la période mesurée."
       },
       {
        "paire": "BCHUSDT",
@@ -4990,7 +5070,7 @@
        "pnl": 90.09426999253031,
        "frais": 0,
        "variation": 0.22417934347477986,
-       "pourquoi": "Gain : le prix a monté de +22,4 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 22,4 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BNBUSDT",
@@ -5003,7 +5083,7 @@
        "pnl": 75.88502266216528,
        "frais": 0,
        "variation": 0.03629394013538878,
-       "pourquoi": "Gain : le prix a monté de +3,6 % en 11 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 3,6 % en 11 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "XRPUSDT",
@@ -5016,7 +5096,7 @@
        "pnl": -264.4996883832623,
        "frais": 0,
        "variation": -0.12698087431693983,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −12,7 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 12,7 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "TRXUSDT",
@@ -5029,7 +5109,7 @@
        "pnl": -8.1338785912385,
        "frais": 0,
        "variation": -0.0038945476333133167,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,4 % en 10 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,4 % en 10 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "ETHUSDT",
@@ -5042,7 +5122,7 @@
        "pnl": -165.91270105625517,
        "frais": 0,
        "variation": -0.07882507738760725,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −7,9 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 7,9 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "LTCUSDT",
@@ -5055,7 +5135,7 @@
        "pnl": 90.767346753634,
        "frais": 0,
        "variation": 0.04458598726114649,
-       "pourquoi": "Gain : le prix a monté de +4,5 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 4,5 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "DOTUSDT",
@@ -5068,7 +5148,7 @@
        "pnl": 231.78967530994487,
        "frais": 0,
        "variation": 0.1753171856978084,
-       "pourquoi": "Gain : le prix a monté de +17,5 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 17,5 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BNBUSDT",
@@ -5081,7 +5161,7 @@
        "pnl": -25.305348723719817,
        "frais": 0,
        "variation": -0.012173723799290048,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,2 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,2 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "ATOMUSDT",
@@ -5094,7 +5174,7 @@
        "pnl": 0.9845396413021525,
        "frais": 0,
        "variation": 0.06192358366271411,
-       "pourquoi": "Gain : le prix a monté de +6,2 % en 9 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 6,2 % en 9 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "EURUSDT",
@@ -5107,7 +5187,7 @@
        "pnl": -5.05507784115116,
        "frais": 0,
        "variation": -0.0024094312021339936,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,2 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,2 % en 4 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "ADAUSDT",
@@ -5120,7 +5200,7 @@
        "pnl": -92.19960823483348,
        "frais": 0,
        "variation": -0.05167724388032635,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −5,2 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 5,2 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BNBUSDT",
@@ -5133,7 +5213,7 @@
        "pnl": 30.16792605619912,
        "frais": 0,
        "variation": 0.014828930024643139,
-       "pourquoi": "Gain : le prix a monté de +1,5 % en 7 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 1,5 % en 7 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BCHUSDT",
@@ -5146,7 +5226,7 @@
        "pnl": -11.268870581445697,
        "frais": 0,
        "variation": -0.03468433359314116,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −3,5 % en 6 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 3,5 % en 6 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "SOLUSDT",
@@ -5159,7 +5239,7 @@
        "pnl": -55.950170481952455,
        "frais": 0,
        "variation": -0.02728747256941133,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −2,7 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 2,7 % en 7 jours avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BTCUSDT",
@@ -5172,7 +5252,7 @@
        "pnl": -39.033391972813206,
        "frais": 0,
        "variation": -0.0183577960907938,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −1,8 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 1,8 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BTCUSDT",
@@ -5185,7 +5265,7 @@
        "pnl": 16.892024234223754,
        "frais": 0,
        "variation": 0.008300870673157101,
-       "pourquoi": "Gain : le prix a monté de +0,8 % en 6 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 0,8 % en 6 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "EURUSDT",
@@ -5198,7 +5278,7 @@
        "pnl": -0.7873383299673264,
        "frais": 0,
        "variation": -0.002149613069647449,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,2 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,2 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BTCUSDT",
@@ -5211,7 +5291,7 @@
        "pnl": 368.9209988279099,
        "frais": 0,
        "variation": 0.20123568523777213,
-       "pourquoi": "Gain : le prix a monté de +20,1 % en 16 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 20,1 % en 16 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "SOLUSDT",
@@ -5224,7 +5304,7 @@
        "pnl": 571.3809299807319,
        "frais": 0,
        "variation": 0.3116285188108392,
-       "pourquoi": "Gain : le prix a monté de +31,2 % en 16 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 31,2 % en 16 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "ETHUSDT",
@@ -5237,7 +5317,7 @@
        "pnl": 444.63347972172164,
        "frais": 0,
        "variation": 0.24250104515050186,
-       "pourquoi": "Gain : le prix a monté de +24,3 % en 16 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 24,3 % en 16 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "LINKUSDT",
@@ -5250,7 +5330,7 @@
        "pnl": 303.57129916753433,
        "frais": 0,
        "variation": 0.16556638373677046,
-       "pourquoi": "Gain : le prix a monté de +16,6 % en 15 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 16,6 % en 15 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BNBUSDT",
@@ -5263,7 +5343,7 @@
        "pnl": 189.4116580495347,
        "frais": 0,
        "variation": 0.10153591912122084,
-       "pourquoi": "Gain : le prix a monté de +10,2 % en 13 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 10,2 % en 13 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "XRPUSDT",
@@ -5276,7 +5356,7 @@
        "pnl": 512.0681001156922,
        "frais": 0,
        "variation": 0.27413019079685763,
-       "pourquoi": "Gain : le prix a monté de +27,4 % en 12 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 27,4 % en 12 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "AVAXUSDT",
@@ -5289,7 +5369,7 @@
        "pnl": 90.55859931713235,
        "frais": 0,
        "variation": 0.047165665738977625,
-       "pourquoi": "Gain : le prix a monté de +4,7 % en 11 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 4,7 % en 11 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "DOGEUSDT",
@@ -5302,7 +5382,7 @@
        "pnl": 356.9113070168894,
        "frais": 0,
        "variation": 0.19301444802917644,
-       "pourquoi": "Gain : le prix a monté de +19,3 % en 11 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 19,3 % en 11 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BCHUSDT",
@@ -5315,7 +5395,7 @@
        "pnl": 5.0699154214985285,
        "frais": 0,
        "variation": 0.1545667447306791,
-       "pourquoi": "Gain : le prix a monté de +15,5 % en 9 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 15,5 % en 9 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "NEARUSDT",
@@ -5328,7 +5408,7 @@
        "pnl": 89.1407871499498,
        "frais": 0,
        "variation": 0.04703832752613235,
-       "pourquoi": "Gain : le prix a monté de +4,7 % en 9 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 4,7 % en 9 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "DOTUSDT",
@@ -5341,7 +5421,7 @@
        "pnl": 134.73291870708636,
        "frais": 0,
        "variation": 0.07061790668348045,
-       "pourquoi": "Gain : le prix a monté de +7,1 % en 9 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 7,1 % en 9 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "LTCUSDT",
@@ -5354,7 +5434,7 @@
        "pnl": 131.13376277005227,
        "frais": 0,
        "variation": 0.07025965524765443,
-       "pourquoi": "Gain : le prix a monté de +7,0 % en 9 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 7,0 % en 9 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "ATOMUSDT",
@@ -5367,7 +5447,7 @@
        "pnl": 1.2778220097045505,
        "frais": 0,
        "variation": 0.0006697923643670389,
-       "pourquoi": "Gain : le prix a monté de +0,1 % en 7 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 0,1 % en 7 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "EURUSDT",
@@ -5380,7 +5460,7 @@
        "pnl": 9.172405448773816,
        "frais": 0,
        "variation": 0.0050025875452821555,
-       "pourquoi": "Gain : le prix a monté de +0,5 % en 9 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 0,5 % en 9 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "TRXUSDT",
@@ -5393,7 +5473,7 @@
        "pnl": 10.450529921500447,
        "frais": 0,
        "variation": 0.005710850616170715,
-       "pourquoi": "Gain : le prix a monté de +0,6 % en 8 jours pendant que la tendance tenait, et la sortie a gardé une partie de la hausse. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Gain : le prix a monté de 0,6 % en 8 jours pendant que la tendance haussière tenait, et la sortie a gardé une partie du mouvement. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "BNBUSDT",
@@ -5406,7 +5486,7 @@
        "pnl": -13.952762521026216,
        "frais": 0,
        "variation": -0.007609772202046727,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,8 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,8 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "ATOMUSDT",
@@ -5419,7 +5499,7 @@
        "pnl": -9.070477414541074,
        "frais": 0,
        "variation": -0.004946996466431153,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,5 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,5 % en 1 jour avant la sortie. Sortie : la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)."
       },
       {
        "paire": "EURUSDT",
@@ -5432,7 +5512,7 @@
        "pnl": -1.115686040034916,
        "frais": 0,
        "variation": -0.0006054315862307202,
-       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de −0,1 % en 3 jours avant la sortie. Sortie : le bitcoin est passé sous sa moyenne 50 jours : sortie par prudence. Le marché du bitcoin était baissier."
+       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,1 % en 3 jours avant la sortie. Sortie : le bitcoin est passé sous sa moyenne 50 jours : sortie par prudence. Le marché du bitcoin était baissier."
       }
      ]
     }
@@ -5538,6 +5618,20 @@
     "cout2": -1103.1536126869512,
     "sansFrais": -183.4299220896116,
     "couverture": 0.000009569377990430622
+   },
+   {
+    "id": "sortie",
+    "nom": "Sortie confirmée (2 bougies) + durée minimale + stop suiveur",
+    "pnl": -1504.8926406819637,
+    "dd": 0.15048926406819682,
+    "n": 394,
+    "expR": -0.6119232011844808,
+    "sqn": -5.728029620081956,
+    "sharpe": -0.27063216529563217,
+    "test": -1486.5571170260873,
+    "cout2": -1505.9840368564708,
+    "sansFrais": -874.1919291506672,
+    "couverture": 1
    }
   ],
   "du": 1759462800000,
