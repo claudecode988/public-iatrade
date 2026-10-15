@@ -19,7 +19,8 @@ const resumeCompte=P=>P?{valeur:+(P.val??1e4).toFixed(2),dd:+(P.dd||0).toFixed(4
   const G=lire(path.join(DIR,'config.json'),null);if(!G){console.error('config.json absent : rien à faire.');return}
   // Version 2 des règles du forward test des familles : même risque pour toutes (plafondRisque). Un ancien état est archivé et
   // toutes les familles repartent le même jour avec les mêmes règles (sinon les comparaisons seraient faussées).
-  const VERSION=3; // 3 : risque par trade passé à 1 % (accord de l'utilisateur), tout le monde repart du même jour{const a=lire(F_ETAT,null);if(a&&a.version!==VERSION){const d=path.join(DIR,'archives'),tag=new Date(now).toISOString().replace(/[:.]/g,'-');fs.mkdirSync(d,{recursive:true});
+  // Version 3 : risque par trade passé à 1 % (accord de l'utilisateur), tout le monde repart du même jour.
+  const VERSION=3;{const a=lire(F_ETAT,null);if(a&&a.version!==VERSION){const d=path.join(DIR,'archives'),tag=new Date(now).toISOString().replace(/[:.]/g,'-');fs.mkdirSync(d,{recursive:true});
     for(const f of[F_ETAT,F_J,F_RES])if(fs.existsSync(f))fs.renameSync(f,path.join(d,tag+'-'+path.basename(f)));console.log('Familles : ancien forward test archivé (règles de risque changées).')}}
   E.setTF(60);const c={...G.cfg,risqueEgal:true},f=(c.fee+c.slip)/100,S0=lire(F_ETAT,null),hNow=Math.floor(now/H)*H-H; // dernière heure FERMÉE (ouverture)
   if(S0&&S0.lastBar>=hNow){console.log('Familles : pas de nouvelle heure fermée.');return}
