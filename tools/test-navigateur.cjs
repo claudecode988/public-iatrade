@@ -48,6 +48,11 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   if(pos){const t0=Date.now();shift[pos.q]=pos.side==='long'?-.05:.05;
     await p.waitForFunction(()=>!S.pos,null,{timeout:5000}).catch(()=>{});const dt=Date.now()-t0,lg=await p.textContent('#log');
     ok(/stop touché au tick/.test(lg),`stop déclenché au tick (sortie ${dt} ms après le saut de prix)`);shift={}}
+  // bouton de clôture manuelle : nouvelle entrée, puis deux touches sur « Vendre maintenant »
+  await p.click('#go');await p.waitForFunction(()=>/Évaluation terminée|Historique|figées/.test(document.getElementById('msg').textContent),null,{timeout:15000});
+  if(await p.evaluate(()=>!!S.pos)){await p.click('#vendre');await p.click('#vendre');await p.waitForFunction(()=>!S.pos,null,{timeout:5000}).catch(()=>{});
+    const vj=await p.evaluate(async()=>{await JR.file;const L=await jrTout();return{pos:!!S.pos,j:L.some(r=>r.agent==='Toi'&&r.type==='sortie')}});ok(!vj.pos&&vj.j,'bouton « Vendre maintenant » : clôture manuelle en deux touches, notée dans le journal')}
+  else ok(true,'bouton « Vendre maintenant » : pas de nouvelle entrée à clôturer (test sauté)');
   // Serveur et gel
   await p.waitForFunction(()=>SV.at>0,null,{timeout:10000});const sv=await p.textContent('#srv');
   ok(/décisions en/.test(sv)&&/Mesure longue \(\d+ mois, serveur\)/.test(sv)&&/Données de test/.test(sv),'forward test 24 h/24 et mesure longue du serveur affichés');
