@@ -12,6 +12,9 @@ const DIR=process.argv[2]||'forward',F_ETAT=path.join(DIR,'familles-etat.json'),
 const sha=t=>crypto.createHash('sha256').update(t).digest('hex'),lire=(f,d)=>{try{return JSON.parse(fs.readFileSync(f,'utf8'))}catch(e){return d}};
 const BASES=['https://data-api.binance.vision','https://api.binance.com'],H=36e5,J1=864e5,now=+process.env.MAINTENANT||Date.now();
 async function get(u){for(const B of BASES){try{const r=await fetch(B+u);if(r.status===429||r.status===418)throw new Error('Binance limite les requêtes');if(r.ok)return r.json()}catch(e){if(/limite/.test(e.message))throw e}}return null}
+// Résumé d'un compte (démo sans frais) pour le site.
+const resumeCompte=P=>P?{valeur:+(P.val??1e4).toFixed(2),dd:+(P.dd||0).toFixed(4),frais:+(P.fees||0).toFixed(2),hist:P.hist||[],nTrades:P.tr?P.tr.clos.length:0,trades:(P.tr?P.tr.clos:[]).slice(-60).reverse(),
+  ouvertes:Object.keys(P.pos||{}).map(q=>({paire:q,valeur:+P.pos[q].toFixed(2),entree:P.tr&&P.tr.ouv[q]?P.tr.ouv[q].prixEntree:null,depuis:P.tr&&P.tr.ouv[q]?P.tr.ouv[q].debut:null}))}:null;
 (async()=>{
   const G=lire(path.join(DIR,'config.json'),null);if(!G){console.error('config.json absent : rien à faire.');return}
   // Version 2 des règles du forward test des familles : même risque pour toutes (plafondRisque). Un ancien état est archivé et
@@ -30,16 +33,19 @@ async function get(u){for(const B of BASES){try{const r=await fetch(B+u);if(r.st
   const F=E.prep(al.D,null,ext),i=F.N-1,tb=F.T[i];if(!(tb>((S0&&S0.lastBar)||0))){console.log('Familles : pas de nouvelle heure fermée.');return}
   const S=S0||{v:1,version:VERSION,debut:now,lastBar:0,h:0,seq:0,prev:'',fams:{}},J=[],ajout=l=>{const r={...l,id:++S.seq,ts:now,prev:S.prev};r.h=sha(JSON.stringify(r));S.prev=r.h;J.push(r)};
   if(S0)S.h+=Math.max(1,Math.round((tb-S.lastBar)/H));
-  for(const id in E.FAMILLES){const fm=E.FAMILLES[id],P=S.fams[id]=S.fams[id]||{debut:now,cash:1e4,pos:{},px:{},st:{},pk:1e4,dd:0,fees:0,n:0};
+  // Démo sans frais demandée par l'utilisateur : les trois stratégies suivies ont aussi un compte où frais et glissement valent zéro.
+  // Le compte avec frais continue en parallèle (c'est lui qui compte pour un passage en argent réel).
+  const comptes=[...Object.keys(E.FAMILLES).map(id=>[id,id,f,c]),...E.TROIS.map(id=>[id+'~sansfrais',id,0,{...c,fee:0,slip:0}])];
+  for(const[key,id,f,c]of comptes){const fm=E.FAMILLES[id],P=S.fams[key]=S.fams[key]||{debut:now,cash:1e4,pos:{},px:{},st:{},pk:1e4,dd:0,fees:0,n:0};
     // positions : valeur mise à jour au prix de clôture ; une paire disparue des données est vendue à son dernier prix connu
-    for(const q in P.pos){if(F.p[q])P.pos[q]*=F.p[q].c[i]/P.px[q];else{const co=P.pos[q]*f;P.cash+=P.pos[q]-co;P.fees+=co;P.n++;ajout({famille:id,paire:q,montant:-P.pos[q],raison:'paire absente des données : vendue au dernier prix connu'});delete P.pos[q]}}
+    for(const q in P.pos){if(F.p[q])P.pos[q]*=F.p[q].c[i]/P.px[q];else{const co=P.pos[q]*f;P.cash+=P.pos[q]-co;P.fees+=co;P.n++;ajout({famille:key,paire:q,montant:-P.pos[q],raison:'paire absente des données : vendue au dernier prix connu'});delete P.pos[q]}}
     const v=P.cash+Object.values(P.pos).reduce((a,b)=>a+b,0);P.st._v=v;P.st._f=f;P.st._risque=c.riskPct/100;const w0=fm.regle(F,i,P.st,F.Q.length,S.h),w=fm.regle.pro||fm.regle.reference?w0:E.plafondRisque(F,i,w0,c,P.pos,v);
     if(w)for(const q in w){const d=v*w[q]-(P.pos[q]||0);if(Math.abs(d)>v*1e-4){const co=Math.abs(d)*f,av=P.pos[q]||0;P.cash-=d+co;P.pos[q]=av+d;P.fees+=co;P.n++;P.tr=P.tr||{ouv:{},clos:[]};E.noteEchange(P.tr,F,id,i,q,d,co,av,P.pos[q],P.st);P.tr.clos=P.tr.clos.slice(-200);
-      ajout({famille:id,paire:q,montant:+d.toFixed(2),part:+w[q].toFixed(4),prix:F.p[q].c[i],bougie:new Date(tb).toISOString()});if(Math.abs(P.pos[q])<1e-6)delete P.pos[q]}}
+      ajout({famille:key,paire:q,montant:+d.toFixed(2),part:+w[q].toFixed(4),prix:F.p[q].c[i],bougie:new Date(tb).toISOString()});if(Math.abs(P.pos[q])<1e-6)delete P.pos[q]}}
     for(const q in P.pos)P.px[q]=F.p[q].c[i];const v2=P.cash+Object.values(P.pos).reduce((a,b)=>a+b,0);P.pk=Math.max(P.pk,v2);P.dd=Math.max(P.dd,(P.pk-v2)/P.pk);P.val=v2;
     {const jr=new Date(tb).toISOString().slice(0,10);P.hist=P.hist||[];if(!P.hist.length||P.hist[P.hist.length-1][0]!==jr)P.hist.push([jr,+v2.toFixed(2)]);else P.hist[P.hist.length-1][1]=+v2.toFixed(2);P.hist=P.hist.slice(-400)}}
   S.lastBar=tb;fs.mkdirSync(DIR,{recursive:true});if(J.length)fs.appendFileSync(F_J,J.map(x=>JSON.stringify(x)).join('\n')+'\n');fs.writeFileSync(F_ETAT,JSON.stringify(S));
   fs.writeFileSync(F_RES,JSON.stringify({maj:now,debut:S.debut,heure:new Date(tb).toISOString(),pairs:F.Q.length,dernierHash:S.prev,faux:!!process.env.FAUX_PRIX,
-    lignes:Object.keys(E.FAMILLES).map(id=>{const P=S.fams[id],inv=Object.values(P.pos).reduce((a,b)=>a+b,0);const T=(P.st._T||[]).slice(-30);return{id,nom:E.FAMILLES[id].nom,valeur:+P.val.toFixed(2),dd:+P.dd.toFixed(4),investi:P.val>0?+(inv/P.val).toFixed(3):0,n:P.n,frais:+P.fees.toFixed(2),debut:P.debut||S.debut,jours:+((now-(P.debut||S.debut))/864e5).toFixed(2),nT:(P.st._T||[]).length,n30:T.length,esp30:T.length?+(T.reduce((a,x)=>a+x.r,0)/T.length).toFixed(4):null,arret:P.st._arret||null,...(E.TROIS.includes(id)?{hist:P.hist||[],ouvertes:Object.keys(P.pos).map(q=>({paire:q,valeur:+P.pos[q].toFixed(2),entree:P.tr&&P.tr.ouv[q]?P.tr.ouv[q].prixEntree:null,depuis:P.tr&&P.tr.ouv[q]?P.tr.ouv[q].debut:null})),trades:(P.tr?P.tr.clos:[]).slice(-60).reverse(),nTrades:P.tr?P.tr.clos.length:0}:{})}})},null,1));
+    lignes:Object.keys(E.FAMILLES).map(id=>{const P=S.fams[id],inv=Object.values(P.pos).reduce((a,b)=>a+b,0);const T=(P.st._T||[]).slice(-30);return{id,nom:E.FAMILLES[id].nom,valeur:+P.val.toFixed(2),dd:+P.dd.toFixed(4),investi:P.val>0?+(inv/P.val).toFixed(3):0,n:P.n,frais:+P.fees.toFixed(2),debut:P.debut||S.debut,jours:+((now-(P.debut||S.debut))/864e5).toFixed(2),nT:(P.st._T||[]).length,n30:T.length,esp30:T.length?+(T.reduce((a,x)=>a+x.r,0)/T.length).toFixed(4):null,arret:P.st._arret||null,...(E.TROIS.includes(id)?{hist:P.hist||[],ouvertes:Object.keys(P.pos).map(q=>({paire:q,valeur:+P.pos[q].toFixed(2),entree:P.tr&&P.tr.ouv[q]?P.tr.ouv[q].prixEntree:null,depuis:P.tr&&P.tr.ouv[q]?P.tr.ouv[q].debut:null})),trades:(P.tr?P.tr.clos:[]).slice(-60).reverse(),nTrades:P.tr?P.tr.clos.length:0,demo:resumeCompte(S.fams[id+'~sansfrais'])}:{})}})},null,1));
   console.log(`Familles : heure ${new Date(tb).toISOString()}, ${J.length} échange(s), ${Object.keys(E.FAMILLES).map(id=>id+' '+S.fams[id].val.toFixed(0)).join(' | ')}`)
 })().catch(e=>{console.error(e);process.exit(1)});
