@@ -1,6 +1,6 @@
 {
- "geleeLe": "2026-10-14T14:43:59Z",
- "note": "Configuration gelée du forward test 24 h/24. La modifier archive le journal et fait repartir la preuve de zéro.",
+ "geleeLe": "2026-10-15T06:57:10Z",
+ "note": "Risque par trade passé de 0,5 % à 1 % le 2026-10-15T06:57:10Z avec l’accord de l’utilisateur : le forward test des agents repart de zéro (ancien journal archivé).",
  "tf": 5,
  "regles": [],
  "cfg": {
@@ -14,7 +14,7 @@
   "atrK": 2,
   "fee": 0.1,
   "slip": 0.05,
-  "riskPct": 0.5,
+  "riskPct": 1,
   "ddMax": 15,
   "rsrc": "auto",
   "news": "neutre"
