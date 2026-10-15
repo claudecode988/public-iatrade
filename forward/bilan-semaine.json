@@ -1,0 +1,101 @@
+{
+ "maj": 1792049410648,
+ "du": 1791444610648,
+ "au": 1792049410648,
+ "agents": {
+  "nom": "Agents actuels",
+  "note": "avec frais",
+  "n": 0,
+  "gagnants": 0,
+  "reussite": null,
+  "gainMoy": 0,
+  "perteMoy": 0,
+  "esperance": null,
+  "total": 0,
+  "erreurs": [],
+  "action": null
+ },
+ "strategies": [
+  {
+   "id": "A2",
+   "nom": "Agents version 2 (règles du dossier)",
+   "note": "avec frais",
+   "n": 0,
+   "gagnants": 0,
+   "reussite": null,
+   "gainMoy": 0,
+   "perteMoy": 0,
+   "esperance": null,
+   "total": 0,
+   "erreurs": [],
+   "action": null,
+   "demo": {
+    "nom": "Agents version 2 (règles du dossier)",
+    "note": "démo sans frais",
+    "n": 0,
+    "gagnants": 0,
+    "reussite": null,
+    "gainMoy": 0,
+    "perteMoy": 0,
+    "esperance": null,
+    "total": 0,
+    "erreurs": [],
+    "action": null
+   }
+  },
+  {
+   "id": "prudente",
+   "nom": "Prudente (tendance + régime + volatilité cible + pause Fed)",
+   "note": "avec frais",
+   "n": 0,
+   "gagnants": 0,
+   "reussite": null,
+   "gainMoy": 0,
+   "perteMoy": 0,
+   "esperance": null,
+   "total": 0,
+   "erreurs": [],
+   "action": null,
+   "demo": {
+    "nom": "Prudente (tendance + régime + volatilité cible + pause Fed)",
+    "note": "démo sans frais",
+    "n": 0,
+    "gagnants": 0,
+    "reussite": null,
+    "gainMoy": 0,
+    "perteMoy": 0,
+    "esperance": null,
+    "total": 0,
+    "erreurs": [],
+    "action": null
+   }
+  },
+  {
+   "id": "regime",
+   "nom": "Tendance lente + régime du bitcoin",
+   "note": "avec frais",
+   "n": 0,
+   "gagnants": 0,
+   "reussite": null,
+   "gainMoy": 0,
+   "perteMoy": 0,
+   "esperance": null,
+   "total": 0,
+   "erreurs": [],
+   "action": null,
+   "demo": {
+    "nom": "Tendance lente + régime du bitcoin",
+    "note": "démo sans frais",
+    "n": 0,
+    "gagnants": 0,
+    "reussite": null,
+    "gainMoy": 0,
+    "perteMoy": 0,
+    "esperance": null,
+    "total": 0,
+    "erreurs": [],
+    "action": null
+   }
+  }
+ ]
+}
