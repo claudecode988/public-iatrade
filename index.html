@@ -774,7 +774,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-15 09:56';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-15 09:59';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;
@@ -1147,7 +1147,7 @@ function render(){
   if(S.dec)$('dec').innerHTML=`<div class="dd"><span class="chip ${dk(S.dec.d)}">${S.dec.d}</span><span class="mut">indice de confiance du bot : ${S.dec.conf}</span></div>${S.dec.why}<br><span class="mut">Rocky : ${S.dec.rr}</span>`;
   const r0=(eq-S.start)/S.start;$('ret').textContent=`${r0>=0?'+':'−'}${Math.abs(r0*100).toFixed(2).replace('.',',')} % depuis le départ (${fmt(S.start)})`;$('ret').className='delta '+(r0>=0?'up':'dn');
   $('nt').textContent=`${S.day===today()?S.nToday:0} / ${S.cfg.maxTrades}`;
-  $('cal').innerHTML=(P?`<b>${P.q} : position ouverte en ${P.side==='long'?'hausse':'baisse'}</b> à ${fp(P.fill)}, stop <span id="pstop">${fp(P.stop)}</span>, résultat latent <span id="plat">–</span>.<br>`:'')+
+  $('cal').innerHTML=(P?`<b>${P.q} : position ouverte en ${P.side==='long'?'hausse':'baisse'}</b> à ${fp(P.fill)}, stop <span id="pstop">${fp(P.stop)}</span>, résultat latent <span id="plat">–</span>.<br><button class="btn stop" id="vendre" type="button">${P.side==='long'?'Vendre maintenant':'Racheter maintenant'} (clôturer moi-même)</button><span class="mut" id="vendmsg"></span><br>`:'')+
     (n?`Indice annoncé en moyenne ${Math.round(H.reduce((a,x)=>a+x.p,0)/n*100)} %, réussite réelle ${Math.round(H.filter(x=>x.pnl>0).length/n*100)} % sur ${n} trades, durée moyenne ${(H.reduce((a,x)=>a+(x.dur||0),0)/n).toFixed(1)} h. Un grand écart veut dire que l’indice du bot n’est pas fiable.`:'<span class="mut">Aucun trade clôturé pour mesurer la fiabilité du bot.</span>');
   delete PV.plat;delete PV.pstop;
   $('log').innerHTML=S.log.length?S.log.map(x=>`<div class="row">${x}</div>`).join(''):'<span class="mut">Le journal est vide.</span>';
@@ -1295,6 +1295,13 @@ $('auto').onclick=()=>{if(timer){stopAuto();return}
   $('auto-st').textContent=`Agents en service · prochaine décision à ${hr(Math.ceil(Date.now()/TF.bar)*TF.bar).slice(0,5)}.`;renderAgents();decider(0,false)};
 $('go').onclick=()=>decider(0,true);
 $('kill2').onclick=()=>$('kill').onclick();
+// Clôture manuelle de la position fictive de ce navigateur : deux touches pour confirmer, au prix en direct (vendeur pour une vente).
+// Elle est notée dans le journal comme une décision de l'utilisateur. Les positions du serveur (onglets) ne peuvent pas être touchées d'ici.
+let VEND=0;document.addEventListener('click',async e=>{if(!e.target||e.target.id!=='vendre')return;const b=e.target,P=S.pos,m=$('vendmsg');if(!P)return;
+  if(!VEND){VEND=setTimeout(()=>{VEND=0;render()},4000);b.textContent='Touche encore pour confirmer la clôture';return}clearTimeout(VEND);VEND=0;
+  const px=P.side==='long'?LV.bid[P.q]:LV.ask[P.q];if(!px||!fresh()){if(m)m.textContent=' Pas de prix en direct récent : clôture impossible pour l’instant.';return}
+  b.disabled=true;await jrAjouter({agent:'Toi',type:'sortie',paire:P.q,sens:P.side,raison:'clôture manuelle demandée par l’utilisateur',confiance:null,prix:jrPrix(P.q),entrees:null,trade:P.jid||null}).then(id=>{P.jsx=id});
+  await cloturer(px,'clôture manuelle',true)});
 $('kill').onclick=()=>{S.stop=!S.stop;if(S.stop&&timer)stopAuto('Arrêt d\'urgence actif : agents arrêtés, aucune nouvelle entrée. Un stop ouvert reste surveillé.');save();render();$('msg').textContent=S.stop?'Tout est suspendu : aucun nouvel ordre.':'Reprise possible.'};
 const NUM={capReel:[0,1e7],npT1:[1,1e4],npJ1:[1,3650],npT2:[1,1e5],npJ2:[1,3650],riskPct:[.05,5],ddMax:[1,50],hb:[2,60],nb:[1,10],size:[10,1e6],maxLoss:[.5,100],maxTrades:[1,1000],sl:[.5,50],thr:[50,99],hold:[0,200],atrK:[.5,10],fee:[0,2],slip:[0,2],maxRuns:[1,100000]};
 const STRAT=['tf','nb','size','maxLoss','maxTrades','sl','thr','hold','atrK','fee','slip','riskPct','ddMax','rsrc','news'];
