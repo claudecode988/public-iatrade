@@ -1,13 +1,13 @@
 {
- "maj": 1792076414516,
+ "maj": 1792076761494,
  "debut": 1792047729946,
  "geleeLe": "2026-10-15T06:57:10Z",
  "tf": "5 min",
  "vAgents": "daf0e246fdc2f5ef",
  "vReglages": "47163c19315888ea",
  "regles": [],
- "decisions": 105,
- "passages": 97,
+ "decisions": 106,
+ "passages": 98,
  "trades": 4,
  "frais": 24.02,
  "glissement": 12.01,
@@ -17,9 +17,9 @@
  "gagne": 0,
  "perdu": -92.46,
  "pf": 0,
- "valeur": 9943.93,
+ "valeur": 9961.7,
  "plusHaut": 10021.26,
- "baisse": 0.0077,
+ "baisse": 0.0059,
  "position": {
   "paire": "ATOMUSDT",
   "sens": "long",
@@ -27,8 +27,8 @@
   "entree": 1.6878435,
   "stop": 1.65326
  },
- "retardMedianS": 33,
+ "retardMedianS": 34,
  "retardMaxS": 130,
- "dernierHash": "18d82bfd070f379fd823db0914bdb0d8d02b9dab17d1b2435005d7df0185a23b",
+ "dernierHash": "d464db0084df517241e13dc1dd57fb9ad0bb3bbfb68be66c875e6dac0afd65e2",
  "faux": false
 }
