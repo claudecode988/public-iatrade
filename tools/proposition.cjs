@@ -2,7 +2,7 @@
 // (une crypto chez Binance, une paire forex chez un courtier), sur bougies journalières, au format de 03_checklist_trade.md.
 // Le site affiche la proposition ; c'est l'utilisateur qui décide et passe l'ordre lui-même. Aucun ordre, aucune clé.
 // Données publiques en lecture seule : Binance (data-api.binance.vision) pour les cryptos, Stooq (CSV journalier) pour le forex,
-// et les taux de référence de la BCE (api.frankfurter.app, clôture seule) en secours. Une donnée absente est signalée, jamais inventée.
+// puis Yahoo Finance (graphique public), et les taux de référence de la BCE (api.frankfurter.app, clôture seule) en dernier secours. Une donnée absente est signalée, jamais inventée.
 // Publie aussi un test sur environ 5 ans de chaque stratégie journalière, actif par actif, avec les mêmes règles (aucun réglage changé).
 //   node tools/proposition.cjs <dossier>     (FAUX_PRIX=1 : prix inventés pour tester le programme ; MAINTENANT : heure simulée)
 const fs=require('fs'),path=require('path');
@@ -16,9 +16,13 @@ async function binance(q){let all=[],end='';for(let k=0;k<2;k++){let j=null;for(
 async function forex(sym){const src=[];
   try{const r=await fetch(`https://stooq.com/q/d/l/?s=${sym.toLowerCase()}&i=d`),t=await r.text();const L=t.trim().split('\n').slice(1).map(l=>l.split(',')).filter(v=>v.length>=5&&/^\d{4}-/.test(v[0]));
     if(L.length>100)return{src:'Stooq (journalier)',J:L.map(v=>({t:Date.parse(v[0]+'T00:00:00Z'),o:+v[1],h:+v[2],l:+v[3],c:+v[4],v:0})).filter(x=>isFinite(x.c)&&x.t+J1<=now)};src.push('Stooq : réponse inutilisable')}catch(e){src.push('Stooq injoignable')}
+  // Yahoo Finance (graphique public, sans clé) : ouverture, plus haut, plus bas, clôture journaliers ; minuit arrondi à la journée UTC.
+  try{const r=await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}=X?range=10y&interval=1d`,{headers:{'User-Agent':'Mozilla/5.0 (TradeInsight, lecture seule)'}}),j=await r.json(),R=j&&j.chart&&j.chart.result&&j.chart.result[0],Q=R&&R.indicators&&R.indicators.quote&&R.indicators.quote[0];
+    if(R&&Q&&R.timestamp){const L=R.timestamp.map((ts,i)=>({t:Math.round(ts*1e3/J1)*J1,o:Q.open[i],h:Q.high[i],l:Q.low[i],c:Q.close[i],v:0})).filter(x=>[x.o,x.h,x.l,x.c].every(v=>v!=null&&isFinite(v))&&x.t+J1<=now);
+      const U=[...new Map(L.map(x=>[x.t,x])).values()].sort((a,b)=>a.t-b.t);if(U.length>100)return{src:'Yahoo Finance (journalier, plus haut et plus bas inclus)'+(src.length?' — '+src.join(' ; '):''),J:U}}src.push(`Yahoo : réponse inutilisable (${r.status})`)}catch(e){src.push('Yahoo injoignable')}
   try{const d0=new Date(now-6*365*J1).toISOString().slice(0,10),r=await fetch(`https://api.frankfurter.app/${d0}..?from=${sym.slice(0,3)}&to=${sym.slice(3)}`),j=await r.json();
     const L=Object.entries(j.rates||{}).map(([d,v])=>({t:Date.parse(d+'T00:00:00Z'),c:v[sym.slice(3)]})).filter(x=>isFinite(x.c)).map(x=>({...x,o:x.c,h:x.c,l:x.c,v:0}));
-    if(L.length>100)return{src:'BCE via frankfurter.app (clôture seule : plus haut et plus bas inconnus)',J:L.filter(x=>x.t+J1<=now)}}catch(e){}src.push('BCE injoignable');return{src:src.join(' ; '),J:[]}}
+    if(L.length>100)return{src:'BCE via frankfurter.app (clôture seule : plus haut et plus bas inconnus) — '+src.join(' ; '),J:L.filter(x=>x.t+J1<=now)}}catch(e){}src.push('BCE injoignable');return{src:src.join(' ; '),J:[]}}
 function faux(q,n=1900){const k=q.charCodeAt(0)+q.charCodeAt(3)*3,f=t=>(q.includes('USDT')?100:1.1)*(1+.3*Math.sin(t/J1/60+k)+.05*Math.sin(t/J1/7+k*2)),t0=Math.floor(now/J1)*J1-n*J1,a=[];
   for(let i=0;i<n;i++){const t=t0+i*J1,o=f(t),c=f(t+J1);a.push({t,o,h:Math.max(o,c)*1.01,l:Math.min(o,c)*.99,c,v:100+50*Math.sin(i/5)})}return a}
 (async()=>{
