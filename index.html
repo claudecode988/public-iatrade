@@ -569,8 +569,9 @@ function noteEchange(TR,F,id,t,q,d,co,avant,apres,st,fin){const x=F.p[q].c[t];
     tr.pourquoi=pourquoi(id,F,q,t,tr,st,fin);TR.clos.push(tr);delete TR.ouv[q]}}
 // Petite analyse d'un trade terminé, d'après ce que l'on sait au moment de la sortie (raison de la règle, mouvement du prix, frais, marché).
 function pourquoi(id,F,q,t,tr,st,fin){const P=F.p[q],j=Math.max(1,Math.round((tr.fin-tr.debut)/864e5)),v=tr.variation,pc=x=>`${x>=0?'+':'−'}${Math.abs(x*100).toFixed(1).replace('.',',')} %`;
-  let sortie=fin?'fin de la période mesurée':'';
-  if(!sortie&&st&&st._T){const z=st._T.filter(y=>y.q===q).pop();if(z&&P.ji&&z.j===P.ji[t]-1)sortie=z.raison}
+  let sortie=fin?'fin de la période mesurée':'',entree='';
+  if(st&&st._T){const z=st._T.filter(y=>y.q===q).pop();if(z&&P.ji&&z.j===P.ji[t]-1){if(!sortie)sortie=z.raison;entree=z.why||''}}
+  if(!entree&&st&&st._pos&&st._pos[q]&&st._pos[q].why)entree=st._pos[q].why;
   if(!sortie)sortie=F.reg&&F.reg[t]===-1?'le bitcoin est passé sous sa moyenne 50 jours : sortie par prudence':P.ef&&P.ef[t]<=P.es[t]?'la tendance de la paire s’est retournée (moyenne 50 h sous la moyenne 200 h)':'rééquilibrage de la stratégie';
   const marche=F.reg&&F.reg[t]===-1?' Le marché du bitcoin était baissier.':'';
   const bas=tr.sens==='baisse',fav=bas?-v:v,mv=w=>`${w>=0?'monté':'baissé'} de ${pc(Math.abs(w)).replace(/^[+−]/,'')}`;
@@ -578,7 +579,7 @@ function pourquoi(id,F,q,t,tr,st,fin){const P=F.p[q],j=Math.max(1,Math.round((tr
     :fav>0?`Perte malgré un mouvement favorable (le prix a ${mv(v)}) : il n’a pas couvert les frais et le glissement (${(tr.frais/(tr.mis||1)*100).toFixed(2).replace('.',',')} % de la mise).`
     :/stop/.test(sortie)?`Perte : le prix est parti dans le mauvais sens (il a ${mv(v)}) juste après l’entrée (faux départ) et le stop a coupé la perte, comme prévu.`
     :`Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a ${mv(v)} en ${j} jour${j>1?'s':''} avant la sortie.`;
-  return`${pourq} Sortie : ${sortie}.${marche}`}
+  return`${entree?`Entrée : ${entree}. `:''}${pourq} Sortie : ${sortie}.${marche}`}
 function portefeuille(F,from,to,c,regle){const Q=F.Q,n=Q.length,k=Math.max(1,Math.round(H1/TF.bar)),f=(c.fee+c.slip)/100,pos={},st={},J=[],TRS=c.trades?{ouv:{},clos:[]}:null;
   let cash=1e4,pk=1e4,dd=0,fees=0,nTr=0,day='';for(const q of Q)pos[q]=0;const val=()=>cash+Q.reduce((a,q)=>a+pos[q],0);
   for(let t=from;t<to;t++){if(t>from)for(const q of Q)pos[q]*=F.p[q].c[t]/F.p[q].c[t-1];
@@ -594,6 +595,51 @@ function portefeuille(F,from,to,c,regle){const Q=F.Q,n=Q.length,k=Math.max(1,Mat
 // 5 % de risque ouvert au total, au plus 2 positions très corrélées (corrélation > 0,8 sur 30 jours), perte du jour ≥ 2 % : plus
 // d'entrée ce jour-là, perte du mois ≥ 6 % : pause jusqu'au mois suivant, baisse ≥ 15 % depuis le plus haut : tout est vendu et la
 // stratégie s'arrête (retour en papier). Jamais de levier, jamais de moyenne à la baisse (une seule position par paire).
+// ---------- Analyse de marché (agents version 3) : huit lectures d'un actif sur bougies journalières ----------
+// Sommets et creux confirmés : un sommet est plus haut que les 3 journées de chaque côté (il n'est donc connu que 3 jours après).
+function pivotsJ(P,i,n=120,k=3){const H=[],B=[];for(let j=Math.max(k,i-n);j<=i-k;j++){let h=true,b=true;for(let m=1;m<=k;m++){if(!(P.jh[j]>P.jh[j-m]&&P.jh[j]>=P.jh[j+m]))h=false;if(!(P.jl[j]<P.jl[j-m]&&P.jl[j]<=P.jl[j+m]))b=false}if(h)H.push(j);if(b)B.push(j)}return{H,B}}
+function rsiSerie(a,i,n=14){const o=new Array(i+1).fill(null);if(i<n)return o;let g=0,l=0;for(let k=1;k<=n;k++){const d=a[k]-a[k-1];d>0?g+=d:l-=d}g/=n;l/=n;o[n]=l?100-100/(1+g/l):100;
+  for(let k=n+1;k<=i;k++){const d=a[k]-a[k-1];g=(g*(n-1)+Math.max(d,0))/n;l=(l*(n-1)+Math.max(-d,0))/n;o[k]=l?100-100/(1+g/l):100}return o}
+// Zones : niveaux des sommets et creux des 6 derniers mois regroupés dans une bande de 0,6 ATR ; force = nombre de contacts.
+function zonesJ(P,i,atr){const{H,B}=pivotsJ(P,i,180),L=[...H.map(j=>P.jh[j]),...B.map(j=>P.jl[j])].sort((a,b)=>a-b),Z=[];
+  for(const v of L){const z=Z[Z.length-1];if(z&&v-z.min<=.6*atr){z.max=v;z.n++;z.niv=(z.niv*(z.n-1)+v)/z.n}else Z.push({min:v,max:v,niv:v,n:1})}return Z.filter(z=>z.n>=2)} // zone large d'au plus 0,6 ATR
+function lectureJour(P,i){if(i<210)return null;const c=P.jc[i],o=P.jc[i-1],atr=atrJ(P,i);if(!atr)return null;
+  const m100=mmJ(P.jc,i,100),fond=c>m100?1:-1,{H,B}=pivotsJ(P,i),h1=H[H.length-1],h0=H[H.length-2],b1=B[B.length-1],b0=B[B.length-2];
+  const structure=h1!=null&&h0!=null&&b1!=null&&b0!=null?(P.jh[h1]>P.jh[h0]&&P.jl[b1]>P.jl[b0]?1:P.jh[h1]<P.jh[h0]&&P.jl[b1]<P.jl[b0]?-1:0):0;
+  const Z=zonesJ(P,i,atr),sup=Z.filter(z=>z.niv<c).pop(),res=Z.find(z=>z.niv>c);
+  // chandelier : ouverture ≈ clôture de la veille (bougies journalières continues en crypto)
+  const op=o,corps=Math.abs(c-op),haut=P.jh[i],bas=P.jl[i],ch=haut-bas||1e-12,op1=P.jc[i-2],c1=P.jc[i-1];
+  const avaleH=c>op&&c1<op1&&c>=op1&&op<=c1,avaleB=c<op&&c1>op1&&c<=op1&&op>=c1,marteau=Math.min(c,op)-bas>=2*corps&&haut-Math.max(c,op)<=corps&&corps>0,etoile=haut-Math.max(c,op)>=2*corps&&Math.min(c,op)-bas<=corps&&corps>0;
+  const bougie=avaleH||marteau?1:avaleB||etoile?-1:0,nomBougie=avaleH?'avalement haussier':marteau?'marteau':avaleB?'avalement baissier':etoile?'étoile filante':'';
+  const R=rsiSerie(P.jc,i);let divergence=0;
+  if(b1!=null&&b0!=null&&P.jl[b1]<P.jl[b0]&&R[b1]!=null&&R[b0]!=null&&R[b1]>R[b0]&&i-b1<=10)divergence=1;
+  if(h1!=null&&h0!=null&&P.jh[h1]>P.jh[h0]&&R[h1]!=null&&R[h0]!=null&&R[h1]<R[h0]&&i-h1<=10)divergence=-1;
+  const vm=mmJ(P.jv,i-1,20),volume=vm&&P.jv[i]>1.5*vm?(c>=op?1:-1):0;
+  const larg=k=>{const m=mmJ(P.jc,k,20);if(!m)return null;let s=0;for(let j=k-19;j<=k;j++)s+=(P.jc[j]-m)**2;return 4*Math.sqrt(s/20)/m};
+  const lw=[];for(let k=i-120;k<i;k++){const x=larg(k);if(x!=null)lw.push(x)}lw.sort((a,b)=>a-b);const lAvant=larg(i-1),m20=mmJ(P.jc,i,20),sd=larg(i)*m20/4;
+  const compression=lw.length&&lAvant!=null&&lAvant<=lw[Math.floor(lw.length*.2)]?(c>m20+2*sd?1:c<m20-2*sd?-1:0):0;
+  return{c,atr,fond,structure,sup,res,bougie,nomBougie,divergence,volume,compression,dernierCreux:b1!=null?P.jl[b1]:null,dernierSommet:h1!=null?P.jh[h1]:null}}
+function analyseMarche(P,i,F,t){const A=lectureJour(P,i);if(!A)return null;const reg=F&&F.reg?F.reg[t]:0,c=A.c;
+  for(const d of[1,-1]){const L=d===-1,raisons=[];
+    // scénario 1 : rebond sur un support (rejet sous une résistance) dans le sens de la tendance de fond ; scénario 2 : cassure de zone
+    const zone=L?A.res:A.sup,proche=zone&&Math.abs(c-zone.niv)<=A.atr&&(L?A.bougie===-1||A.divergence===-1:A.bougie===1||A.divergence===1)&&A.fond===d;
+    const zc=L?A.sup&&P.jc[i-1]>=A.sup.niv&&c<A.sup.niv-.25*A.atr?A.sup:null:A.res&&P.jc[i-1]<=A.res.niv&&c>A.res.niv+.25*A.atr?A.res:null;
+    const casse=zc&&A.volume===d&&A.fond===d;if(!proche&&!casse)continue;
+    let score=0;const v=(ok,txt)=>{if(ok){score++;raisons.push(txt)}};
+    v(A.fond===d,L?'tendance de fond baissière (sous la MM100)':'tendance de fond haussière (au-dessus de la MM100)');
+    v(A.structure===d,L?'structure baissière (plus hauts et plus bas descendants)':'structure haussière (plus hauts et plus bas montants)');
+    v(!!proche,L?`rejet sous une résistance touchée ${zone&&zone.n} fois`:`rebond sur un support touché ${zone&&zone.n} fois`);
+    v(A.bougie===d,`figure de chandelier : ${A.nomBougie}`);
+    v(A.divergence===d,L?'divergence baissière du RSI':'divergence haussière du RSI');
+    v(A.volume===d,'volume au-dessus de 1,5 × sa moyenne');
+    v(A.compression===d||!!casse,casse?`cassure ${L?'du support':'de la résistance'} à ${zc.niv.toPrecision(5)}`:'sortie de compression de Bollinger');
+    v(reg===d||reg===0&&!F.reg.some(x=>x),L?'marché du bitcoin baissier':'marché du bitcoin haussier');
+    if(score<4)continue;
+    const stop=L?Math.max(c+A.atr,(proche?zone.max:zc.max)+.5*A.atr,A.dernierSommet&&A.dernierSommet>c?A.dernierSommet+.25*A.atr:0):Math.min(c-A.atr,(proche?zone.min:zc.min)-.5*A.atr,A.dernierCreux&&A.dernierCreux<c?A.dernierCreux-.25*A.atr:Infinity);
+    const cible=L?(A.sup&&A.sup!==zc?A.sup.niv:c-3*(stop-c)):(A.res&&A.res!==zc?A.res.niv:c+3*(c-stop)),gr=L?(c-cible)/(stop-c):(cible-c)/(c-stop);
+    if(!(gr>=2))continue; // gain visé ≥ 2 × le risque (01_gestion_risque.md)
+    return{side:L?'short':'long',stop,objectif:cible,force:score+gr/10,why:`${score}/8 analyses d’accord : ${raisons.join(', ')} ; gain visé ${gr.toFixed(1).replace('.',',')} × le risque`}}
+  return null}
 const PRO_RISQUE=.01,PRO_RISQUE_TOTAL=.05;
 const mmJ=(a,i,n)=>{if(i+1<n)return null;let s=0;for(let k=i-n+1;k<=i;k++)s+=a[k];return s/n};
 function atrJ(P,i,n=14){if(i<n)return null;let s=0;for(let k=i-n+1;k<=i;k++)s+=Math.max(P.jh[k]-P.jl[k],Math.abs(P.jh[k]-P.jc[k-1]),Math.abs(P.jl[k]-P.jc[k-1]));return s/n}
@@ -627,25 +673,29 @@ const STRAT_PRO={
       if(!casse){let touche=false;for(let k=i-3;k<i;k++){const m=mmJ(P.jc,k,20);if(m&&P.jl[k]<=m)touche=true}rep=touche&&c>P.jh[i-1]}
       return casse||rep?{stop:c-2*x,force:c/P.jc[i-63]-1}:null},
     sortie:(P,i,p)=>{p.stop=Math.max(p.stop,Math.min(...P.jl.slice(i-19,i+1)));const a=mmJ(P.jc,i,50);return a&&P.jc[i]<a?'clôture sous la MM50 : tendance perdue':''}},
-  // Agents version 3 : la version 2 dans les deux sens. Achat dans une tendance de fond haussière, vente à découvert (pari sur la baisse)
-  // dans une tendance de fond baissière, avec les mêmes déclencheurs en miroir. Sortie seulement quand l'analyse le confirme : deux
-  // clôtures de suite de l'autre côté de la MM50 (une seule journée contraire ne suffit pas, le prix peut repartir), ou le stop.
-  A3:{nom:'Agents version 3 (hausse et baisse)',txt:'La version 2 dans les deux sens : achat quand la tendance de fond monte, vente à découvert quand elle baisse (bitcoin du même côté de sa moyenne 50 jours), déclencheur cassure 20 jours avec volume ou reprise / rebond raté, sortie seulement après deux clôtures de suite de l’autre côté de la MM50 (une journée contraire ne suffit pas) ou sur le stop suiveur, 1 % risqué par trade.',
-    filtre:(F,t,side)=>!FOMC.some(x=>x>F.T[t]&&x-F.T[t]<=24*H1)&&(side==='short'?F.reg[t]!==1:F.reg[t]!==-1),
-    entree:(P,i)=>{if(i<205)return null;const a=mmJ(P.jc,i,50),b=mmJ(P.jc,i,200),x=atrJ(P,i),c=P.jc[i];if(!(a&&b&&x))return null;const vm=mmJ(P.jv,i-1,20),vol=vm&&P.jv[i]>vm;
-      if(a>b&&c>a){const casse=c>Math.max(...P.jh.slice(i-20,i))&&vol;let rep=false;if(!casse){let t_=false;for(let k=i-3;k<i;k++){const m=mmJ(P.jc,k,20);if(m&&P.jl[k]<=m)t_=true}rep=t_&&c>P.jh[i-1]}
-        return casse||rep?{side:'long',stop:c-2*x,force:c/P.jc[i-63]-1}:null}
-      if(a<b&&c<a){const casse=c<Math.min(...P.jl.slice(i-20,i))&&vol;let rat=false;if(!casse){let t_=false;for(let k=i-3;k<i;k++){const m=mmJ(P.jc,k,20);if(m&&P.jh[k]>=m)t_=true}rat=t_&&c<P.jl[i-1]}
-        return casse||rat?{side:'short',stop:c+2*x,force:1-c/P.jc[i-63]}:null}
-      return null},
-    sortie:(P,i,p)=>{const a=mmJ(P.jc,i,50),a1=mmJ(P.jc,i-1,50);
-      if(p.side==='short'){p.stop=Math.min(p.stop,Math.max(...P.jh.slice(i-19,i+1)));return a&&a1&&P.jc[i]>a&&P.jc[i-1]>a1?'deux clôtures de suite au-dessus de la MM50 : la baisse est finie (analyse confirmée)':''}
-      p.stop=Math.max(p.stop,Math.min(...P.jl.slice(i-19,i+1)));return a&&a1&&P.jc[i]<a&&P.jc[i-1]<a1?'deux clôtures de suite sous la MM50 : la hausse est finie (analyse confirmée)':''}},
+  // Agents version 3 : analyse de marché comme un trader. Chaque jour, pour chaque actif, Filou lit huit analyses (bougies journalières) :
+  // 1. tendance de fond (prix et MM100 ≈ 20 semaines), 2. structure du marché (plus hauts et plus bas de plus en plus hauts, ou bas),
+  // 3. supports et résistances (zones touchées au moins 2 fois en 6 mois), 4. figure de chandelier (avalement, marteau, étoile filante),
+  // 5. divergence du RSI 14, 6. volume (au-dessus de 1,5 × sa moyenne), 7. compression des bandes de Bollinger puis sortie,
+  // 8. contexte (régime du bitcoin pour les cryptos, annonce de la Fed). Deux scénarios seulement : rebond sur un support (ou rejet sous une
+  // résistance) dans le sens de la tendance de fond, ou cassure confirmée d'une résistance (d'un support). Entrée si le scénario est là ET
+  // au moins 4 analyses sur 8 sont d'accord ET le gain visé (prochaine résistance ou support) vaut au moins 2 fois le risque (dossier).
+  // Stop derrière la zone ou le dernier creux / sommet. Sortie quand l'analyse le dit : objectif atteint, structure cassée (plus bas plus
+  // bas en achat, plus haut plus haut en vente), ou figure contraire confirmée par une divergence ; jamais sur un simple retournement d'un jour.
+  A3:{nom:'Agents version 3 (analyse de marché)',txt:'Les agents lisent le marché comme un trader : tendance de fond, structure (plus hauts et plus bas), supports et résistances, figures de chandeliers, divergences du RSI, volume, compression de Bollinger et contexte (bitcoin, Fed). Entrée seulement sur un rebond ou une cassure de zone avec au moins 4 analyses sur 8 d’accord et un gain visé d’au moins 2 fois le risque ; sortie à l’objectif, sur cassure de structure ou figure contraire confirmée, ou au stop. Achat ou vente à découvert selon l’analyse.',
+    filtre:(F,t,side)=>!FOMC.some(x=>x>F.T[t]&&x-F.T[t]<=24*H1),
+    entree:(P,i,F,t)=>analyseMarche(P,i,F,t),
+    sortie:(P,i,p)=>{const A=lectureJour(P,i);if(!A)return'';const L=p.side==='short';
+      if(L?P.jl[i]<=p.objectif:P.jh[i]>=p.objectif)return`objectif atteint (${L?'support':'résistance'} visé${L?'':'e'} à ${p.objectif.toPrecision(5)})`;
+      if(L?A.structure===1&&P.jc[i]>A.dernierSommet:A.structure===-1&&P.jc[i]<A.dernierCreux)return L?'structure cassée : nouveau plus haut plus haut, la baisse est finie':'structure cassée : nouveau plus bas plus bas, la hausse est finie';
+      if(L?(A.bougie===1&&A.divergence===1):(A.bougie===-1&&A.divergence===-1))return L?'figure de retournement haussière confirmée par une divergence du RSI':'figure de retournement baissière confirmée par une divergence du RSI';
+      if(!L)p.stop=Math.max(p.stop,A.dernierCreux?A.dernierCreux-.5*A.atr:p.stop);else p.stop=Math.min(p.stop,A.dernierSommet?A.dernierSommet+.5*A.atr:p.stop);
+      return''}},
   S5:{nom:'S5 · Rotation momentum mensuelle',txt:'Le premier jour du mois : les 2 paires qui ont le plus monté sur 6 mois, à parts égales ; une paire sous sa MM200 est remplacée par des liquidités. Pas de stop (rééquilibrage mensuel seulement).',rotation:true}};
 function reglePro(id){const S=STRAT_PRO[id];return(F,t,st,n)=>{const P0=F.p[F.Q[0]],k=P0.ji[t];if(!k||k===st._kj)return null;st._kj=k;const I=q=>F.p[q].ji[t]-1,o={},v=st._v||1e4,f=st._f||0;
     st._T=st._T||[];st._pk=Math.max(st._pk||v,v);const mois=new Date(F.T[t]+TF.bar).toISOString().slice(0,7);if(st._mois!==mois){st._mois=mois;st._m0=v}
     const pj=st._j0?v/st._j0-1:0;st._j0=v;const dd=(st._pk-v)/st._pk;st._pos=st._pos||{};const pos=st._pos;
-    const fermer=(q,raison)=>{const p=pos[q],P=F.p[q],x=P.jc[I(q)],g=p.side==='short'?1-x/p.e:x/p.e-1;st._T.push({q,r:(g-2*f)/p.rf,raison,j:I(q),e:p.e,x,side:p.side||'long'});delete pos[q];o[q]=0};
+    const fermer=(q,raison)=>{const p=pos[q],P=F.p[q],x=P.jc[I(q)],g=p.side==='short'?1-x/p.e:x/p.e-1;st._T.push({q,r:(g-2*f)/p.rf,raison,j:I(q),e:p.e,x,side:p.side||'long',why:p.why||''});delete pos[q];o[q]=0};
     // Baisse ≥ 15 % : le dossier dit « arrêt total, retour en paper trading ». L'argent réel s'arrête, la stratégie continue en papier :
     // la date est notée (et affichée), mais la simulation continue pour que la mesure couvre toute la période.
     if(dd>=.15&&!st._arret)st._arret=new Date(F.T[t]).toISOString();
@@ -655,11 +705,11 @@ function reglePro(id){const S=STRAT_PRO[id];return(F,t,st,n)=>{const P0=F.p[F.Q[
     for(const q in pos){const P=F.p[q],p=pos[q],i=I(q),x=P.jc[i];if(p.side==='short'?x>=p.stop:x<=p.stop){fermer(q,'stop touché (clôture journalière)');continue}const r=S.sortie(P,i,p);if(r)fermer(q,r)}
     const bloque=(v/st._m0-1)<=-.06?'perte du mois ≥ 6 %':pj<=-.02?'perte du jour ≥ 2 %':S.filtre&&!S.filtre(F,t,'long')&&!S.filtre(F,t,'short')?'filtre de Pistache (marché du bitcoin défavorable ou annonce de la Fed)':'';st._bloque=bloque;if(bloque)return o;
     let risque=Object.keys(pos).reduce((a,q)=>{const p=pos[q],x=F.p[q].jc[I(q)];return a+Math.max(0,p.w*(p.side==='short'?p.stop-x:x-p.stop)/x)},0);
-    const cands=[];for(const q of F.Q){if(pos[q])continue;const P=F.p[q],i=I(q);if(i<1)continue;const s=S.entree(P,i);if(s&&(!S.filtre||S.filtre(F,t,s.side||'long')))cands.push({q,P,i,s})}
+    const cands=[];for(const q of F.Q){if(pos[q])continue;const P=F.p[q],i=I(q);if(i<1)continue;const s=S.entree(P,i,F,t);if(s&&(!S.filtre||S.filtre(F,t,s.side||'long')))cands.push({q,P,i,s})}
     cands.sort((a,b)=>(b.s.force||0)-(a.s.force||0));
     const RQ=st._risque||PRO_RISQUE;for(const{q,P,i,s}of cands){if(risque+RQ>PRO_RISQUE_TOTAL+1e-9)break;const x=P.jc[i],sh=s.side==='short',rf=(sh?s.stop-x:x-s.stop)/x;if(!(rf>0))continue;
       if(Object.keys(pos).filter(h=>correl(P,i,F.p[h],I(h))>.8).length>=2)continue;
-      const w=Math.min(.5,RQ/rf);pos[q]={e:x,stop:s.stop,objectif:s.objectif,rf,w,j:i,side:sh?'short':'long'};o[q]=sh?-w:w;risque+=w*rf}
+      const w=Math.min(.5,RQ/rf);pos[q]={e:x,stop:s.stop,objectif:s.objectif,rf,w,j:i,side:sh?'short':'long',why:s.why||''};o[q]=sh?-w:w;risque+=w*rf}
     return o}}
 for(const id in STRAT_PRO){const r=reglePro(id);r.pro=true;FAMILLES[id]={nom:STRAT_PRO[id].nom,txt:STRAT_PRO[id].txt,pro:true,regle:r}}
 FAMILLES.bh.regle.reference=true;
@@ -724,7 +774,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-15 09:41';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-15 09:56';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;
