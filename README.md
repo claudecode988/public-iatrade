@@ -65,8 +65,8 @@ Les cinq stratégies S1 à S5 du dossier sont codées telles qu'écrites (bougie
 
 `tools/bilan.cjs` (lancé par le serveur, au plus une fois par heure) publie `bilan-semaine.json` : pour les agents et les trois stratégies suivies, sur 7 jours, trades, réussite, gain et perte moyens, espérance, 3 causes de perte les plus fréquentes et une action corrective proposée (jamais appliquée sans accord), comme dans `04_journal_template.md`.
 
-## Agents version 3 (hausse et baisse)
+## Agents version 3 (analyse de marché)
 
-La version 2 dans les deux sens : achat quand la tendance de fond monte, vente à découvert (pari sur la baisse) quand elle baisse, déclencheurs en miroir. Sortie seulement quand l'analyse le confirme (deux clôtures de suite de l'autre côté de la MM50) ou sur le stop suiveur. En argent réel, parier sur la baisse demande un compte à terme ou sur marge (Binance Futures sans levier, ou un CFD chez un courtier forex). Mesurée sur 5 ans et suivie en forward test ; la proposition du jour reste sur la version 2 tant que l'utilisateur n'a pas choisi.
+Les agents lisent chaque jour huit analyses d'un actif, comme un trader : tendance de fond (MM100), structure du marché (plus hauts et plus bas), supports et résistances (zones touchées au moins 2 fois en 6 mois), figures de chandeliers (avalement, marteau, étoile filante), divergences du RSI 14, volume, compression des bandes de Bollinger, contexte (régime du bitcoin, annonce de la Fed). Deux scénarios : rebond sur un support (rejet sous une résistance) dans le sens de la tendance de fond, ou cassure confirmée d'une zone. Entrée si au moins 4 analyses sur 8 sont d'accord et si le gain visé vaut au moins 2 fois le risque ; stop derrière la zone ; sortie à l'objectif, sur cassure de structure ou figure contraire confirmée par une divergence, jamais sur un simple retournement d'un jour. Achat ou vente à découvert selon l'analyse. Chaque trade garde la liste des analyses qui l'ont déclenché.
 
 Version en ligne : https://claudecode988.github.io/public-iatrade/
