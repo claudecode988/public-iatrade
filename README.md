@@ -65,4 +65,8 @@ Les cinq stratégies S1 à S5 du dossier sont codées telles qu'écrites (bougie
 
 `tools/bilan.cjs` (lancé par le serveur, au plus une fois par heure) publie `bilan-semaine.json` : pour les agents et les trois stratégies suivies, sur 7 jours, trades, réussite, gain et perte moyens, espérance, 3 causes de perte les plus fréquentes et une action corrective proposée (jamais appliquée sans accord), comme dans `04_journal_template.md`.
 
+## Agents version 3 (hausse et baisse)
+
+La version 2 dans les deux sens : achat quand la tendance de fond monte, vente à découvert (pari sur la baisse) quand elle baisse, déclencheurs en miroir. Sortie seulement quand l'analyse le confirme (deux clôtures de suite de l'autre côté de la MM50) ou sur le stop suiveur. En argent réel, parier sur la baisse demande un compte à terme ou sur marge (Binance Futures sans levier, ou un CFD chez un courtier forex). Mesurée sur 5 ans et suivie en forward test ; la proposition du jour reste sur la version 2 tant que l'utilisateur n'a pas choisi.
+
 Version en ligne : https://claudecode988.github.io/public-iatrade/
