@@ -1,13 +1,13 @@
 {
- "maj": 1792027801146,
+ "maj": 1792028136548,
  "debut": 1791989614204,
  "geleeLe": "2026-10-14T14:43:59Z",
  "tf": "5 min",
  "vAgents": "daf0e246fdc2f5ef",
  "vReglages": "2d0afdd925faff69",
  "regles": [],
- "decisions": 132,
- "passages": 124,
+ "decisions": 133,
+ "passages": 125,
  "trades": 4,
  "frais": 14.95,
  "glissement": 7.47,
@@ -17,9 +17,9 @@
  "gagne": 0,
  "perdu": -56.62,
  "pf": 0,
- "valeur": 9945.65,
+ "valeur": 9937.4,
  "plusHaut": 10002.99,
- "baisse": 0.0057,
+ "baisse": 0.0066,
  "position": {
   "paire": "XRPUSDT",
   "sens": "short",
@@ -29,6 +29,6 @@
  },
  "retardMedianS": 32,
  "retardMaxS": 214,
- "dernierHash": "ebf6eb0d943602d856bd7576f8645376b82c8a16a81dfa8b63e1d5ff46fa9e67",
+ "dernierHash": "520677dd0b0975ee4619482dc590a0559af52892cb3b8a8610397b4246431975",
  "faux": false
 }
