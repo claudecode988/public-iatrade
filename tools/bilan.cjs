@@ -12,6 +12,9 @@ const ACTIONS={
   'sortie sur signal inversé':'Sorties trop rapides : laisser courir les gains avec un stop suiveur plutôt que sortir à la première inversion (comme la version 2).',
   'faux signal (tendance retournée juste après l’entrée)':'Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4).',
   'hausse trop faible pour couvrir les frais':'Trop de petits trades : décider moins souvent (bougies plus longues) pour que les frais pèsent moins.',
+  'sortie trop rapide sur un signal inversé':'Sorties trop rapides : laisser courir les gains avec un stop suiveur plutôt que sortir à la première inversion (comme la version 2).',
+  'frais plus grands que le gain':'Trop de petits trades : décider moins souvent (bougies plus longues) pour que les frais pèsent moins.',
+  'mauvaise entrée':'Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4).',
   'autre':'Pas de cause dominante : continuer à observer.'};
 function resume(nom,T,note){const G=T.filter(x=>x.pnl>0),P=T.filter(x=>x.pnl<=0),m=a=>a.length?a.reduce((s,x)=>s+x.pnl,0)/a.length:0,wr=T.length?G.length/T.length:null;
   const causes={};for(const x of P)causes[x.cause]=(causes[x.cause]||0)+1;const top=Object.entries(causes).sort((a,b)=>b[1]-a[1]).slice(0,3);
@@ -23,7 +26,7 @@ const ag=[],ent=new Map();
 try{for(const l of fs.readFileSync(path.join(DIR,'journal.jsonl'),'utf8').split('\n')){if(!l)continue;let r;try{r=JSON.parse(l)}catch(e){continue}
     if(r.k==='decision'&&r.type==='entrée')ent.set(r.id,r);
     else if(r.k==='resultat'&&r.resultat&&r.resultat.statut==='trade clos'&&ent.has(r.cible)&&r.ts>=now-J7){const e=ent.get(r.cible),why=String(r.resultat.raison||'');
-      ag.push({pnl:r.resultat.net,paire:e.paire,sens:e.sens,cause:why==='stop'||/stop/.test(why)?'stop touché':/invers/.test(why)?'sortie sur signal inversé':'autre'})}}}catch(e){}
+      ag.push({pnl:r.resultat.net,paire:e.paire,sens:e.sens,cause:r.resultat.cause||(why==='stop'||/stop/.test(why)?'stop touché':/invers/.test(why)?'sortie sur signal inversé':'autre')})}}}catch(e){}
 const fam=lire(path.join(DIR,'familles-resume.json'),{lignes:[]}),strat=[];
 for(const id of['A2','prudente','regime']){const L=fam.lignes.find(x=>x.id===id);if(!L)continue;const conv=a=>(a||[]).filter(x=>x.fin>=now-J7).map(x=>({pnl:x.pnl,paire:x.paire,cause:causeFam(x.pourquoi||'')}));
   strat.push({id,...resume(L.nom,conv(L.trades),'avec frais'),demo:L.demo?resume(L.nom,conv(L.demo.trades),'démo sans frais'):null})}
