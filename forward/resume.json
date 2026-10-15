@@ -1,13 +1,13 @@
 {
- "maj": 1792069253665,
+ "maj": 1792069514442,
  "debut": 1792047729946,
  "geleeLe": "2026-10-15T06:57:10Z",
  "tf": "5 min",
  "vAgents": "daf0e246fdc2f5ef",
  "vReglages": "47163c19315888ea",
  "regles": [],
- "decisions": 79,
- "passages": 73,
+ "decisions": 80,
+ "passages": 74,
  "trades": 3,
  "frais": 18,
  "glissement": 9,
@@ -17,9 +17,9 @@
  "gagne": 0,
  "perdu": -65.56,
  "pf": 0,
- "valeur": 9938.06,
+ "valeur": 9936.48,
  "plusHaut": 10021.26,
- "baisse": 0.0083,
+ "baisse": 0.0085,
  "position": {
   "paire": "ETHUSDT",
   "sens": "short",
@@ -29,6 +29,6 @@
  },
  "retardMedianS": 33,
  "retardMaxS": 130,
- "dernierHash": "cfd3a69771c40eb4ae628e9cf34e60188d47fcc2411607d0e2fbaaf07e22aa5d",
+ "dernierHash": "dc8b808a855ad241c3e891fdae3fd120e346294bcfb523aceb77e94fde51896d",
  "faux": false
 }
