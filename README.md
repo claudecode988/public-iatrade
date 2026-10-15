@@ -61,4 +61,8 @@ Les cinq stratégies S1 à S5 du dossier sont codées telles qu'écrites (bougie
 
 « Version 2 », « Prudente » et « Tendance » : portefeuille fictif de 100 € (forward test du serveur), gains, pertes, nombre de trades, réussite, pire baisse, frais, positions ouvertes, puis chaque trade (sens, résultat, dates, variation du prix) avec une petite analyse de la raison du gain ou de la perte, et le même journal sur la longue période (test sur le passé).
 
+## Bilan de la semaine
+
+`tools/bilan.cjs` (lancé par le serveur, au plus une fois par heure) publie `bilan-semaine.json` : pour les agents et les trois stratégies suivies, sur 7 jours, trades, réussite, gain et perte moyens, espérance, 3 causes de perte les plus fréquentes et une action corrective proposée (jamais appliquée sans accord), comme dans `04_journal_template.md`.
+
 Version en ligne : https://claudecode988.github.io/public-iatrade/

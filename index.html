@@ -137,6 +137,7 @@ body{padding-bottom:calc(132px + env(safe-area-inset-bottom))}.rbar{bottom:calc(
 <h2>Serveur 24 h/24</h2><div class="card" id="srv"></div>
 <h2>Dernière décision</h2><div class="card" id="dec">Aucune décision pour l'instant.</div>
 <h2>Position</h2><div class="card" id="cal"></div>
+<h2>Bilan de la semaine</h2><div class="card" id="bil"><span class="mut">Lecture du serveur…</span></div>
 <details class="plus sect"><summary>Plus de détails (journal, mesures de ce navigateur)</summary>
 <h2>Journal de décisions</h2><div class="card" id="fwd"></div>
 <h2>Mesure sur l'historique réel</h2><div class="card" id="simres"></div>
@@ -707,7 +708,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-15 08:50';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-15 08:53';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;
@@ -1022,6 +1023,13 @@ function renderAgents(){vagHTML();delete PV.fst;
     <details data-k="${g.n}"${ouv.has(g.n)?' open':''}><summary>Ce qu’il regarde</summary>${a&&court(a.t)!==a.t?`<p><b>Détail :</b> ${a.t}</p>`:''}<p>${E[g.n]}</p>${g.n==='Journal'&&S.sim?'<p>'+simLine(S.sim)+'</p>':''}<p class="mut2">Règles fixes écrites dans le code, sans modèle d’IA.</p></details></div></div>`}).join('');
   if(hx!==REPS_){REPS_=hx;$('reps').innerHTML=hx}} // réécrit seulement si quelque chose a changé : animations sans à-coups
 let REPS_='';
+// Bilan des 7 derniers jours (modèle 04_journal_template.md) : une ligne par stratégie, causes de perte et action proposée repliées.
+function bilanHTML(){const e=$('bil');if(!e)return;const B=SV.bil;if(!B||!B.agents){e.innerHTML=`<span class="mut">${SV.at?'Pas encore de bilan publié par le serveur.':'Lecture du serveur…'}</span>`;return}
+  const L=[B.agents,...B.strategies.map(x=>x.demo?{...x.demo,nom:x.nom+' (démo sans frais)'}:x)],pc=x=>x==null?'–':Math.round(x*100)+' %';
+  const ouv=!!(e.querySelector('details')||{}).open;
+  e.innerHTML=L.map(x=>`<div class="row"><span><b>${x.nom}</b><br><span class="mut">${x.n} trade${x.n>1?'s':''} · réussite ${pc(x.reussite)} · espérance ${x.esperance==null?'–':fmt(x.esperance)} par trade</span></span><span class="${x.total>=0?'up':'dn'}">${fmt(x.total)}</span></div>`).join('')+
+    `<details class="plus"><summary>Erreurs récurrentes et action proposée</summary>${L.filter(x=>x.n).map(x=>`<p><b>${x.nom}</b> : gain moyen ${fmt(x.gainMoy)}, perte moyenne ${fmt(x.perteMoy)}.${x.erreurs.length?` Causes des pertes : ${x.erreurs.map(z=>`${z.cause} (${z.n})`).join(', ')}.`:''}${x.action?`<br><span class="mut">Action proposée : ${x.action}</span>`:''}</p>`).join('')||'<p class="mut">Pas encore de trade terminé cette semaine.</p>'}<p class="mut">Du ${new Date(B.du).toLocaleDateString('fr-FR')} au ${new Date(B.au).toLocaleDateString('fr-FR')}. Les actions proposées ne sont jamais appliquées sans ton accord.</p></details>`;
+  if(ouv)e.querySelector('details').open=true}
 // ---------- Onglets des trois stratégies suivies : portefeuille fictif de 100 €, gains, pertes, trades, et petite analyse de chaque trade ----------
 const ONGLETS={3:'A2',4:'prudente',5:'regime'};
 function courbe(H){if(!H||H.length<2)return'<div class="hempty">La courbe apparaît après deux jours de test.</div>';const v=H.map(x=>x[1]),mn=Math.min(...v),mx=Math.max(...v),r=mx-mn||1,
@@ -1151,10 +1159,10 @@ function cmpHTML(C){if(!C||C.v!==1||!C.rows.length)return'<span class="mut">Pas 
 // résultat sous coûts × 2 (test de robustesse) et Sharpe corrigé du nombre d'essais (SR > SR0, soit DSR > 50 %).
 // Serveur : GitHub Actions fait tourner le même moteur toutes les 5 minutes avec une configuration gelée et publie ses fichiers
 // sur la branche forward-test du dépôt public. Le site les lit en lecture seule (aucune donnée envoyée).
-const SRV='https://raw.githubusercontent.com/claudecode988/public-iatrade/forward-test/forward/',SV={res:null,lg:null,cfg:null,fam:null,der:null,prop:null,err:'',at:0};
+const SRV='https://raw.githubusercontent.com/claudecode988/public-iatrade/forward-test/forward/',SV={res:null,lg:null,cfg:null,fam:null,der:null,prop:null,bil:null,err:'',at:0};
 async function lireServeur(){try{const g=async f=>{const r=await fetch(SRV+f+'?t='+Math.floor(Date.now()/6e4),{cache:'no-store'});return r.ok?r.json():null};
-    [SV.res,SV.cfg,SV.lg,SV.fam,SV.der,SV.prop]=await Promise.all([g('resume.json'),g('config.json'),g('mesure-longue.json'),g('familles-resume.json'),g('derniers.json'),g('proposition.json')]);SV.err=SV.cfg?'':'Pas encore de données publiées par le serveur.'}
-  catch(e){SV.err='Serveur injoignable depuis ce navigateur.'}SV.at=Date.now();srvHTML();preuveHTML();absHTML();propHTML();stratHTML()}
+    [SV.res,SV.cfg,SV.lg,SV.fam,SV.der,SV.prop,SV.bil]=await Promise.all([g('resume.json'),g('config.json'),g('mesure-longue.json'),g('familles-resume.json'),g('derniers.json'),g('proposition.json'),g('bilan-semaine.json')]);SV.err=SV.cfg?'':'Pas encore de données publiées par le serveur.'}
+  catch(e){SV.err='Serveur injoignable depuis ce navigateur.'}SV.at=Date.now();srvHTML();preuveHTML();absHTML();propHTML();stratHTML();bilanHTML()}
 setTimeout(lireServeur,1500);setInterval(lireServeur,5*6e4);
 function srvHTML(){const e=$('srv');if(!e)return;const r=SV.res,g=SV.cfg,L=SV.lg,ouv=!!(e.querySelector('details')||{}).open;
   if(!g&&!r){e.innerHTML=`<span class="mut">${SV.at?SV.err:'Lecture des données du serveur…'} Le serveur décide toutes les 5 minutes, même quand cette page est fermée.</span>`;return}
