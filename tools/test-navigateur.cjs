@@ -37,6 +37,7 @@ const bar=(s,t,d=H)=>{const o=px(s,t),c=px(s,t+d);return[t,String(o),String(Math
   for(const t of ['1','2','0']){await p.click(`nav button[data-t="${t}"]`);ok(await p.isVisible(`#t${t}`)&&await p.isVisible('#kill2'),`onglet ${t} visible, arrêt d’urgence visible`)}
   await p.waitForFunction(()=>document.getElementById('cst').textContent==='EN DIRECT',null,{timeout:20000});ok(true,'prix en continu : état « EN DIRECT »');
   ok(await p.evaluate(()=>TF.min===S.cfg.tf),'agents : taille de bougie utilisée = réglage enregistré');
+  {const b=await p.evaluate(()=>bornerCfg({riskPct:50,maxLoss:1000,ddMax:100}));ok(b.riskPct===1&&b.maxLoss===2&&b.ddMax===15,'limites du dossier : un réglage plus lâche est ramené au plafond (1 %, 2 %, 15 %)')}
   {const t=await p.evaluate(()=>RA.t);ok(/Sources des pros/.test(t)&&/SOLUSDT/.test(t)&&/prochaine annonce de la Fed le 28\/10\/2026|calendrier de la Fed/.test(t)&&fapiCalls>0,'Pistache : taux de financement, calendrier de la Fed et régime du bitcoin lus');}
   await p.waitForTimeout(2500);const rate=parseInt(await p.textContent('#crate')),lag=await p.textContent('#clag');
   console.log(`     ${rate} messages/s affichés, ${lag}`);ok(rate>100&&/délai \d+ ms/.test(lag),'débit et délai affichés');
