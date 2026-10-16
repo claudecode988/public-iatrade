@@ -1,13 +1,13 @@
 {
- "maj": 1792136434262,
+ "maj": 1792136760062,
  "debut": 1792047729946,
  "geleeLe": "2026-10-15T06:57:10Z",
  "tf": "5 min",
  "vAgents": "daf0e246fdc2f5ef",
  "vReglages": "47163c19315888ea",
  "regles": [],
- "decisions": 313,
- "passages": 297,
+ "decisions": 314,
+ "passages": 298,
  "trades": 8,
  "frais": 48.09,
  "glissement": 24.04,
@@ -17,9 +17,9 @@
  "gagne": 97.49,
  "perdu": -177.73,
  "pf": 0.549,
- "valeur": 9949.27,
+ "valeur": 9949.87,
  "plusHaut": 10036.35,
- "baisse": 0.0087,
+ "baisse": 0.0086,
  "position": {
   "paire": "AVAXUSDT",
   "sens": "long",
@@ -29,6 +29,6 @@
  },
  "retardMedianS": 34,
  "retardMaxS": 79,
- "dernierHash": "89a3fba49d5f17ba614fb2159d9bd3e8e53ae39cc83bcd170b1b75adf5cd3ebf",
+ "dernierHash": "874ab797712471a06a887caa9bb0e524ac3fbb941e57789957fe497a3664a9ba",
  "faux": false
 }
