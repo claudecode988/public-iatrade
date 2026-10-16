@@ -298,7 +298,7 @@ const heureCreuse=t=>{const d=new Date(t),j=d.getUTCDay(),h=d.getUTCHours();retu
 const pauseSerie=(T,lastX,t)=>T.length>=3&&T.slice(-3).every(x=>x<0)&&t-lastX<12*H1;
 // Monte-Carlo par blocs (5 jours) sur des rendements journaliers : 1000 trajectoires de même longueur, tirage reproductible.
 // Donne la probabilité de finir en perte, le 5e centile du rendement et la pire baisse atteinte dans 95 % des cas.
-function monteCarlo(rj,n=1000,bloc=5){if(!rj||rj.length<30)return null;let g=12345;const rnd=()=>(g=(g*1103515245+12345)%2147483648)/2147483648,L=rj.length,F=[],DD=[];
+function monteCarlo(rj,n=1000,bloc=5){if(!rj||rj.length<30)return null;let g=12345;const rnd=()=>(g=(Math.imul(g,1103515245)+12345)>>>0)/4294967296,L=rj.length,F=[],DD=[];
   for(let k=0;k<n;k++){let v=1,pk=1,dd=0,i=0;while(i<L){const a=Math.floor(rnd()*(L-bloc+1));for(let j=0;j<bloc&&i<L;j++,i++){v*=1+rj[a+j];pk=Math.max(pk,v);dd=Math.max(dd,(pk-v)/pk)}}F.push(v-1);DD.push(dd)}
   F.sort((a,b)=>a-b);DD.sort((a,b)=>a-b);return{pPerte:F.filter(x=>x<0).length/n,r5:F[Math.floor(n*.05)],r50:F[Math.floor(n*.5)],dd95:DD[Math.floor(n*.95)]}}
 // Changements essayés un par un par mesurer(), dans cet ordre.
@@ -443,17 +443,17 @@ function alertes(a,b){const o=[];
   if(a.n&&b.n&&Math.sign(a.pnl)!==Math.sign(b.pnl))o.push(`Écart important : ${a.pnl>0?'gain':'perte'} à l’entraînement mais ${b.pnl>0?'gain':'perte'} au test.`);
   else if(a.pf&&b.pf!==null&&b.pf<a.pf/2)o.push(`Écart important : le profit factor passe de ${a.pf.toFixed(2).replace('.',',')} à l’entraînement à ${b.pf.toFixed(2).replace('.',',')} au test.`);
   return o}
-// Méthode : départ = règles d'avant. Chaque changement est ajouté seul ; il est gardé seulement s'il améliore le bilan
-// sur le TEST (30 % final) et aussi sur l'entraînement (70 % du début), avec au moins 30 trades sur le test. Puis le seuil est choisi sur le calibrage seul et vérifié sur le test.
+// Méthode : départ = règles d'avant. Chaque changement est ajouté seul ; il est gardé s'il améliore le bilan de l'ENTRAÎNEMENT
+// (70 % du début, au moins 30 trades). Le seuil est aussi choisi sur l'entraînement seul. Le TEST (30 % final) n'est jamais utilisé
+// pour choisir : il sert une seule fois, à la fin, de vérification (sinon le test serait ajusté et ne prouverait plus rien).
 function mesurer(F,c){const W=Math.min(TF.W,Math.floor(F.N/4)),cut=W+Math.floor((F.N-W)*.7),seg=(R,thr)=>({cal:simuler(F,W,cut,{...c,thr},R),test:simuler(F,cut,F.N,{...c,thr},R)});
   const base=seg({},c.thr);let R={},cur=base;const essais=[];
-  for(const m of CHANGES){const R2={...R,[m.id]:1},r=seg(R2,c.thr),bc=r.cal.pnl>cur.cal.pnl+.005,bt=r.test.pnl>cur.test.pnl+.005,peu=r.test.n<30,garde=bc&&bt&&!peu;
-    const pq=!r.cal.n&&!r.test.n?'aucun trade : rien à mesurer':peu&&bc&&bt?`seulement ${r.test.n} trades sur le test : trop peu pour conclure, donc pas gardé`:garde?'améliore le test et l’entraînement':bt?'améliore le test mais pas l’entraînement : rien ne permettait de le choisir avant de voir le test'
-      :bc?'améliore l’entraînement mais pas le test : probablement un effet du hasard':'n’améliore ni le test ni l’entraînement';
+  for(const m of CHANGES){const R2={...R,[m.id]:1},r=seg(R2,c.thr),bc=r.cal.pnl>cur.cal.pnl+.005,bt=r.test.pnl>cur.test.pnl+.005,peu=r.cal.n<30,garde=bc&&!peu;
+    const pq=!r.cal.n&&!r.test.n?'aucun trade : rien à mesurer':peu&&bc?`seulement ${r.cal.n} trades à l’entraînement : trop peu pour conclure, donc pas gardé`:garde&&bt?'gardé (améliore l’entraînement) ; le test le confirme':garde?'gardé (améliore l’entraînement) ; le test ne le confirme pas':bt?'pas gardé (n’améliore pas l’entraînement)':'pas gardé (n’améliore pas l’entraînement)';
     essais.push({id:m.id,nom:m.nom,cal:r.cal,test:r.test,avantCal:cur.cal,avantTest:cur.test,garde,pq});if(garde){R=R2;cur=r}}
   const seuils=[70,75,80,85,90].map(thr=>({thr,cal:simuler(F,W,cut,{...c,thr},R),test:simuler(F,cut,F.N,{...c,thr},R)}));
-  const best=seuils.reduce((a,b)=>b.cal.pnl>a.cal.pnl+.005?b:a).thr,tb=simuler(F,cut,F.N,{...c,thr:best},R),seuilOk=best!==c.thr&&tb.pnl>cur.test.pnl+.005;
-  return{v:6,tf:TF.min,tfLab:TF.lab,nb:c.nb||1,base,fin:seuilOk?seg(R,best):cur,essais,avantSeuil:cur.test.pnl,seuils,best,testBest:tb,seuilOk,thr:c.thr,R,c:{fee:c.fee,slip:c.slip,hold:c.hold,atrK:c.atrK,sl:c.sl},
+  const best=seuils.reduce((a,b)=>b.cal.pnl>a.cal.pnl+.005?b:a).thr,tb=simuler(F,cut,F.N,{...c,thr:best},R),seuilOk=best!==c.thr;
+  return{v:7,tf:TF.min,tfLab:TF.lab,nb:c.nb||1,base,fin:seuilOk?seg(R,best):cur,essais,avantSeuil:cur.test.pnl,seuils,best,testBest:tb,seuilOk,thr:c.thr,R,c:{fee:c.fee,slip:c.slip,hold:c.hold,atrK:c.atrK,sl:c.sl},
     pairs:F.Q.length,du:F.T[W],coupe:F.T[cut],au:F.T[F.N-1],quand:Date.now()}}
 // ---------- Validation : walk-forward, compteur d'essais, Sharpe corrigé (DSR), fiabilité ----------
 // ESSAI : si défini, appelé après chaque simulation avec la configuration et son résultat (compteur d'essais).
@@ -633,7 +633,7 @@ function analyseMarche(P,i,F,t){const A=lectureJour(P,i);if(!A)return null;const
     v(A.divergence===d,L?'divergence baissière du RSI':'divergence haussière du RSI');
     v(A.volume===d,'volume au-dessus de 1,5 × sa moyenne');
     v(A.compression===d||!!casse,casse?`cassure ${L?'du support':'de la résistance'} à ${zc.niv.toPrecision(5)}`:'sortie de compression de Bollinger');
-    v(reg===d||reg===0&&!F.reg.some(x=>x),L?'marché du bitcoin baissier':'marché du bitcoin haussier');
+    v(reg===d,L?'marché du bitcoin baissier':'marché du bitcoin haussier');
     if(score<4)continue;
     const stop=L?Math.max(c+A.atr,(proche?zone.max:zc.max)+.5*A.atr,A.dernierSommet&&A.dernierSommet>c?A.dernierSommet+.25*A.atr:0):Math.min(c-A.atr,(proche?zone.min:zc.min)-.5*A.atr,A.dernierCreux&&A.dernierCreux<c?A.dernierCreux-.25*A.atr:Infinity);
     const cible=L?(A.sup&&A.sup!==zc?A.sup.niv:c-3*(stop-c)):(A.res&&A.res!==zc?A.res.niv:c+3*(c-stop)),gr=L?(c-cible)/(stop-c):(cible-c)/(c-stop);
@@ -704,12 +704,13 @@ function reglePro(id){const S=STRAT_PRO[id];return(F,t,st,n)=>{const P0=F.p[F.Q[
       if((v/st._m0-1)>-.06)for(const q of garde)if(!pos[q]){pos[q]={e:F.p[q].jc[I(q)],rf:1,j:I(q)};o[q]=.5}return o}
     for(const q in pos){const P=F.p[q],p=pos[q],i=I(q),x=P.jc[i];if(p.side==='short'?x>=p.stop:x<=p.stop){fermer(q,'stop touché (clôture journalière)');continue}const r=S.sortie(P,i,p);if(r)fermer(q,r)}
     const bloque=(v/st._m0-1)<=-.06?'perte du mois ≥ 6 %':pj<=-.02?'perte du jour ≥ 2 %':S.filtre&&!S.filtre(F,t,'long')&&!S.filtre(F,t,'short')?'filtre de Pistache (marché du bitcoin défavorable ou annonce de la Fed)':'';st._bloque=bloque;if(bloque)return o;
-    let risque=Object.keys(pos).reduce((a,q)=>{const p=pos[q],x=F.p[q].jc[I(q)];return a+Math.max(0,p.w*(p.side==='short'?p.stop-x:x-p.stop)/x)},0);
+    let expo=Object.values(pos).reduce((a,p)=>a+(p.w||0),0),risque=Object.keys(pos).reduce((a,q)=>{const p=pos[q],x=F.p[q].jc[I(q)];return a+Math.max(0,p.w*(p.side==='short'?p.stop-x:x-p.stop)/x)},0);
     const cands=[];for(const q of F.Q){if(pos[q])continue;const P=F.p[q],i=I(q);if(i<1)continue;const s=S.entree(P,i,F,t);if(s&&(!S.filtre||S.filtre(F,t,s.side||'long')))cands.push({q,P,i,s})}
     cands.sort((a,b)=>(b.s.force||0)-(a.s.force||0));
     const RQ=st._risque||PRO_RISQUE;for(const{q,P,i,s}of cands){if(risque+RQ>PRO_RISQUE_TOTAL+1e-9)break;const x=P.jc[i],sh=s.side==='short',rf=(sh?s.stop-x:x-s.stop)/x;if(!(rf>0))continue;
       if(Object.keys(pos).filter(h=>correl(P,i,F.p[h],I(h))>.8).length>=2)continue;
-      const w=Math.min(.5,RQ/rf);pos[q]={e:x,stop:s.stop,objectif:s.objectif,rf,w,j:i,side:sh?'short':'long',why:s.why||''};o[q]=sh?-w:w;risque+=w*rf}
+      const w=Math.min(.5,RQ/rf,1-expo);if(!(w>.01))continue; // jamais de levier : la somme des positions ne dépasse pas le capital
+      pos[q]={e:x,stop:s.stop,objectif:s.objectif,rf,w,j:i,side:sh?'short':'long',why:s.why||''};o[q]=sh?-w:w;risque+=w*rf;expo+=w}
     return o}}
 for(const id in STRAT_PRO){const r=reglePro(id);r.pro=true;FAMILLES[id]={nom:STRAT_PRO[id].nom,txt:STRAT_PRO[id].txt,pro:true,regle:r}}
 FAMILLES.bh.regle.reference=true;
@@ -777,7 +778,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-17 00:53';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-17 00:57';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;
@@ -786,7 +787,7 @@ const D=()=>({pk:10000,cash:10000,start:10000,pos:null,trades:[],log:[],stop:fal
  cfg:{capReel:500,size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:1,ddMax:15,hb:5,npT1:30,npJ1:30,npT2:100,npJ2:90,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
 let S=D(),KEYS={k:'',s:''};
 try{const j=localStorage.getItem('tiq');if(j)S=Object.assign(D(),JSON.parse(j))}catch(e){}
-S.cfg=Object.assign(D().cfg,S.cfg);if(!S.cfg5){S.cfg.maxRuns=1440;S.cfg5=1}if(!S.cfg6){S.cfg.tf=10;S.cfg6=1}if(!S.cfg7){S.cfg.tf=5;S.cfg.nb=3;S.cfg7=1}if(!S.cfg8){S.cfg.riskPct=1;S.cfg8=1}/* 1 % par trade, accepté par l'utilisateur le 15/10/2026 (maximum du dossier) */setTF(S.cfg.tf);if(S.sim&&S.sim.tf!==TF.min){S.sim=0;S.rules={}}if(S.sim&&S.sim.v!==6){S.sim=0;S.rules={}}S.rules=S.rules||{};
+S.cfg=Object.assign(D().cfg,S.cfg);if(!S.cfg5){S.cfg.maxRuns=1440;S.cfg5=1}if(!S.cfg6){S.cfg.tf=10;S.cfg6=1}if(!S.cfg7){S.cfg.tf=5;S.cfg.nb=3;S.cfg7=1}if(!S.cfg8){S.cfg.riskPct=1;S.cfg8=1}/* 1 % par trade, accepté par l'utilisateur le 15/10/2026 (maximum du dossier) */setTF(S.cfg.tf);if(S.sim&&S.sim.tf!==TF.min){S.sim=0;S.rules={}}if(S.sim&&S.sim.v!==7){S.sim=0;S.rules={}}S.rules=S.rules||{};
 if(S.pos&&(!S.pos.q||!S.pos.dist)){S.cash+=S.pos.size||0;S.pos=null} // position d'une ancienne version : remboursée au prix d'entrée
 let SAVED=0,SAVEERR='';let ESS={};try{ESS=JSON.parse(localStorage.getItem('tiq-essais')||'{}')}catch(e){}
 const enregistrerEssais=()=>{try{localStorage.setItem('tiq-essais',JSON.stringify(ESS))}catch(e){}};
@@ -1179,7 +1180,7 @@ function paint(){const st=LV.st,cl=st==='EN DIRECT'?'ok':st==='DONNÉES FIGÉES'
   const P=S.pos;if(P){const px=(P.side==='long'?LV.bid[P.q]:LV.ask[P.q])||P.px;put('plat',fmt((P.side==='long'?1:-1)*P.n*(px-P.fill)));put('pstop',fp(P.stop))}}
 setInterval(()=>{paint();if(S.pos)save()},250);
 const dt=x=>new Date(x).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'2-digit'}),pct=x=>(x*100).toFixed(1).replace('.',',')+' %',sg$=x=>`<b class="${x>=0?'up':'dn'}">${fmt(x)}</b>`;
-const simLine=M=>M&&M.v===6?`Mesure : départ ${fmt(M.base.test.pnl)} sur le test (${M.base.test.n} trades), après changements ${fmt(M.fin.test.pnl)} (${M.fin.test.n} trades, durée moyenne ${M.fin.test.dur.toFixed(1)} h, frais ${fmt(M.fin.test.fees)}, glissement ${fmt(M.fin.test.slip)}, pire baisse ${pct(M.fin.test.dd)})${M.fin.test.n<30?', trop peu de trades pour conclure':''}. Gardés : ${M.essais.filter(e=>e.garde).map(e=>e.nom).join(', ')||'aucun'}.`:'';
+const simLine=M=>M&&M.v===7?`Mesure : départ ${fmt(M.base.test.pnl)} sur le test (${M.base.test.n} trades), après changements ${fmt(M.fin.test.pnl)} (${M.fin.test.n} trades, durée moyenne ${M.fin.test.dur.toFixed(1)} h, frais ${fmt(M.fin.test.fees)}, glissement ${fmt(M.fin.test.slip)}, pire baisse ${pct(M.fin.test.dd)})${M.fin.test.n<30?', trop peu de trades pour conclure':''}. Gardés : ${M.essais.filter(e=>e.garde).map(e=>e.nom).join(', ')||'aucun'}.`:'';
 function valHTML(M){const wf=M.wf,f=M.fiab||{niveau:'faible',raison:'–'},d=M.dsr,pf=r=>!r.n?'–':r.pf===null?(r.gain>0?'∞':'–'):r.pf.toFixed(2).replace('.',',');
   let h=`<div class="fiab ${f.niveau}"><b>Fiabilité : ${f.niveau}</b><br>${f.raison}</div>
   <p class="mut">${M.nEssais} configuration${M.nEssais>1?'s':''} testée${M.nEssais>1?'s':''} au total sur ce navigateur (toutes mesures confondues). ${d?`Sharpe par trade hors échantillon : ${d.sr.toFixed(3).replace('.',',')}. Sharpe corrigé du nombre d’essais (DSR) : <b>${(d.dsr*100).toFixed(0)} %</b> de probabilité que le vrai Sharpe soit positif (seuil d’essais SR0 = ${d.sr0.toFixed(3).replace('.',',')}, ${d.T} trades, ${d.N} essais).`:'Sharpe corrigé (DSR) non calculable : il faut au moins 30 trades hors échantillon et 2 configurations testées.'}</p>`;
@@ -1190,7 +1191,7 @@ function valHTML(M){const wf=M.wf,f=M.fiab||{niveau:'faible',raison:'–'},d=M.d
   <tr><th>Total</th><td>${sg$(wf.ent.pnl)}</td><td>${sg$(wf.test.pnl)}</td><td>${wf.test.n}</td><td>${pf(wf.test)}</td><td>${wf.test.pos}/${wf.fen.length} fenêtres positives</td></tr></tbody></table></div>
   <p class="mut">* moins de 30 trades dans la fenêtre. Hors échantillon cumulé : pire baisse ${pct(wf.test.dd)}, frais ${fmt(wf.test.fees)}, glissement ${fmt(wf.test.slip)}, acheter et garder sur les mêmes fenêtres ${fmt(wf.test.bh)}. Un gain d’entraînement n’est jamais une preuve : seule la colonne « hors échantillon » compte.</p>`;
   return h}
-function simHTML(M){if(!M||M.v!==6)return'<span class="mut">Pas encore lancée. Va dans l’onglet Agents et touche « Mesurer sur l’historique réel ».</span>';
+function simHTML(M){if(!M||M.v!==7)return'<span class="mut">Pas encore lancée. Va dans l’onglet Agents et touche « Mesurer sur l’historique réel ».</span>';
   const peu=r=>r.n<30,pfx=r=>!r.n?'–':r.pf===null?(r.gain>0?'∞ (aucune perte)':'–'):r.pf.toFixed(2).replace('.',','),
     row=(n,r)=>`<tr><th>${n}</th><td>${peu(r)?'<span class="mut">trop peu de trades</span>':sg$(r.pnl)}</td><td>${r.n}</td><td>${pfx(r)}</td><td>${r.n?Math.round(r.wr*100)+' %':'–'}</td><td>${pct(r.dd)}</td><td>${sg$(r.bh)}</td><td>${r.dur.toFixed(1)} h</td><td class="up">${fmt(r.gain)}</td><td class="dn">${fmt(r.loss)}</td><td>${fmt(r.fees)}</td><td>${fmt(r.slip)}</td></tr>`;
   const ft=M.fin.test,fc=M.fin.cal,al=alertes(fc,ft),cote=(n,f)=>`<tr><th>${n}</th><td>${f(fc)}</td><td>${f(ft)}</td></tr>`;
