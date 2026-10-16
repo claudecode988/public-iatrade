@@ -34,15 +34,20 @@ jobs:
           git config user.name "forward-test"
           git config user.email "forward-test@users.noreply.github.com"
           fin=$(( $(date +%s) + 50*60 ))
+          # En cas de conflit avec la branche distante : on abandonne le rebase et on repart de la version distante
+          # (les programmes reprennent là où l'état enregistré s'est arrêté). Jamais de fichier en conflit enregistré.
+          sync() { git pull -q --rebase origin forward-test || { git rebase --abort 2>/dev/null; git fetch -q origin forward-test && git reset -q --hard origin/forward-test; return 1; }; }
           while [ $(date +%s) -lt $fin ]; do
-            node ../code/tools/forward.cjs forward || true
-            node ../code/tools/familles-fw.cjs forward || true
-            node ../code/tools/proposition.cjs forward || true
-            node ../code/tools/bilan.cjs forward || true
+            sync || true
+            node ../code/tools/forward.cjs forward || echo "::warning::forward.cjs en erreur"
+            node ../code/tools/familles-fw.cjs forward || echo "::warning::familles-fw.cjs en erreur"
+            node ../code/tools/proposition.cjs forward || echo "::warning::proposition.cjs en erreur"
+            node ../code/tools/bilan.cjs forward || echo "::warning::bilan.cjs en erreur"
+            rm -f forward/*.tmp
             git add -A forward
             if ! git diff --cached --quiet; then
               git commit -q -m "Forward test $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-              git pull -q --rebase origin forward-test && git push -q origin HEAD:forward-test || true
+              for k in 1 2 3; do sync && git push -q origin HEAD:forward-test && break; sleep 5; done
             fi
             sleep 60
           done
