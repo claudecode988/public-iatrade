@@ -1,8 +1,12 @@
 {
- "geleeLe": "2026-10-15T06:57:10Z",
- "note": "Risque par trade passé de 0,5 % à 1 % le 2026-10-15T06:57:10Z avec l’accord de l’utilisateur : le forward test des agents repart de zéro (ancien journal archivé).",
+ "geleeLe": "2026-10-16T22:37:26Z",
+ "note": "Le 2026-10-16, avec l’accord de l’utilisateur (« règle tous les problèmes ») : trois filtres d’entrée ajoutés aux agents (liste de contrôle 3 sur 4, heures creuses évitées, filtre de frais). Ils ne font que refuser des entrées. Mesure : 12 mois en 5 min −6,2 % au lieu de −15,1 % ; 5 ans en 1 h −9,8 % au lieu de −15,1 %. Toujours perdant avec frais. Le forward test des agents repart de zéro (ancien journal archivé). Risque par trade 1 % inchangé.",
  "tf": 5,
- "regles": [],
+ "regles": [
+  "conf",
+  "heures",
+  "fee"
+ ],
  "cfg": {
   "size": 1000,
   "nb": 3,
