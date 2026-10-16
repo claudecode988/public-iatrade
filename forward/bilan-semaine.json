@@ -1,32 +1,19 @@
 {
- "maj": 1792187249601,
- "du": 1791582449601,
- "au": 1792187249601,
+ "maj": 1792190887184,
+ "du": 1791586087184,
+ "au": 1792190887184,
  "agents": {
   "nom": "Agents actuels",
   "note": "avec frais",
-  "n": 11,
-  "gagnants": 2,
-  "reussite": 0.18181818181818182,
-  "gainMoy": 76.56710000000001,
-  "perteMoy": -24.374688888888883,
-  "esperance": -6.021636363636356,
-  "total": -66.238,
-  "erreurs": [
-   {
-    "cause": "mauvaise entrée",
-    "n": 4
-   },
-   {
-    "cause": "sortie sur signal inversé",
-    "n": 3
-   },
-   {
-    "cause": "sortie trop rapide sur un signal inversé",
-    "n": 2
-   }
-  ],
-  "action": "Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4)."
+  "n": 0,
+  "gagnants": 0,
+  "reussite": null,
+  "gainMoy": 0,
+  "perteMoy": 0,
+  "esperance": null,
+  "total": 0,
+  "erreurs": [],
+  "action": null
  },
  "strategies": [
   {
