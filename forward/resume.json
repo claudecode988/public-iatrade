@@ -1,13 +1,13 @@
 {
- "maj": 1792174230047,
+ "maj": 1792174557863,
  "debut": 1792047729946,
  "geleeLe": "2026-10-15T06:57:10Z",
  "tf": "5 min",
  "vAgents": "daf0e246fdc2f5ef",
  "vReglages": "47163c19315888ea",
  "regles": [],
- "decisions": 445,
- "passages": 423,
+ "decisions": 446,
+ "passages": 424,
  "trades": 11,
  "frais": 66.12,
  "glissement": 33.06,
@@ -23,6 +23,6 @@
  "position": null,
  "retardMedianS": 35,
  "retardMaxS": 79,
- "dernierHash": "9b9dda2adbcded6dac8483d8c6d4d0801ac8660a253fbbe89c61e0a4e9287af8",
+ "dernierHash": "ed4384132c9a41306d61c93f5f6b8600e7982ce486bd044e0d89a1ae66da0c31",
  "faux": false
 }
