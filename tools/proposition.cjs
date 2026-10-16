@@ -9,19 +9,19 @@ const fs=require('fs'),path=require('path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+';return{setTF,Fjour,proposition,portefeuille,FAMILLES,kl,rendementsJours,sharpe,monteCarlo}')();
 const DIR=process.argv[2]||'forward',J1=864e5,now=+process.env.MAINTENANT||Date.now(),lire=(f,d)=>{try{return JSON.parse(fs.readFileSync(f,'utf8'))}catch(e){return d}};
-const BASES=['https://data-api.binance.vision','https://api.binance.com'];
-async function binance(q){let all=[],end='';for(let k=0;k<2;k++){let j=null;for(const B of BASES){try{const r=await fetch(`${B}/api/v3/klines?symbol=${q}&interval=1d&limit=1000${end}`);if(r.ok){j=await r.json();break}}catch(e){}}
+const BASES=['https://data-api.binance.vision','https://api.binance.com'],AT=()=>({signal:AbortSignal.timeout(15000)});
+async function binance(q){let all=[],end='';for(let k=0;k<2;k++){let j=null;for(const B of BASES){try{const r=await fetch(`${B}/api/v3/klines?symbol=${q}&interval=1d&limit=1000${end}`,AT());if(r.ok){j=await r.json();break}}catch(e){}}
     if(!j||!j.length)break;all=j.concat(all);end=`&endTime=${j[0][0]-1}`;if(j.length<1000)break}
   return all.map(E.kl).filter(x=>x.t+J1<=now)}
 async function forex(sym){const src=[];
   // Yahoo Finance (graphique public, sans clé) : ouverture, plus haut, plus bas, clôture journaliers ; minuit arrondi à la journée UTC.
-  try{const r=await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}=X?range=10y&interval=1d`,{headers:{'User-Agent':'Mozilla/5.0 (TradeInsight, lecture seule)'}}),j=await r.json(),R=j&&j.chart&&j.chart.result&&j.chart.result[0],Q=R&&R.indicators&&R.indicators.quote&&R.indicators.quote[0];
+  try{const r=await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}=X?range=10y&interval=1d`,{...AT(),headers:{'User-Agent':'Mozilla/5.0 (TradeInsight, lecture seule)'}}),j=await r.json(),R=j&&j.chart&&j.chart.result&&j.chart.result[0],Q=R&&R.indicators&&R.indicators.quote&&R.indicators.quote[0];
     if(R&&Q&&R.timestamp){const L=R.timestamp.map((ts,i)=>({t:Math.round(ts*1e3/J1)*J1,o:Q.open[i],h:Q.high[i],l:Q.low[i],c:Q.close[i],v:0})).filter(x=>[x.o,x.h,x.l,x.c].every(v=>v!=null&&isFinite(v))&&x.t+J1<=now);
       const U=[...new Map(L.map(x=>[x.t,x])).values()].sort((a,b)=>a.t-b.t);if(U.length>100)return{src:'Yahoo Finance (journalier, plus haut et plus bas inclus)'+(src.length?' — '+src.join(' ; '):''),J:U}}src.push(`Yahoo : réponse inutilisable (${r.status})`)}catch(e){src.push('Yahoo injoignable')}
   // Stooq (CSV journalier) en secours : il renvoie parfois une page inutilisable depuis les serveurs GitHub.
-  try{const r=await fetch(`https://stooq.com/q/d/l/?s=${sym.toLowerCase()}&i=d`),t=await r.text();const L=t.trim().split('\n').slice(1).map(l=>l.split(',')).filter(v=>v.length>=5&&/^\d{4}-/.test(v[0]));
+  try{const r=await fetch(`https://stooq.com/q/d/l/?s=${sym.toLowerCase()}&i=d`,AT()),t=await r.text();const L=t.trim().split('\n').slice(1).map(l=>l.split(',')).filter(v=>v.length>=5&&/^\d{4}-/.test(v[0]));
     if(L.length>100)return{src:'Stooq (journalier)'+(src.length?' — '+src.join(' ; '):''),J:L.map(v=>({t:Date.parse(v[0]+'T00:00:00Z'),o:+v[1],h:+v[2],l:+v[3],c:+v[4],v:0})).filter(x=>isFinite(x.c)&&x.t+J1<=now)};src.push('Stooq : réponse inutilisable')}catch(e){src.push('Stooq injoignable')}
-  try{const d0=new Date(now-6*365*J1).toISOString().slice(0,10),r=await fetch(`https://api.frankfurter.app/${d0}..?from=${sym.slice(0,3)}&to=${sym.slice(3)}`),j=await r.json();
+  try{const d0=new Date(now-6*365*J1).toISOString().slice(0,10),r=await fetch(`https://api.frankfurter.app/${d0}..?from=${sym.slice(0,3)}&to=${sym.slice(3)}`,AT()),j=await r.json();
     const L=Object.entries(j.rates||{}).map(([d,v])=>({t:Date.parse(d+'T00:00:00Z'),c:v[sym.slice(3)]})).filter(x=>isFinite(x.c)).map(x=>({...x,o:x.c,h:x.c,l:x.c,v:0}));
     if(L.length>100)return{src:'BCE via frankfurter.app (clôture seule : plus haut et plus bas inconnus) — '+src.join(' ; '),J:L.filter(x=>x.t+J1<=now)}}catch(e){}src.push('BCE injoignable');return{src:src.join(' ; '),J:[]}}
 function faux(q,n=1900){const k=q.charCodeAt(0)+q.charCodeAt(3)*3,f=t=>(q.includes('USDT')?100:1.1)*(1+.3*Math.sin(t/J1/60+k)+.05*Math.sin(t/J1/7+k*2)),t0=Math.floor(now/J1)*J1-n*J1,a=[];
@@ -30,6 +30,7 @@ function faux(q,n=1900){const k=q.charCodeAt(0)+q.charCodeAt(3)*3,f=t=>(q.includ
   const G=lire(path.join(DIR,'config.json'),null),PR=G&&G.proposition;if(!PR){console.error('config.json : pas de section « proposition » : rien à faire.');return}
   const F_OUT=path.join(DIR,'proposition.json'),old=lire(F_OUT,null),jour=Math.floor(now/J1)*J1-J1;
   if(old&&old.jourCalcul===jour&&old.strategie===PR.strategie&&!process.env.FORCER){console.log('Proposition déjà calculée pour cette journée.');return}
+  if(old&&old.jourCalcul===null&&now-old.maj<15*6e4&&!process.env.FORCER){console.log('Proposition incomplète il y a moins de 15 min : nouvel essai plus tard.');return}
   const actifs=[...PR.actifs,...(PR.controle||[])],D={},sources={};
   for(const q of[...new Set(['BTCUSDT',...actifs])]){if(process.env.FAUX_PRIX){D[q]=faux(q);sources[q]='prix inventés (test)';continue}
     if(/USDT$/.test(q)){D[q]=await binance(q);sources[q]='Binance (journalier)'}else{const r=await forex(q);D[q]=r.J;sources[q]=r.src}console.log(q,D[q].length,'journées,',sources[q])}
@@ -42,7 +43,9 @@ function faux(q,n=1900){const k=q.charCodeAt(0)+q.charCodeAt(3)*3,f=t=>(q.includ
       const r=E.portefeuille(F,W,F.N,c,E.FAMILLES[id].regle),rj=E.rendementsJours(r.jrs),mc=E.monteCarlo(rj);
       return{id,nom:E.FAMILLES[id].nom,pnl:r.pnl,dd:r.dd,nT:r.nT,expR:r.expR,wrT:r.wrT,arret:r.arret,ent:E.portefeuille(F,W,cut,c,E.FAMILLES[id].regle).pnl,test:E.portefeuille(F,cut,F.N,c,E.FAMILLES[id].regle).pnl,
         cout2:E.portefeuille(F,W,F.N,{...c,fee:c.fee*2,slip:c.slip*2},E.FAMILLES[id].regle).pnl,sansFrais:E.portefeuille(F,W,F.N,{...c,fee:0,slip:0},E.FAMILLES[id].regle).pnl,sharpe:E.sharpe(rj),chanceGain:mc?1-mc.pPerte:null,dd95:mc?mc.dd95:null}})}}
-  fs.writeFileSync(F_OUT,JSON.stringify({maj:now,jourCalcul:jour,strategie:PR.strategie,nom:E.FAMILLES[PR.strategie]&&E.FAMILLES[PR.strategie].nom,depuis:PR.depuis,actifs:PR.actifs,controle:PR.controle||[],
+  // Données manquantes pour un actif : on publie quand même, mais sans marquer la journée comme calculée (nouvel essai au passage suivant).
+  const incomplet=Object.values(sorties).some(x=>/données insuffisantes/.test(x.erreur||''));if(incomplet)console.error('Proposition : données manquantes, nouvel essai au prochain passage.');
+  fs.writeFileSync(F_OUT,JSON.stringify({maj:now,jourCalcul:incomplet?null:jour,strategie:PR.strategie,nom:E.FAMILLES[PR.strategie]&&E.FAMILLES[PR.strategie].nom,depuis:PR.depuis,actifs:PR.actifs,controle:PR.controle||[],
     propositions:sorties,tests,faux:!!process.env.FAUX_PRIX},null,1));
   console.log('Proposition du jour :',Object.values(sorties).map(x=>`${x.paire} ${x.action||x.erreur}`).join(' | '))
 })().catch(e=>{console.error(e);process.exit(1)});
