@@ -1,13 +1,13 @@
 {
- "maj": 1792184428782,
+ "maj": 1792184762833,
  "debut": 1792047729946,
  "geleeLe": "2026-10-15T06:57:10Z",
  "tf": "5 min",
  "vAgents": "daf0e246fdc2f5ef",
  "vReglages": "47163c19315888ea",
  "regles": [],
- "decisions": 479,
- "passages": 457,
+ "decisions": 480,
+ "passages": 458,
  "trades": 11,
  "frais": 66.12,
  "glissement": 33.06,
@@ -17,9 +17,9 @@
  "gagne": 153.13,
  "perdu": -219.37,
  "pf": 0.698,
- "valeur": 9941.22,
+ "valeur": 9938.96,
  "plusHaut": 10040.86,
- "baisse": 0.0099,
+ "baisse": 0.0101,
  "position": {
   "paire": "BTCUSDT",
   "sens": "long",
@@ -29,6 +29,6 @@
  },
  "retardMedianS": 35,
  "retardMaxS": 79,
- "dernierHash": "30e7a4a619750c3c90235041810da7625eb274ec6edb40ba3d101ded0a2ebdab",
+ "dernierHash": "1422e23399d5f55e9147c3bda8b73d6a47db2af77ee15fd5d17cb0b5e4f7aaae",
  "faux": false
 }
