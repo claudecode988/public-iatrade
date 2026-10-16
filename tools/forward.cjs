@@ -9,7 +9,7 @@
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+
-  ';return{WL,H1,setTF,agreger,aligner,prep,choisir,ouvrir,stopTick,sortieCloture,fermer,risque,distanceStop,fngNews,sigAt,rt,kl,analyse,refusEntree,pauseSerie}')();
+  ';return{WL,H1,setTF,agreger,aligner,prep,choisir,ouvrir,stopTick,sortieCloture,fermer,risque,distanceStop,fngNews,sigAt,rt,kl,analyse,refusEntree,pauseSerie,bornerCfg}')();
 const DIR=process.argv[2]||'forward',F_ETAT=path.join(DIR,'etat.json'),F_CFG=path.join(DIR,'config.json'),F_J=path.join(DIR,'journal.jsonl'),F_RES=path.join(DIR,'resume.json');
 const sha=t=>crypto.createHash('sha256').update(t).digest('hex'),lire=(f,d)=>{try{return JSON.parse(fs.readFileSync(f,'utf8'))}catch(e){return d}};
 // État du test : un fichier présent mais illisible n'est JAMAIS remplacé par un état neuf (le test repartirait de zéro en silence) :
@@ -25,7 +25,7 @@ const AT=()=>({signal:AbortSignal.timeout(10000)}); // délai maximal de 10 s pa
 const BASES=['https://data-api.binance.vision','https://api.binance.com'],FNG='https://api.alternative.me/fng/?limit=1',now=+process.env.MAINTENANT||Date.now(); // MAINTENANT : pour les tests seulement
 (async()=>{
   const G=lire(F_CFG,null);if(!G){console.error('config.json absent : rien à faire.');return}
-  const TF=E.setTF(G.tf),c={...G.cfg,tf:G.tf},R=Object.fromEntries((G.regles||[]).map(k=>[k,1]));
+  const TF=E.setTF(G.tf),c=E.bornerCfg({...G.cfg,tf:G.tf}),R=Object.fromEntries((G.regles||[]).map(k=>[k,1]));
   const vReglages=sha(JSON.stringify({tf:G.tf,cfg:G.cfg,regles:(G.regles||[]).slice().sort()})).slice(0,16);
   const vAgents=sha([E.analyse,E.prep,E.sigAt,E.refusEntree,E.choisir,E.ouvrir,E.stopTick,E.sortieCloture,E.fermer].map(f=>f.toString()).join('\n')).slice(0,16);
   let S=lireEtat(F_ETAT);

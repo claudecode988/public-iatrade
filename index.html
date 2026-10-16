@@ -183,7 +183,7 @@ body{padding-bottom:calc(132px + env(safe-area-inset-bottom))}.rbar{bottom:calc(
 <label>Taille d'un achat (base interne de 10 000 ; affichée ÷ 100)<input id="size" type="number" min="10"></label>
 <label>Achats par décision<input id="nb" type="number" min="1" max="10" step="1"></label>
 <div class="mut">Quand tous les agents sont d'accord, Caramel passe ce nombre d'achats d'un coup : la position vaut ce nombre × la taille d'un achat. Les gains et les pertes sont multipliés d'autant, et chaque achat compte dans le maximum de trades par jour.</div>
-<label>Perte maximale par jour (% du capital)<input id="maxLoss" type="number" min="0.5" step="0.5"></label>
+<label>Perte maximale par jour (% du capital)<input id="maxLoss" type="number" min="0.5" max="2" step="0.5"></label>
 <label>Nombre maximal de trades par jour<input id="maxTrades" type="number" min="1"></label>
 <label>Stop de perte maximal (%)<input id="sl" type="number" min="0.5" step="0.5"></label>
 <label>Seuil de confiance pour entrer (%)<input id="thr" type="number" min="50" max="99"></label>
@@ -199,9 +199,9 @@ body{padding-bottom:calc(132px + env(safe-area-inset-bottom))}.rbar{bottom:calc(
 <label>Arrêt automatique des agents après (minutes)<input id="maxRuns" type="number" min="1"></label>
 <h2>Couche de risque</h2>
 <div class="mut">Règles en code pur, sans agent ni modèle, avec droit de veto. Elles peuvent seulement réduire ou bloquer une entrée, jamais l'agrandir.</div>
-<label>Risque maximal par trade (% du capital)<input id="riskPct" type="number" min="0.05" max="5" step="0.05"></label>
+<label>Risque maximal par trade (% du capital)<input id="riskPct" type="number" min="0.05" max="1" step="0.05"></label>
 <div class="mut">La taille est calculée pour qu'un stop à N × ATR (ou le stop réel s'il est plus large) ne fasse perdre que ce pourcentage. Elle ne dépasse jamais « taille d'un achat × achats par décision ».</div>
-<label>Coupe-circuit : baisse maximale depuis le plus haut (%)<input id="ddMax" type="number" min="1" max="50" step="1"></label>
+<label>Coupe-circuit : baisse maximale depuis le plus haut (%)<input id="ddMax" type="number" min="1" max="15" step="1"></label>
 <div class="mut">Barème : baisse sous 5 % → taille normale ; de 5 à 10 % → moitié ; au-delà → quart ; à ce seuil → plus aucune nouvelle entrée.</div>
 <label>Heartbeat : délai sans prix frais avant blocage (secondes)<input id="hb" type="number" min="2" max="60" step="1"></label>
 <h2>Niveau de preuve</h2>
@@ -301,6 +301,9 @@ const pauseSerie=(T,lastX,t)=>T.length>=3&&T.slice(-3).every(x=>x<0)&&t-lastX<12
 function monteCarlo(rj,n=1000,bloc=5){if(!rj||rj.length<30)return null;let g=12345;const rnd=()=>(g=(Math.imul(g,1103515245)+12345)>>>0)/4294967296,L=rj.length,F=[],DD=[];
   for(let k=0;k<n;k++){let v=1,pk=1,dd=0,i=0;while(i<L){const a=Math.floor(rnd()*(L-bloc+1));for(let j=0;j<bloc&&i<L;j++,i++){v*=1+rj[a+j];pk=Math.max(pk,v);dd=Math.max(dd,(pk-v)/pk)}}F.push(v-1);DD.push(dd)}
   F.sort((a,b)=>a-b);DD.sort((a,b)=>a-b);return{pPerte:F.filter(x=>x<0).length/n,r5:F[Math.floor(n*.05)],r50:F[Math.floor(n*.5)],dd95:DD[Math.floor(n*.95)]}}
+// Plafonds du dossier (01_gestion_risque.md) : 1 % du capital risqué par trade, perte du jour 2 %, baisse maximale 15 %.
+// Appliqués au chargement, à l'enregistrement et sur le serveur : un réglage plus lâche (stockage du navigateur modifié, sauvegarde importée) est ramené au plafond.
+const PLAFONDS={riskPct:1,maxLoss:2,ddMax:15};function bornerCfg(c){for(const k in PLAFONDS)if(!(c[k]>0&&c[k]<=PLAFONDS[k]))c[k]=PLAFONDS[k];return c}
 // Changements essayés un par un par mesurer(), dans cet ordre.
 const CHANGES=[
   {id:'mtf',nom:'Confirmation sur bougies longues',txt:'Entrée seulement si la tendance des bougies longues (4 h pour des bougies d’1 h, 1 h pour 10 min ; EMA 20 contre EMA 50) va dans le même sens.'},
@@ -778,16 +781,16 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-17 00:57';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-17 00:59';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;
 const $=i=>document.getElementById(i),fmt=n=>(n<0?'−':'')+Math.abs(n*CAPF/1e4).toFixed(2)+' €',fp=n=>n.toFixed(n<10?5:2);
 const D=()=>({pk:10000,cash:10000,start:10000,pos:null,trades:[],log:[],stop:false,day:'',nToday:0,lossToday:0,
- cfg:{capReel:500,size:1000,maxLoss:5,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:1,ddMax:15,hb:5,npT1:30,npJ1:30,npT2:100,npJ2:90,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
+ cfg:{capReel:500,size:1000,maxLoss:2,maxTrades:50,sl:2,thr:85,tf:5,nb:3,riskPct:1,ddMax:15,hb:5,npT1:30,npJ1:30,npT2:100,npJ2:90,hold:6,atrK:2,fee:.1,slip:.05,news:'neutre',rsrc:'auto',tn:'0',maxRuns:1440},ags:[],dec:null,hist:[],rules:{},lastX:0,eq:[]});
 let S=D(),KEYS={k:'',s:''};
 try{const j=localStorage.getItem('tiq');if(j)S=Object.assign(D(),JSON.parse(j))}catch(e){}
-S.cfg=Object.assign(D().cfg,S.cfg);if(!S.cfg5){S.cfg.maxRuns=1440;S.cfg5=1}if(!S.cfg6){S.cfg.tf=10;S.cfg6=1}if(!S.cfg7){S.cfg.tf=5;S.cfg.nb=3;S.cfg7=1}if(!S.cfg8){S.cfg.riskPct=1;S.cfg8=1}/* 1 % par trade, accepté par l'utilisateur le 15/10/2026 (maximum du dossier) */setTF(S.cfg.tf);if(S.sim&&S.sim.tf!==TF.min){S.sim=0;S.rules={}}if(S.sim&&S.sim.v!==7){S.sim=0;S.rules={}}S.rules=S.rules||{};
+S.cfg=Object.assign(D().cfg,S.cfg);if(!S.cfg5){S.cfg.maxRuns=1440;S.cfg5=1}if(!S.cfg6){S.cfg.tf=10;S.cfg6=1}if(!S.cfg7){S.cfg.tf=5;S.cfg.nb=3;S.cfg7=1}if(!S.cfg8){S.cfg.riskPct=1;S.cfg8=1}/* 1 % par trade, accepté par l'utilisateur le 15/10/2026 (maximum du dossier) */bornerCfg(S.cfg);setTF(S.cfg.tf);if(S.sim&&S.sim.tf!==TF.min){S.sim=0;S.rules={}}if(S.sim&&S.sim.v!==7){S.sim=0;S.rules={}}S.rules=S.rules||{};
 if(S.pos&&(!S.pos.q||!S.pos.dist)){S.cash+=S.pos.size||0;S.pos=null} // position d'une ancienne version : remboursée au prix d'entrée
 let SAVED=0,SAVEERR='';let ESS={};try{ESS=JSON.parse(localStorage.getItem('tiq-essais')||'{}')}catch(e){}
 const enregistrerEssais=()=>{try{localStorage.setItem('tiq-essais',JSON.stringify(ESS))}catch(e){}};
@@ -1307,7 +1310,7 @@ let VEND=0;document.addEventListener('click',async e=>{if(!e.target||e.target.id
   b.disabled=true;await jrAjouter({agent:'Toi',type:'sortie',paire:P.q,sens:P.side,raison:'clôture manuelle demandée par l’utilisateur',confiance:null,prix:jrPrix(P.q),entrees:null,trade:P.jid||null}).then(id=>{P.jsx=id});
   await cloturer(px,'clôture manuelle',true)});
 $('kill').onclick=()=>{S.stop=!S.stop;if(S.stop&&timer)stopAuto('Arrêt d\'urgence actif : agents arrêtés, aucune nouvelle entrée. Un stop ouvert reste surveillé.');save();render();$('msg').textContent=S.stop?'Tout est suspendu : aucun nouvel ordre.':'Reprise possible.'};
-const NUM={capReel:[0,1e7],npT1:[1,1e4],npJ1:[1,3650],npT2:[1,1e5],npJ2:[1,3650],riskPct:[.05,5],ddMax:[1,50],hb:[2,60],nb:[1,10],size:[10,1e6],maxLoss:[.5,100],maxTrades:[1,1000],sl:[.5,50],thr:[50,99],hold:[0,200],atrK:[.5,10],fee:[0,2],slip:[0,2],maxRuns:[1,100000]};
+const NUM={capReel:[0,1e7],npT1:[1,1e4],npJ1:[1,3650],npT2:[1,1e5],npJ2:[1,3650],riskPct:[.05,1],ddMax:[1,15],hb:[2,60],nb:[1,10],size:[10,1e6],maxLoss:[.5,2],maxTrades:[1,1000],sl:[.5,50],thr:[50,99],hold:[0,200],atrK:[.5,10],fee:[0,2],slip:[0,2],maxRuns:[1,100000]};
 const STRAT=['tf','nb','size','maxLoss','maxTrades','sl','thr','hold','atrK','fee','slip','riskPct','ddMax','rsrc','news'];
 $('save').onclick=()=>{const avant=JSON.stringify(STRAT.map(k=>S.cfg[k])),cfg0={...S.cfg};for(const k in NUM){const v=parseFloat(String($(k).value).replace(',','.'));if(isFinite(v))S.cfg[k]=Math.min(NUM[k][1],Math.max(NUM[k][0],v))}
   const tf0=S.cfg.tf;S.cfg.tf=+$('tf').value;S.cfg.news=$('news').value;S.cfg.rsrc=$('rsrc').value;S.cfg.tn=$('tn').value;KEYS={k:$('k').value.trim(),s:$('s').value.trim()};RD.at=0;

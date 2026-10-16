@@ -7,7 +7,7 @@
 //   node tools/familles-fw.cjs <dossier>     (FAUX_PRIX=1 : prix inventés, test du programme seulement ; MAINTENANT : heure simulée)
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
-const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+';return{WL,setTF,aligner,prep,kl,FAMILLES,plafondRisque,noteEchange,TROIS}')();
+const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+';return{WL,setTF,aligner,prep,kl,FAMILLES,plafondRisque,noteEchange,TROIS,bornerCfg}')();
 const DIR=process.argv[2]||'forward',F_ETAT=path.join(DIR,'familles-etat.json'),F_J=path.join(DIR,'familles.jsonl'),F_RES=path.join(DIR,'familles-resume.json');
 const sha=t=>crypto.createHash('sha256').update(t).digest('hex'),lire=(f,d)=>{try{return JSON.parse(fs.readFileSync(f,'utf8'))}catch(e){return d}};
 // État présent mais illisible : arrêt en erreur sans rien écrire (jamais de remise à zéro silencieuse). Écritures atomiques.
@@ -26,7 +26,7 @@ const resumeCompte=P=>P?{valeur:+(P.val??1e4).toFixed(2),dd:+(P.dd||0).toFixed(4
   // Version 4 : plus de levier dans les stratégies journalières (somme des positions ≤ capital) ; tout le monde repart du même jour.
   const VERSION=4;{const a=lireEtat(F_ETAT);if(a&&a.version!==VERSION){const d=path.join(DIR,'archives'),tag=new Date(now).toISOString().replace(/[:.]/g,'-');fs.mkdirSync(d,{recursive:true});
     for(const f of[F_ETAT,F_J,F_RES])if(fs.existsSync(f))fs.renameSync(f,path.join(d,tag+'-'+path.basename(f)));console.log('Familles : ancien forward test archivé (règles de risque changées).')}}
-  E.setTF(60);const c={...G.cfg,risqueEgal:true},f=(c.fee+c.slip)/100,S0=lireEtat(F_ETAT),hNow=Math.floor(now/H)*H-H; // dernière heure FERMÉE (ouverture)
+  E.setTF(60);const c=E.bornerCfg({...G.cfg,risqueEgal:true}),f=(c.fee+c.slip)/100,S0=lireEtat(F_ETAT),hNow=Math.floor(now/H)*H-H; // dernière heure FERMÉE (ouverture)
   if(S0&&S0.lastBar>=hNow){console.log('Familles : pas de nouvelle heure fermée.');return}
   const L=[...E.WL.CRYPTO,...E.WL.FOREX],D={},ext={btcJ:[],jours:{}};
   if(process.env.FAUX_PRIX){const px=(q,t)=>{const k=q.charCodeAt(0)+q.charCodeAt(1)*3;return 100*(1+.2*Math.sin(t/J1/30+k)+.05*Math.sin(t/H/9+k*2))};
