@@ -781,7 +781,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-17 00:59';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-17 01:01';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;
@@ -934,7 +934,7 @@ async function decider0(t,manuel){const c=S.cfg,A=[],d0=today(),R=S.rules,W=v=>v
   else if(act==='close'){const px=P.side==='long'?LV.bid[P.q]:LV.ask[P.q];ex=px?await cloturer(px,why.replace(/\.$/,'').toLowerCase(),manuel):'Aucun prix reçu : sortie reportée.'}
   A.push({n:'Exécuteur fictif',s:act==='open'&&ok&&S.pos?'Ordre passé':act==='close'?'Position fermée':'Aucun ordre',t:ex+(c.tn==='1'&&manuel?' Le testnet ne reçoit que BTC et ETH, en hausse.':'')});
   const L=S.trades.length,w=S.trades.filter(x=>x>0).length;
-  A.push({n:'Journal',s:`${L} trades notés`,t:L?`${L} trades, ${w} gagnants. Compare l’indice annoncé à la réussite réelle dans l’accueil.`:'Pas encore de trade clôturé.'});
+  A.push({n:'Journal',s:`${L} trades notés`,t:L?`${L} trades, ${w} gagnants. L’indice est une note du bot, pas une probabilité : la part réelle de trades gagnants est dans l’accueil.`:'Pas encore de trade clôturé.'});
   const at=Date.now();S.ags=A.map(a=>({...a,at}));house.play(A,q);S.dec={d,why,conf:pc+' %',rr};S.eq=(S.eq||[]).concat(valeur()).slice(-300);save();render();$('msg').textContent=manuel?'Évaluation terminée.':`Décision prise à la fermeture de ${hr(tb+TF.bar)}.`}
 const valeur=()=>{const P=S.pos;if(!P)return S.cash;const px=(P.side==='long'?LV.bid[P.q]:LV.ask[P.q])||LV.px[P.q]||P.px;return S.cash+P.size+(P.side==='long'?1:-1)*P.n*(px-P.fill)};
 
@@ -977,7 +977,7 @@ async function sign(q){const e=new TextEncoder(),k=await crypto.subtle.importKey
   return [...new Uint8Array(await crypto.subtle.sign('HMAC',k,e.encode(q)))].map(b=>b.toString(16).padStart(2,'0')).join('')}
 async function testnetOrder(side,qty,quote,sym){
   if(!KEYS.k||!KEYS.s)return 'Clés testnet absentes : ordre non envoyé.';
-  const txt=side==='BUY'?`ACHETER pour ${quote} USDT de ${sym} sur le testnet ?`:`VENDRE ${qty} ${sym} sur le testnet ?`;
+  const txt=side==='BUY'?`ACHETER pour ${quote} USDT de test de ${sym} sur le testnet (argent sans valeur, jamais un vrai compte) ?`:`VENDRE ${qty} ${sym} sur le testnet (argent sans valeur, jamais un vrai compte) ?`;
   if(!confirm(txt))return 'Ordre testnet annulé par toi.';
   let q=`symbol=${sym}&side=${side}&type=MARKET&`+(side==='BUY'?`quoteOrderQty=${quote}`:`quantity=${qty}`)+`&timestamp=${Date.now()}`;
   q+=`&signature=${await sign(q)}`;
@@ -1098,10 +1098,10 @@ function renderAgents(){vagHTML();delete PV.fst;
 let REPS_='';
 // Bilan des 7 derniers jours (modèle 04_journal_template.md) : une ligne par stratégie, causes de perte et action proposée repliées.
 function bilanHTML(){const e=$('bil');if(!e)return;const B=SV.bil;if(!B||!B.agents){e.innerHTML=`<span class="mut">${SV.at?'Pas encore de bilan publié par le serveur.':'Lecture du serveur…'}</span>`;return}
-  const L=[B.agents,...B.strategies.map(x=>x.demo?{...x.demo,nom:x.nom+' (démo sans frais)'}:x)],pc=x=>x==null?'–':Math.round(x*100)+' %';
+  const L=[B.agents,...B.strategies.flatMap(x=>x.demo?[{...x,nom:x.nom+' (avec frais)'},{...x.demo,nom:x.nom+' (démo sans frais)',demo:1}]:[x])],pc=x=>x==null?'–':Math.round(x*100)+' %';
   const ouv=!!(e.querySelector('details')||{}).open;
-  e.innerHTML=L.map(x=>`<div class="row"><span><b>${x.nom}</b><br><span class="mut">${x.n} trade${x.n>1?'s':''} · réussite ${pc(x.reussite)} · espérance ${x.esperance==null?'–':fmt(x.esperance)} par trade</span></span><span class="${x.total>=0?'up':'dn'}">${fmt(x.total)}</span></div>`).join('')+
-    `<details class="plus"><summary>Erreurs récurrentes et action proposée</summary>${L.filter(x=>x.n).map(x=>`<p><b>${x.nom}</b> : gain moyen ${fmt(x.gainMoy)}, perte moyenne ${fmt(x.perteMoy)}.${x.erreurs.length?` Causes des pertes : ${x.erreurs.map(z=>`${z.cause} (${z.n})`).join(', ')}.`:''}${x.action?`<br><span class="mut">Action proposée : ${x.action}</span>`:''}</p>`).join('')||'<p class="mut">Pas encore de trade terminé cette semaine.</p>'}<p class="mut">Du ${new Date(B.du).toLocaleDateString('fr-FR')} au ${new Date(B.au).toLocaleDateString('fr-FR')}. Les actions proposées ne sont jamais appliquées sans ton accord.</p></details>`;
+  e.innerHTML=L.map(x=>`<div class="row"${x.demo?' style="opacity:.7"':''}><span><b>${x.nom}</b><br><span class="mut">${x.n} trade${x.n>1?'s':''} · réussite ${pc(x.reussite)} · espérance ${x.esperance==null?'–':fmt(x.esperance)} par trade</span></span><span class="${x.total>=0?'up':'dn'}">${fmt(x.total)}</span></div>`).join('')+
+    `<details class="plus"><summary>Erreurs récurrentes et action proposée</summary>${L.filter(x=>x.n).map(x=>`<p><b>${x.nom}</b> : gain moyen ${fmt(x.gainMoy)}, perte moyenne ${fmt(x.perteMoy)}.${x.erreurs.length?` Causes des pertes : ${x.erreurs.map(z=>`${z.cause} (${z.n})`).join(', ')}.`:''}${x.action?`<br><span class="mut">Action proposée : ${x.action}</span>`:''}</p>`).join('')||'<p class="mut">Pas encore de trade terminé cette semaine.</p>'}<p class="mut">Du ${new Date(B.du).toLocaleDateString('fr-FR')} au ${new Date(B.au).toLocaleDateString('fr-FR')}. Les actions proposées ne sont jamais appliquées sans ton accord.</p>${B.verif?`<p class="mut">Journaux du serveur vérifiés (chaîne d’empreintes) : ${Object.entries(B.verif).map(([k,v])=>`${k} ${v.ok?'intact':'⚠️ '+v.erreur} (${v.n} lignes)`).join(' · ')}.</p>`:''}</details>`;
   if(ouv)e.querySelector('details').open=true}
 // ---------- Onglets des trois stratégies suivies : portefeuille fictif de 100 €, gains, pertes, trades, et petite analyse de chaque trade ----------
 const ONGLETS={3:'A2',4:'prudente',5:'regime'};
@@ -1155,7 +1155,7 @@ function render(){
   const r0=(eq-S.start)/S.start;$('ret').textContent=`${r0>=0?'+':'−'}${Math.abs(r0*100).toFixed(2).replace('.',',')} % depuis le départ (${fmt(S.start)})`;$('ret').className='delta '+(r0>=0?'up':'dn');
   $('nt').textContent=`${S.day===today()?S.nToday:0} / ${S.cfg.maxTrades}`;
   $('cal').innerHTML=(P?`<b>${P.q} : position ouverte en ${P.side==='long'?'hausse':'baisse'}</b> à ${fp(P.fill)}, stop <span id="pstop">${fp(P.stop)}</span>, résultat latent <span id="plat">–</span>.<br><button class="btn stop" id="vendre" type="button">${P.side==='long'?'Vendre maintenant':'Racheter maintenant'} (clôturer moi-même)</button><span class="mut" id="vendmsg"></span><br>`:'')+
-    (n?`Indice annoncé en moyenne ${Math.round(H.reduce((a,x)=>a+x.p,0)/n*100)} %, réussite réelle ${Math.round(H.filter(x=>x.pnl>0).length/n*100)} % sur ${n} trades, durée moyenne ${(H.reduce((a,x)=>a+(x.dur||0),0)/n).toFixed(1)} h. Un grand écart veut dire que l’indice du bot n’est pas fiable.`:'<span class="mut">Aucun trade clôturé pour mesurer la fiabilité du bot.</span>');
+    (n?`Indice moyen du bot (une note, pas une probabilité) ${Math.round(H.reduce((a,x)=>a+x.p,0)/n*100)} % ; trades réellement gagnants ${Math.round(H.filter(x=>x.pnl>0).length/n*100)} % sur ${n} trades, durée moyenne ${(H.reduce((a,x)=>a+(x.dur||0),0)/n).toFixed(1)} h. Un grand écart veut dire que l’indice du bot n’est pas fiable.`:'<span class="mut">Aucun trade clôturé pour mesurer la fiabilité du bot.</span>');
   delete PV.plat;delete PV.pstop;
   $('log').innerHTML=S.log.length?S.log.map(x=>`<div class="row">${x}</div>`).join(''):'<span class="mut">Le journal est vide.</span>';
   $('kill').textContent=S.stop?'Arrêt actif : remettre en marche':"Arrêt d'urgence";
