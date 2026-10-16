@@ -757,6 +757,9 @@ function pistes(F,c,R){const W=Math.min(TF.W,Math.floor(F.N/4)),N=F.N,cut=W+Math
   const L=[un(R,'Configuration gelée (référence)','ref')];
   for(const id of['regime','macro','fund','conf','serie','heures']){const m=CHANGES.find(x=>x.id===id);L.push({...un({...R,[id]:1},m.nom,id),couverture:couv[id]/(N-W)})}
   L.push({...un({...R,rev:1,hold:1,atr:1},'Sortie confirmée (2 bougies) + durée minimale + stop suiveur','sortie'),couverture:1}); // demandé : ne pas sortir au premier retournement
+  // Combinaisons de filtres d'entrée (ils ne font que refuser des entrées : ils renforcent, n'assouplissent jamais).
+  for(const[ids,id]of[[['mtf'],'mtf'],[['fee'],'fee'],[['conf','heures'],'conf+heures'],[['mtf','heures'],'mtf+heures'],[['conf','heures','fee'],'conf+heures+fee'],[['mtf','conf','heures'],'mtf+conf+heures']])
+    L.push({...un({...R,...Object.fromEntries(ids.map(k=>[k,1]))},ids.map(k=>CHANGES.find(x=>x.id===k).nom).join(' + '),id),couverture:1});
   return{lignes:L,du:F.T[W],coupe:F.T[cut],au:F.T[N-1]}}
 // Les trois stratégies suivies en détail (onglets du site) : journal de tous les trades sur la longue période, avec la petite analyse.
 const TROIS=['A2','prudente','regime'];
@@ -774,7 +777,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-15 13:46';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-17 00:21';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;
