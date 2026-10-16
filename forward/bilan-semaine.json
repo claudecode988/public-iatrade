@@ -1,17 +1,17 @@
 {
- "maj": 1792154558236,
- "du": 1791549758236,
- "au": 1792154558236,
+ "maj": 1792158174033,
+ "du": 1791553374033,
+ "au": 1792158174033,
  "agents": {
   "nom": "Agents actuels",
   "note": "avec frais",
-  "n": 9,
+  "n": 10,
   "gagnants": 2,
-  "reussite": 0.2222222222222222,
+  "reussite": 0.2,
   "gainMoy": 76.56710000000001,
-  "perteMoy": -25.389499999999998,
-  "esperance": -2.7324777777777776,
-  "total": -24.592299999999994,
+  "perteMoy": -26.297087499999996,
+  "esperance": -5.724249999999996,
+  "total": -57.24249999999999,
   "erreurs": [
    {
     "cause": "sortie sur signal inversé",
@@ -23,7 +23,7 @@
    },
    {
     "cause": "sortie trop rapide sur un signal inversé",
-    "n": 1
+    "n": 2
    }
   ],
   "action": "Sorties trop rapides : laisser courir les gains avec un stop suiveur plutôt que sortir à la première inversion (comme la version 2)."
