@@ -34,5 +34,5 @@ jobs:
           git add -A forward
           if ! git diff --cached --quiet; then
             git commit -q -m "Mesure longue $(date -u +%Y-%m-%d)"
-            git pull -q --rebase origin forward-test && git push -q origin HEAD:forward-test
+            for k in 1 2 3 4 5; do git pull -q --rebase origin forward-test && git push -q origin HEAD:forward-test && break; git rebase --abort 2>/dev/null; sleep 10; done
           fi
