@@ -1,19 +1,42 @@
 {
- "maj": 1792194524840,
- "du": 1791589724840,
- "au": 1792194524840,
+ "maj": 1792198186406,
+ "du": 1791593386406,
+ "au": 1792198186406,
+ "verif": {
+  "agents": {
+   "ok": true,
+   "n": 22
+  },
+  "familles": {
+   "ok": true,
+   "n": 55
+  }
+ },
  "agents": {
   "nom": "Agents actuels",
   "note": "avec frais",
-  "n": 0,
-  "gagnants": 0,
-  "reussite": null,
-  "gainMoy": 0,
-  "perteMoy": 0,
-  "esperance": null,
-  "total": 0,
-  "erreurs": [],
-  "action": null
+  "n": 17,
+  "gagnants": 3,
+  "reussite": 0.17647058823529413,
+  "gainMoy": 53.62640000000001,
+  "perteMoy": -22.04665714285714,
+  "esperance": -8.692588235294112,
+  "total": -147.774,
+  "erreurs": [
+   {
+    "cause": "sortie sur signal inversé",
+    "n": 8
+   },
+   {
+    "cause": "mauvaise entrée",
+    "n": 4
+   },
+   {
+    "cause": "sortie trop rapide sur un signal inversé",
+    "n": 2
+   }
+  ],
+  "action": "Sorties trop rapides : laisser courir les gains avec un stop suiveur plutôt que sortir à la première inversion (comme la version 2)."
  },
  "strategies": [
   {
@@ -47,74 +70,54 @@
    "id": "prudente",
    "nom": "Prudente (tendance + régime + volatilité cible + pause Fed)",
    "note": "avec frais",
-   "n": 1,
+   "n": 0,
    "gagnants": 0,
-   "reussite": 0,
+   "reussite": null,
    "gainMoy": 0,
-   "perteMoy": -7.3104005065285005,
-   "esperance": -7.3104005065285005,
-   "total": -7.3104005065285005,
-   "erreurs": [
-    {
-     "cause": "faux signal (tendance retournée juste après l’entrée)",
-     "n": 1
-    }
-   ],
-   "action": "Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4).",
+   "perteMoy": 0,
+   "esperance": null,
+   "total": 0,
+   "erreurs": [],
+   "action": null,
    "demo": {
     "nom": "Prudente (tendance + régime + volatilité cible + pause Fed)",
     "note": "démo sans frais",
-    "n": 1,
+    "n": 0,
     "gagnants": 0,
-    "reussite": 0,
+    "reussite": null,
     "gainMoy": 0,
-    "perteMoy": -6.697294381504236,
-    "esperance": -6.697294381504236,
-    "total": -6.697294381504236,
-    "erreurs": [
-     {
-      "cause": "faux signal (tendance retournée juste après l’entrée)",
-      "n": 1
-     }
-    ],
-    "action": "Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4)."
+    "perteMoy": 0,
+    "esperance": null,
+    "total": 0,
+    "erreurs": [],
+    "action": null
    }
   },
   {
    "id": "regime",
    "nom": "Tendance lente + régime du bitcoin",
    "note": "avec frais",
-   "n": 1,
+   "n": 0,
    "gagnants": 0,
-   "reussite": 0,
+   "reussite": null,
    "gainMoy": 0,
-   "perteMoy": -15.285271591532148,
-   "esperance": -15.285271591532148,
-   "total": -15.285271591532148,
-   "erreurs": [
-    {
-     "cause": "faux signal (tendance retournée juste après l’entrée)",
-     "n": 1
-    }
-   ],
-   "action": "Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4).",
+   "perteMoy": 0,
+   "esperance": null,
+   "total": 0,
+   "erreurs": [],
+   "action": null,
    "demo": {
     "nom": "Tendance lente + régime du bitcoin",
     "note": "démo sans frais",
-    "n": 1,
+    "n": 0,
     "gagnants": 0,
-    "reussite": 0,
+    "reussite": null,
     "gainMoy": 0,
-    "perteMoy": -14.003331754301826,
-    "esperance": -14.003331754301826,
-    "total": -14.003331754301826,
-    "erreurs": [
-     {
-      "cause": "faux signal (tendance retournée juste après l’entrée)",
-      "n": 1
-     }
-    ],
-    "action": "Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4)."
+    "perteMoy": 0,
+    "esperance": null,
+    "total": 0,
+    "erreurs": [],
+    "action": null
    }
   }
  ]
