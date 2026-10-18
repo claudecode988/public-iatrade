@@ -9,10 +9,10 @@ const F_OUT=path.join(DIR,'bilan-semaine.json'),old=lire(F_OUT,null);
 if(old&&now-old.maj<36e5&&!process.env.FORCER){console.log('Bilan déjà calculé il y a moins d’une heure.');process.exit(0)}
 const ACTIONS={
   'stop touché':'Stop trop serré par rapport aux mouvements normaux : vérifier qu’il est au moins à 2 × la variation moyenne (ATR).',
-  'sortie sur signal inversé':'Sorties trop rapides : laisser courir les gains avec un stop suiveur plutôt que sortir à la première inversion (comme la version 2).',
+  'sortie sur signal inversé':'Le vrai problème est l’entrée : le prix part du mauvais côté juste après. « Sortir moins vite » a été mesuré sur 12 mois et sur 5 ans et aggrave les pertes ; la piste utile est de filtrer les entrées (liste de contrôle, heures creuses, frais : déjà appliqués le 16/10).',
   'faux signal (tendance retournée juste après l’entrée)':'Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4).',
   'hausse trop faible pour couvrir les frais':'Trop de petits trades : décider moins souvent (bougies plus longues) pour que les frais pèsent moins.',
-  'sortie trop rapide sur un signal inversé':'Sorties trop rapides : laisser courir les gains avec un stop suiveur plutôt que sortir à la première inversion (comme la version 2).',
+  'sortie trop rapide sur un signal inversé':'Garder la position plus longtemps a été mesuré et aggrave les pertes ; mieux vaut moins d’entrées, mieux confirmées (filtres appliqués le 16/10).',
   'frais plus grands que le gain':'Trop de petits trades : décider moins souvent (bougies plus longues) pour que les frais pèsent moins.',
   'mauvaise entrée':'Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4).',
   'autre':'Pas de cause dominante : continuer à observer.'};
