@@ -39,7 +39,8 @@ async function chargerFin(q){const out=[],d=new Date();for(let m=MOIS;m>=1;m--){
   let fam3=null;{const T3=E.setTF(60);const D3={};
     if(process.env.FAUX_PRIX){for(const q of Object.keys(al.D))D3[q]=E.agreger(al.D[q].filter((x,i)=>i%12===11).map(x=>({...x})),36e5)}
     else for(const q of L){const a=await charger(q,'1h',MOIS3);if(a.length)D3[q]=a;console.log(q,a.length,'bougies 1 h')}
-    const al3=E.aligner(D3);if(al3&&Object.keys(al3.D).length){const F3=E.prep(al3.D);fam3={...E.familles(F3,c,R),pairs:F3.Q.length,ecartees:al3.ecartees};const w3=Math.min(T3.W,Math.floor(F3.N/4));fam3.diag60=E.simuler(F3,w3,F3.N,{...c,diag:1},R).diag;fam3.trois=E.journalTrois(F3,c);fam3.pistes=E.pistes(F3,c,R);console.log('Pistes 5 ans :',fam3.pistes.lignes.map(x=>`${x.id} ${x.pnl.toFixed(0)} $`).join(' | '));
+    const al3=E.aligner(D3);if(al3&&Object.keys(al3.D).length){const F3=E.prep(al3.D);fam3={...E.familles(F3,c,R),pairs:F3.Q.length,ecartees:al3.ecartees};const w3=Math.min(T3.W,Math.floor(F3.N/4));fam3.diag60=E.simuler(F3,w3,F3.N,{...c,diag:1},R).diag;fam3.trois16=E.journalTrois(F3,c);{const FQ=['BTCUSDT','EURUSDT'].filter(q=>al3.D[q]);fam3.trois=FQ.length===2?E.journalTrois(E.prep(Object.fromEntries(FQ.map(q=>[q,al3.D[q]]))),c):null;fam3.troisActifs=FQ} // onglets : bitcoin + euro-dollar ; trois16 : toutes les paires, pour comparaison
+    fam3.pistes=E.pistes(F3,c,R);console.log('Pistes 5 ans :',fam3.pistes.lignes.map(x=>`${x.id} ${x.pnl.toFixed(0)} $`).join(' | '));
       console.log('Familles 3 ans :',fam3.lignes.map(x=>`${x.nom} ${x.pnl.toFixed(0)} $`).join(' | '))}else console.log('Familles 3 ans : données introuvables');
     E.setTF(G.tf)}
   const diag=E.simuler(F,Math.min(TF.W,Math.floor(F.N/4)),F.N,{...c,diag:1},R).diag;console.log('Diagnostic des agents :',JSON.stringify(diag));

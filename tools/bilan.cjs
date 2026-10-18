@@ -37,6 +37,6 @@ function verifier(f){if(!fs.existsSync(f))return{ok:true,n:0};let prev='',n=0;fo
 const verif={agents:verifier(path.join(DIR,'journal.jsonl')),familles:verifier(path.join(DIR,'familles.jsonl'))};
 const fam=lire(path.join(DIR,'familles-resume.json'),{lignes:[]}),strat=[];
 for(const id of['A2','prudente','regime']){const L=fam.lignes.find(x=>x.id===id);if(!L)continue;const conv=a=>(a||[]).filter(x=>x.fin>=now-J7).map(x=>({pnl:x.pnl,paire:x.paire,cause:causeFam(x.pourquoi||'')}));
-  strat.push({id,...resume(L.nom,conv(L.trades),'avec frais'),demo:L.demo?resume(L.nom,conv(L.demo.trades),'démo sans frais'):null})}
+  const A=L.focus||L;strat.push({id,...resume(L.nom,conv(A.trades),L.focus?'bitcoin + euro-dollar, avec frais':'avec frais'),demo:L.demo?resume(L.nom,conv(L.demo.trades),'démo sans frais'):null})}
 fs.writeFileSync(F_OUT,JSON.stringify({maj:now,du:now-J7,au:now,verif,agents:resume('Agents actuels',ag,'avec frais'),strategies:strat},null,1));
 console.log('Bilan de la semaine :',`journaux ${Object.entries(verif).map(([k,v])=>k+' '+(v.ok?'intact':v.erreur)).join(', ')} |`,`agents ${ag.length} trades`,strat.map(x=>`${x.id} ${x.n}`).join(' | '));

@@ -792,7 +792,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-18 02:40';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-18 02:43';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;
@@ -1121,12 +1121,12 @@ function courbe(H){if(!H||H.length<2)return'<div class="hempty">La courbe appara
 function ligneTrade(x){const d=t=>new Date(t).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'}),g=x.pnl>0,pc=y=>`${y>=0?'+':'−'}${Math.abs(y*100).toFixed(1).replace('.',',')} %`;
   return`<div class="tr ${g?'g':'p'}"><div class="trh"><b>${x.paire.replace('USDT','')}</b><span class="sens ${x.sens==='baisse'?'b':''}">${x.sens==='baisse'?'▼ Baisse':'▲ Hausse'}</span><span class="res ${g?'up':'dn'}">${fmt(x.pnl)}</span></div>
     <div class="trm">${d(x.debut)} → ${d(x.fin)} · prix ${pc(x.variation)} · mise ${fmt(x.mis)}</div><p>${x.pourquoi||''}</p></div>`}
-function stratHTML(){for(const k in ONGLETS){const e=$('st'+k);if(!e)continue;const id=ONGLETS[k],F=FAMILLES[id],fwF=SV.fam&&SV.fam.lignes?SV.fam.lignes.find(x=>x.id===id):null,fw=fwF&&fwF.demo?{...fwF.demo,jours:fwF.jours}:fwF,
+function stratHTML(){for(const k in ONGLETS){const e=$('st'+k);if(!e)continue;const id=ONGLETS[k],F=FAMILLES[id],fwF=SV.fam&&SV.fam.lignes?SV.fam.lignes.find(x=>x.id===id):null,Fo=fwF&&fwF.focus,fw=fwF&&fwF.demo?{...fwF.demo,jours:Fo?Fo.jours:fwF.jours}:fwF,AV=Fo||fwF,
     btF=SV.lg&&SV.lg.familles3&&SV.lg.familles3.trois?SV.lg.familles3.trois[id]:null,bt=btF&&btF.sansFrais?btF.sansFrais:btF,T=fw&&fw.trades||[],G=T.filter(x=>x.pnl>0),gain=G.reduce((a,x)=>a+x.pnl,0),perte=T.filter(x=>x.pnl<=0).reduce((a,x)=>a+x.pnl,0),
     v=fw?fw.valeur:1e4,r=(v-1e4)/1e4,j=fw&&fw.jours!=null?fw.jours:0,pc=y=>`${y>=0?'+':'−'}${Math.abs(y*100).toFixed(2).replace('.',',')} %`;
-  const h=`<div class="card hero strat"><div class="sth"><span class="lbl">${F?F.nom:id}</span><span class="chip">Démo sans frais · ${j<1?Math.round(j*24)+' h':Math.floor(j)+' j'}</span></div>
+  const h=`<div class="card hero strat"><div class="sth"><span class="lbl">${F?F.nom:id}</span><span class="chip">${Fo?'Bitcoin + euro-dollar · ':''}Démo sans frais · ${j<1?Math.round(j*24)+' h':Math.floor(j)+' j'}</span></div>
     <span class="hv">${fmt(v)}</span><span class="delta ${r>=0?'up':'dn'}">${pc(r)} depuis le départ (${fmt(1e4)})</span>${courbe(fw&&fw.hist)}
-    <p class="mut">${fwF&&fwF.demo?`Avec frais et glissement, le même portefeuille vaudrait <b>${fmt(fwF.valeur)}</b> (${fmt(fwF.frais||0)} de frais payés). `:''}${F?F.txt:''}</p></div>
+    <p class="mut">${fwF&&fwF.demo?`Avec frais et glissement, le même portefeuille vaudrait <b>${fmt(AV.valeur)}</b> (${fmt(AV.frais||0)} de frais payés)${AV.arret?` ; baisse de 15 % atteinte le ${dt(AV.arret)} : stratégie arrêtée (règle du dossier)`:''}. `:''}${Fo?'Uniquement sur le bitcoin et l’euro-dollar. ':''}${F?F.txt:''}</p></div>
   <div class="kpis"><div class="kpi"><span>Gains</span><b class="up">${fmt(gain)}</b></div><div class="kpi"><span>Pertes</span><b class="dn">${fmt(perte)}</b></div><div class="kpi"><span>Trades</span><b>${T.length}</b></div>
     <div class="kpi"><span>Réussite</span><b>${T.length?Math.round(G.length/T.length*100)+' %':'–'}</b></div><div class="kpi"><span>Pire baisse</span><b>${fw?pct(fw.dd):'–'}</b></div><div class="kpi"><span>Frais (démo)</span><b>${fw?fmt(fw.frais||0):'–'}</b></div></div>
   <h2>Positions ouvertes</h2><div class="card">${fw&&fw.ouvertes&&fw.ouvertes.length?fw.ouvertes.map(o=>`<div class="row"><span><b>${o.paire.replace('USDT','')}</b> ${o.valeur<0?'▼ baisse':'▲ hausse'}${o.depuis?` · depuis le ${new Date(o.depuis).toLocaleDateString('fr-FR')}`:''}</span><span>${fmt(Math.abs(o.valeur))}</span></div>`).join(''):'<span class="mut">Aucune position ouverte : la stratégie attend son signal.</span>'}</div>
