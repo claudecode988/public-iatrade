@@ -7,7 +7,7 @@
 //   node tools/familles-fw.cjs <dossier>     (FAUX_PRIX=1 : prix inventés, test du programme seulement ; MAINTENANT : heure simulée)
 const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
-const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+';return{WL,setTF,aligner,prep,kl,FAMILLES,plafondRisque,noteEchange,TROIS,bornerCfg}')();
+const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+';return{WL,setTF,aligner,prep,kl,FAMILLES,plafondRisque,noteEchange,TROIS,bornerCfg,EMPRUNT_J}')();
 const DIR=process.argv[2]||'forward',F_ETAT=path.join(DIR,'familles-etat.json'),F_J=path.join(DIR,'familles.jsonl'),F_RES=path.join(DIR,'familles-resume.json');
 const sha=t=>crypto.createHash('sha256').update(t).digest('hex'),lire=(f,d)=>{try{return JSON.parse(fs.readFileSync(f,'utf8'))}catch(e){return d}};
 // État présent mais illisible : arrêt en erreur sans rien écrire (jamais de remise à zéro silencieuse). Écritures atomiques.
@@ -47,7 +47,7 @@ const resumeCompte=P=>P?{valeur:+(P.val??1e4).toFixed(2),dd:+(P.dd||0).toFixed(4
   const comptes=[...Object.keys(E.FAMILLES).map(id=>[id,id,f,c]),...E.TROIS.map(id=>[id+'~sansfrais',id,0,{...c,fee:0,slip:0}])];
   for(const[key,id,f,c]of comptes){const fm=E.FAMILLES[id],P=S.fams[key]=S.fams[key]||{debut:now,cash:1e4,pos:{},px:{},st:{},pk:1e4,dd:0,fees:0,n:0};
     // positions : valeur mise à jour au prix de clôture ; une paire disparue des données est vendue à son dernier prix connu
-    for(const q in P.pos){if(F.p[q])P.pos[q]*=F.p[q].c[i]/P.px[q];else{const co=Math.abs(P.pos[q])*f;P.cash+=P.pos[q]-co;P.fees+=co;P.n++;ajout({famille:key,paire:q,montant:-P.pos[q],raison:'paire absente des données : vendue au dernier prix connu'});delete P.pos[q]}}
+    for(const q in P.pos){if(F.p[q]){P.pos[q]*=F.p[q].c[i]/P.px[q];if(P.pos[q]<0&&f>0){const e=-P.pos[q]*E.EMPRUNT_J/24*(S0?Math.max(1,Math.round((tb-S0.lastBar)/H)):1);P.cash-=e;P.fees+=e}}else{const co=Math.abs(P.pos[q])*f;P.cash+=P.pos[q]-co;P.fees+=co;P.n++;ajout({famille:key,paire:q,montant:-P.pos[q],raison:'paire absente des données : vendue au dernier prix connu'});delete P.pos[q]}}
     const v=P.cash+Object.values(P.pos).reduce((a,b)=>a+b,0);P.st._v=v;P.st._f=f;P.st._risque=c.riskPct/100;const w0=P.arret?null:fm.regle(F,i,P.st,F.Q.length,S.h),w=!w0?null:fm.regle.pro||fm.regle.reference?w0:E.plafondRisque(F,i,w0,c,P.pos,v);
     if(w)for(const q in w){const d=v*w[q]-(P.pos[q]||0);if(Math.abs(d)>v*1e-4){const co=Math.abs(d)*f,av=P.pos[q]||0;P.cash-=d+co;P.pos[q]=av+d;P.fees+=co;P.n++;P.tr=P.tr||{ouv:{},clos:[]};E.noteEchange(P.tr,F,id,i,q,d,co,av,P.pos[q],P.st);P.tr.clos=P.tr.clos.slice(-200);
       ajout({famille:key,paire:q,montant:+d.toFixed(2),part:+w[q].toFixed(4),prix:F.p[q].c[i],bougie:new Date(tb).toISOString()});if(Math.abs(P.pos[q])<1e-6)delete P.pos[q]}}
