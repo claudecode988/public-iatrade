@@ -7,7 +7,7 @@
 //   node tools/proposition.cjs <dossier>     (FAUX_PRIX=1 : prix inventés pour tester le programme ; MAINTENANT : heure simulée)
 const fs=require('fs'),path=require('path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
-const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+';return{setTF,Fjour,proposition,portefeuille,FAMILLES,kl,rendementsJours,sharpe,monteCarlo}')();
+const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+';return{setTF,Fjour,proposition,portefeuille,FAMILLES,kl,rendementsJours,sharpe,monteCarlo,RETIREES}')();
 const DIR=process.argv[2]||'forward',J1=864e5,now=+process.env.MAINTENANT||Date.now(),lire=(f,d)=>{try{return JSON.parse(fs.readFileSync(f,'utf8'))}catch(e){return d}};
 const BASES=['https://data-api.binance.vision','https://api.binance.com'],AT=()=>({signal:AbortSignal.timeout(15000)});
 async function binance(q){let all=[],end='';for(let k=0;k<2;k++){let j=null;for(const B of BASES){try{const r=await fetch(`${B}/api/v3/klines?symbol=${q}&interval=1d&limit=1000${end}`,AT());if(r.ok){j=await r.json();break}}catch(e){}}
@@ -39,7 +39,7 @@ function faux(q,n=1900){const k=q.charCodeAt(0)+q.charCodeAt(3)*3,f=t=>(q.includ
     const F=E.Fjour({[q]:D[q]},/USDT$/.test(q)?btcJ:null),c=cout(q),p=E.proposition(F,PR.strategie,Date.parse(PR.depuis),c);
     sorties[q]={...(p&&p.L?{...p,...p.L[0]}:{erreur:`première proposition après la clôture du ${new Date(Date.parse(PR.depuis)).toISOString().slice(0,10)} (journée UTC)`}),L:undefined,source:sources[q],couts:{fee:c.fee,slip:c.slip},controle:(PR.controle||[]).includes(q)};
     // test sur toute la période disponible (au plus environ 5 ans), mêmes règles pour chaque actif, partie de vérification = 30 % finaux
-    const W=Math.max(0,F.N-5*365),cut=W+Math.floor((F.N-W)*.7);tests[q]={du:F.T[W],au:F.T[F.N-1],lignes:Object.keys(E.FAMILLES).filter(id=>E.FAMILLES[id].pro).map(id=>{
+    const W=Math.max(0,F.N-5*365),cut=W+Math.floor((F.N-W)*.7);tests[q]={du:F.T[W],au:F.T[F.N-1],lignes:Object.keys(E.FAMILLES).filter(id=>E.FAMILLES[id].pro&&!E.RETIREES.includes(id)).map(id=>{
       const r=E.portefeuille(F,W,F.N,c,E.FAMILLES[id].regle),rj=E.rendementsJours(r.jrs),mc=E.monteCarlo(rj);
       return{id,nom:E.FAMILLES[id].nom,pnl:r.pnl,dd:r.dd,nT:r.nT,expR:r.expR,wrT:r.wrT,arret:r.arret,ent:E.portefeuille(F,W,cut,c,E.FAMILLES[id].regle).pnl,test:E.portefeuille(F,cut,F.N,c,E.FAMILLES[id].regle).pnl,
         cout2:E.portefeuille(F,W,F.N,{...c,fee:c.fee*2,slip:c.slip*2},E.FAMILLES[id].regle).pnl,sansFrais:E.portefeuille(F,W,F.N,{...c,fee:0,slip:0},E.FAMILLES[id].regle).pnl,sharpe:E.sharpe(rj),chanceGain:mc?1-mc.pPerte:null,dd95:mc?mc.dd95:null}})}}
