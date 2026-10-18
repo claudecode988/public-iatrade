@@ -303,6 +303,12 @@ function monteCarlo(rj,n=1000,bloc=5){if(!rj||rj.length<30)return null;let g=123
   F.sort((a,b)=>a-b);DD.sort((a,b)=>a-b);return{pPerte:F.filter(x=>x<0).length/n,r5:F[Math.floor(n*.05)],r50:F[Math.floor(n*.5)],dd95:DD[Math.floor(n*.95)]}}
 // Plafonds du dossier (01_gestion_risque.md) : 1 % du capital risqué par trade, perte du jour 2 %, baisse maximale 15 %.
 // Appliqués au chargement, à l'enregistrement et sur le serveur : un réglage plus lâche (stockage du navigateur modifié, sauvegarde importée) est ramené au plafond.
+// Coût d'emprunt d'un pari à la baisse (vente à découvert) : 0,02 % par jour de la position (environ 7 % par an), estimation
+// prudente des taux d'emprunt sur marge des grandes cryptos ; payé chaque bougie par les positions vendeuses des stratégies (compté avec les frais : la démo « sans frais » n'en paie pas).
+// Les agents tiennent leurs positions quelques heures : leur coût d'emprunt serait inférieur à 0,001 % par trade, il n'est pas compté.
+const EMPRUNT_J=.0002;
+// Biais du survivant : rappel affiché à côté des mesures longues.
+const NOTE_SURVIE='Biais du survivant : la liste ne contient que des cryptos encore cotées aujourd’hui ; celles qui se sont effondrées (LUNA, FTT…) n’y sont pas, donc les tests longs sont un peu trop favorables.';
 const PLAFONDS={riskPct:1,maxLoss:2,ddMax:15};function bornerCfg(c){for(const k in PLAFONDS)if(!(c[k]>0&&c[k]<=PLAFONDS[k]))c[k]=PLAFONDS[k];return c}
 // Changements essayés un par un par mesurer(), dans cet ordre.
 const CHANGES=[
@@ -588,7 +594,7 @@ function pourquoi(id,F,q,t,tr,st,fin){const P=F.p[q],j=Math.max(1,Math.round((tr
 // Seule la référence « acheter et garder » n'a pas d'arrêt (c'est un repère, pas une stratégie).
 function portefeuille(F,from,to,c,regle){const Q=F.Q,n=Q.length,k=Math.max(1,Math.round(H1/TF.bar)),f=(c.fee+c.slip)/100,pos={},st={},J=[],TRS=c.trades?{ouv:{},clos:[]}:null;
   let cash=1e4,pk=1e4,dd=0,fees=0,nTr=0,day='',arret=null;const avecArret=!c.sansArret&&!regle.reference;for(const q of Q)pos[q]=0;const val=()=>cash+Q.reduce((a,q)=>a+pos[q],0);
-  for(let t=from;t<to;t++){if(t>from)for(const q of Q)pos[q]*=F.p[q].c[t]/F.p[q].c[t-1];
+  for(let t=from;t<to;t++){if(t>from)for(const q of Q){pos[q]*=F.p[q].c[t]/F.p[q].c[t-1];if(pos[q]<0&&f>0){const e=-pos[q]*EMPRUNT_J*TF.bar/864e5;cash-=e;fees+=e}}
     const dj=new Date(F.T[t]).toISOString().slice(0,10);if(dj!==day){if(day)J.push(val());day=dj}
     if(!arret&&(t-from)%k===0){const v=val();st._v=v;st._f=f;st._risque=c.riskPct/100;const w0=regle(F,t,st,n,(t-from)/k),w=regle.pro||regle.reference?w0:plafondRisque(F,t,w0,c,pos,v);if(w)for(const q in w){const d=v*w[q]-pos[q];if(Math.abs(d)>v*1e-4){const co=Math.abs(d)*f,av=pos[q];cash-=d+co;pos[q]+=d;fees+=co;nTr++;if(TRS)noteEchange(TRS,F,c.idStrat,t,q,d,co,av,pos[q],st)}}}
     const v=val();pk=Math.max(pk,v);dd=Math.max(dd,(pk-v)/pk);
@@ -786,7 +792,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-18 02:38';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-18 02:40';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;
@@ -1266,7 +1272,7 @@ function pistesHTML(L){const G=L&&L.pistes;if(!G)return'';const r0=G.lignes[0],p
 // Stratégies du dossier « bot-trading » : résultats sur plusieurs années et statut selon le protocole de validation (05).
 function proHTML(L){const G=L&&L.familles3;if(!G)return'';const X=G.lignes.filter(x=>x.pro);if(!X.length)return'';const pc=x=>`${x>=0?'+':'−'}${Math.abs(x/100).toFixed(1).replace('.',',')} %`,cl=x=>x>=0?'up':'dn';
   const fw=id=>SV.fam&&SV.fam.lignes?SV.fam.lignes.find(y=>y.id===id):null;
-  return`<h3>Stratégies du dossier bot-trading (S1 à S5)</h3><div class="mut">Règles et gestion du risque du dossier appliquées telles quelles (1 % risqué par trade, 5 % au total, pertes du jour 2 %, du mois 6 %, arrêt à 15 % de baisse). Décision une fois par jour ; stops vérifiés sur la clôture journalière. Du ${dt(G.du)} au ${dt(G.au)}.</div>
+  return`<h3>Stratégies du dossier bot-trading (S1 à S5)</h3><div class="mut">Règles et gestion du risque du dossier appliquées telles quelles (1 % risqué par trade, 5 % au total, pertes du jour 2 %, du mois 6 %, arrêt à 15 % de baisse). Décision une fois par jour ; stops vérifiés sur la clôture journalière. Du ${dt(G.du)} au ${dt(G.au)}. Les paris à la baisse paient un coût d’emprunt de 0,02 % par jour. ${NOTE_SURVIE}</div>
   <div class="tw"><table class="st"><thead><tr><th>Stratégie</th><th>Statut</th><th>Rendement</th><th>Pire baisse</th><th>Trades</th><th>Réussite</th><th>Espérance par trade</th><th>Optimisation 70 %</th><th>Vérification 30 %</th><th>Sans frais</th><th>Coûts × 2</th></tr></thead><tbody>
   ${X.map(x=>{const s=statutPro(x,fw(x.id));return`<tr><th title="${x.txt}">${x.nom}</th><td><span class="pill ${s.statut==='VALIDÉE'?'ok':'no'}" title="${s.criteres.map(c=>(c[0]?'✓ ':'✗ ')+c[1]).join(' · ')}">${s.statut}</span></td><td class="${cl(x.pnl)}">${pc(x.pnl)}</td><td>${pct(x.dd)}</td><td>${x.nT??'–'}</td><td>${x.wrT==null?'–':Math.round(x.wrT*100)+' %'}</td><td class="${(x.expR||0)>=0?'up':'dn'}">${x.expR==null?'–':(x.expR>=0?'+':'−')+Math.abs(x.expR).toFixed(2).replace('.',',')+' R'}</td><td class="${cl(x.ent)}">${pc(x.ent)}</td><td class="${cl(x.test)}">${pc(x.test)}</td><td class="${x.sansFrais==null?'':cl(x.sansFrais)}">${x.sansFrais==null?'–':pc(x.sansFrais)}</td><td class="${cl(x.cout2)}">${pc(x.cout2)}</td></tr>`}).join('')}</tbody></table></div>
   ${X.filter(x=>x.arret).map(x=>`<p class="mut">${x.nom} : baisse de 15 % atteinte le ${dt(x.arret)} : tout est vendu et la stratégie s’arrête (règle du dossier) ; le résultat affiché s’arrête là.${x.papier!=null?` Pour information, en continuant en papier : ${x.papier>=0?'+':'−'}${Math.abs(x.papier/100).toFixed(1).replace('.',',')} %.`:''}</p>`).join('')}
@@ -1278,7 +1284,7 @@ function famFwdHTML(){const f=SV.fam;if(!f||!f.lignes)return'<p class="mut">Forw
   ${f.lignes.map(x=>`<tr><th>${x.nom}</th><td>${fmt(x.valeur)}</td><td class="${x.valeur>=1e4?'up':'dn'}">${pc(x.valeur-1e4)}</td><td>${pct(x.dd)}</td><td>${Math.round(x.investi*100)} %</td><td>${x.n}</td><td class="${x.valeur+(x.frais||0)>=1e4?'up':'dn'}">${pc(x.valeur+(x.frais||0)-1e4)}</td></tr>`).join('')}</tbody></table></div>`}
 function famHTML(G0,titre){if(!G0)return'';const G={...G0,lignes:G0.lignes.filter(x=>!x.pro)};const bh=G.lignes.find(x=>x.id==='bh'),pc=x=>`${x>=0?'+':'−'}${Math.abs(x/100).toFixed(1).replace('.',',')} %`,cl=x=>x>=0?'up':'dn';
   const cand=x=>x.id!=='bh'&&bh&&x.pnl>bh.pnl&&x.test>bh.test&&x.cout2>0&&x.trimPos>=3,C=G.lignes.filter(cand);
-  return`<h3>${titre} (même période, mêmes frais)</h3><div class="mut">Paramètres fixés à l’avance, jamais réglés sur ces données. Du ${dt(G.du)} au ${dt(G.au)}, partie test à partir du ${dt(G.coupe)}. Même risque pour toutes : chaque position est réduite pour qu’un recul de 2 × la variation journalière moyenne ne coûte que le même % du capital que les agents (5 % au total) ; seul « acheter et garder » reste entier, comme référence du marché.</div>
+  return`<h3>${titre} (même période, mêmes frais)</h3><div class="mut">Paramètres fixés à l’avance, jamais réglés sur ces données. Du ${dt(G.du)} au ${dt(G.au)}, partie test à partir du ${dt(G.coupe)}. Même risque pour toutes : chaque position est réduite pour qu’un recul de 2 × la variation journalière moyenne ne coûte que le même % du capital que les agents (5 % au total) ; seul « acheter et garder » reste entier, comme référence du marché. ${NOTE_SURVIE}</div>
   <div class="tw"><table class="st"><thead><tr><th>Stratégie</th><th>Rendement</th><th>Pire baisse</th><th>Rendement ÷ baisse</th><th>Sharpe / jour</th><th>Quarts de la période positifs</th><th title="Même stratégie sans aucun frais ni glissement : pour voir si les signaux gagnent d’eux-mêmes. Les frais existent en vrai.">Sans frais</th><th>Coûts × 2</th><th>Partie test</th><th>DSR</th><th title="1000 trajectoires simulées en remélangeant des blocs de 5 jours">Chance de finir en perte (simulé)</th><th title="Pire baisse atteinte dans 95 % des trajectoires simulées">Pire baisse probable (95 %)</th></tr></thead><tbody>
   ${G.lignes.map(x=>`<tr${cand(x)?' class="cand"':''}><th title="${x.txt}">${x.nom}</th><td class="${cl(x.pnl)}">${pc(x.pnl)}</td><td>${pct(x.dd)}</td><td>${x.dd>0?(x.pnl/1e4/x.dd).toFixed(2).replace('.',','):'–'}</td><td>${x.sharpe===null?'–':x.sharpe.toFixed(3).replace('.',',')}</td><td>${x.trimPos}/4</td><td class="${x.sansFrais==null?'':cl(x.sansFrais)}">${x.sansFrais==null?'–':pc(x.sansFrais)}</td><td class="${cl(x.cout2)}">${pc(x.cout2)}</td><td class="${cl(x.test)}">${pc(x.test)}</td><td>${x.dsr?Math.round(x.dsr.dsr*100)+' %':'–'}</td><td>${x.mc?Math.round(x.mc.pPerte*100)+' %':'–'}</td><td>${x.mc?pct(x.mc.dd95):'–'}</td></tr>`).join('')}</tbody></table></div>
   <p><b>${C.length?`Candidate${C.length>1?'s':''} à suivre : ${C.map(x=>x.nom).join(', ')}. Ce n’est pas une preuve : une seule période, et choisir la meilleure après coup est déjà un essai (le DSR en tient compte).`:'Aucune stratégie ne bat « acheter et garder » de façon robuste sur cette période (toute la période, partie test, coûts doublés et 3 quarts de la période sur 4).'}</b></p>`}
