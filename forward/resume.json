@@ -1,5 +1,5 @@
 {
- "maj": 1792428328053,
+ "maj": 1792428654801,
  "debut": 1792191723549,
  "geleeLe": "2026-10-16T23:00:22Z",
  "tf": "5 min",
@@ -10,8 +10,8 @@
   "heures",
   "fee"
  ],
- "decisions": 790,
- "passages": 790,
+ "decisions": 791,
+ "passages": 791,
  "trades": 0,
  "frais": 0,
  "glissement": 0,
@@ -21,9 +21,9 @@
  "gagne": 0,
  "perdu": 0,
  "pf": null,
- "valeur": 10003.16,
+ "valeur": 9987.85,
  "plusHaut": 10003.16,
- "baisse": 0,
+ "baisse": 0.0015,
  "position": {
   "paire": "DOTUSDT",
   "sens": "long",
@@ -33,6 +33,6 @@
  },
  "retardMedianS": 34,
  "retardMaxS": 69,
- "dernierHash": "9a19b21f43502679426a9806a96f1bf5d948b781050d4cd8cd5d883e81627439",
+ "dernierHash": "517adf866d20a1aaa57a16e0c7b798a9e77e966e001b77f6cda29d2a3641c925",
  "faux": false
 }
