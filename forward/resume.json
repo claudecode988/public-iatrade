@@ -1,5 +1,5 @@
 {
- "maj": 1792615845001,
+ "maj": 1792616105148,
  "debut": 1792191723549,
  "geleeLe": "2026-10-16T23:00:22Z",
  "tf": "5 min",
@@ -10,8 +10,8 @@
   "heures",
   "fee"
  ],
- "decisions": 1420,
- "passages": 1415,
+ "decisions": 1421,
+ "passages": 1416,
  "trades": 2,
  "frais": 11.94,
  "glissement": 5.97,
@@ -27,6 +27,6 @@
  "position": null,
  "retardMedianS": 31,
  "retardMaxS": 71,
- "dernierHash": "dbe13aeb74432b16e2d3a22d7c7c4990d988580cf16c093281c70d3f468833fb",
+ "dernierHash": "c61d1087e79f6e67f96b30246c8b7e2b2e2ae6c7f2734b130e29b6a0a8d7c518",
  "faux": false
 }
