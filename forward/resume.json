@@ -1,5 +1,5 @@
 {
- "maj": 1792600544622,
+ "maj": 1792600805002,
  "debut": 1792191723549,
  "geleeLe": "2026-10-16T23:00:22Z",
  "tf": "5 min",
@@ -10,8 +10,8 @@
   "heures",
   "fee"
  ],
- "decisions": 1367,
- "passages": 1364,
+ "decisions": 1368,
+ "passages": 1365,
  "trades": 1,
  "frais": 5.94,
  "glissement": 2.97,
@@ -21,9 +21,9 @@
  "gagne": 0,
  "perdu": -68.88,
  "pf": 0,
- "valeur": 9948.18,
+ "valeur": 9973.71,
  "plusHaut": 10013.98,
- "baisse": 0.0066,
+ "baisse": 0.004,
  "position": {
   "paire": "NEARUSDT",
   "sens": "long",
@@ -33,6 +33,6 @@
  },
  "retardMedianS": 32,
  "retardMaxS": 71,
- "dernierHash": "dd52322f2a0f1630ff753548e01bcdbc42a3fce84bab84892a8ce632a0d3e711",
+ "dernierHash": "9bf7e3b31d7c3d5771e7a2fd349304f4508b1f2af113c954150440f9f154be8d",
  "faux": false
 }
