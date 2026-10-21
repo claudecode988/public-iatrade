@@ -1,7 +1,7 @@
 {
- "maj": 1792616433135,
+ "maj": 1792620020176,
  "debut": 1792195251497,
- "heure": "2026-10-21T20:00:00.000Z",
+ "heure": "2026-10-21T21:00:00.000Z",
  "pairs": 16,
  "dernierHash": "e67a4917f63ec68c7bf7dbfbddedb60b489469519484f6776f0081d678fd736c",
  "faux": false,
@@ -9,13 +9,13 @@
   {
    "id": "tendance",
    "nom": "Suivi de tendance lent",
-   "valeur": 10008.85,
+   "valeur": 10015.04,
    "dd": 0.0022,
    "investi": 0.518,
    "n": 11,
    "frais": 9.6,
    "debut": 1792195251497,
-   "jours": 4.87,
+   "jours": 4.92,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -30,7 +30,7 @@
    "n": 64,
    "frais": 50.2,
    "debut": 1792195251497,
-   "jours": 4.87,
+   "jours": 4.92,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -39,13 +39,13 @@
   {
    "id": "reeq",
    "nom": "Rééquilibrage hebdomadaire",
-   "valeur": 10156.21,
+   "valeur": 10159.4,
    "dd": 0.0221,
    "investi": 0.544,
    "n": 9,
    "frais": 8.05,
    "debut": 1792195251497,
-   "jours": 4.87,
+   "jours": 4.92,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -54,13 +54,13 @@
   {
    "id": "bh",
    "nom": "Acheter et garder",
-   "valeur": 10195.64,
+   "valeur": 10205.57,
    "dd": 0.0493,
    "investi": 1.001,
    "n": 16,
    "frais": 15,
    "debut": 1792195251497,
-   "jours": 4.87,
+   "jours": 4.92,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -69,13 +69,13 @@
   {
    "id": "regime",
    "nom": "Tendance lente + régime du bitcoin",
-   "valeur": 10008.85,
+   "valeur": 10015.04,
    "dd": 0.0022,
    "investi": 0.518,
    "n": 11,
    "frais": 9.6,
    "debut": 1792195251497,
-   "jours": 4.87,
+   "jours": 4.92,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -89,7 +89,7 @@
     "EUR/USD : tendance haussière et bitcoin favorable : détenu"
    ],
    "focus": {
-    "valeur": 10033.82,
+    "valeur": 10036.69,
     "dd": 0.0028,
     "frais": 10.45,
     "hist": [
@@ -107,7 +107,7 @@
      ],
      [
       "2026-10-21",
-      10033.82
+      10036.69
      ]
     ],
     "nTrades": 0,
@@ -115,23 +115,23 @@
     "ouvertes": [
      {
       "paire": "EURUSDT",
-      "valeur": 4999.56,
+      "valeur": 4998.67,
       "entree": 1.1244,
       "depuis": 1792288800000
      },
      {
       "paire": "BTCUSDT",
-      "valeur": 2013.06,
+      "valeur": 2016.82,
       "entree": 82804.22,
       "depuis": 1792551600000
      }
     ],
     "debut": 1792288815366,
-    "jours": 3.79,
+    "jours": 3.83,
     "arret": null
    },
    "demo": {
-    "valeur": 10044.31,
+    "valeur": 10047.18,
     "dd": 0.0022,
     "frais": 0,
     "hist": [
@@ -149,7 +149,7 @@
      ],
      [
       "2026-10-21",
-      10044.31
+      10047.18
      ]
     ],
     "nTrades": 0,
@@ -157,13 +157,13 @@
     "ouvertes": [
      {
       "paire": "EURUSDT",
-      "valeur": 4999.56,
+      "valeur": 4998.67,
       "entree": 1.1244,
       "depuis": 1792288800000
      },
      {
       "paire": "BTCUSDT",
-      "valeur": 2014.57,
+      "valeur": 2018.34,
       "entree": 82804.22,
       "depuis": 1792551600000
      }
@@ -173,13 +173,13 @@
   {
    "id": "volcible",
    "nom": "Tendance lente + volatilité cible",
-   "valeur": 10006.04,
+   "valeur": 10012.85,
    "dd": 0.0017,
-   "investi": 0.497,
+   "investi": 0.498,
    "n": 12,
    "frais": 9.29,
    "debut": 1792195251497,
-   "jours": 4.87,
+   "jours": 4.92,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -188,13 +188,13 @@
   {
    "id": "prudente",
    "nom": "Prudente (tendance + régime + volatilité cible + pause Fed)",
-   "valeur": 10006.04,
+   "valeur": 10012.85,
    "dd": 0.0017,
-   "investi": 0.497,
+   "investi": 0.498,
    "n": 12,
    "frais": 9.29,
    "debut": 1792195251497,
-   "jours": 4.87,
+   "jours": 4.92,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -208,7 +208,7 @@
     "EUR/USD : tendance haussière et bitcoin favorable : détenu (part réduite si le marché est agité)"
    ],
    "focus": {
-    "valeur": 10033.82,
+    "valeur": 10036.69,
     "dd": 0.0028,
     "frais": 10.45,
     "hist": [
@@ -226,7 +226,7 @@
      ],
      [
       "2026-10-21",
-      10033.82
+      10036.69
      ]
     ],
     "nTrades": 0,
@@ -234,23 +234,23 @@
     "ouvertes": [
      {
       "paire": "EURUSDT",
-      "valeur": 4999.56,
+      "valeur": 4998.67,
       "entree": 1.1244,
       "depuis": 1792288800000
      },
      {
       "paire": "BTCUSDT",
-      "valeur": 2013.06,
+      "valeur": 2016.82,
       "entree": 82804.22,
       "depuis": 1792551600000
      }
     ],
     "debut": 1792288815366,
-    "jours": 3.79,
+    "jours": 3.83,
     "arret": null
    },
    "demo": {
-    "valeur": 10044.31,
+    "valeur": 10047.18,
     "dd": 0.0022,
     "frais": 0,
     "hist": [
@@ -268,7 +268,7 @@
      ],
      [
       "2026-10-21",
-      10044.31
+      10047.18
      ]
     ],
     "nTrades": 0,
@@ -276,13 +276,13 @@
     "ouvertes": [
      {
       "paire": "EURUSDT",
-      "valeur": 4999.56,
+      "valeur": 4998.67,
       "entree": 1.1244,
       "depuis": 1792288800000
      },
      {
       "paire": "BTCUSDT",
-      "valeur": 2014.57,
+      "valeur": 2018.34,
       "entree": 82804.22,
       "depuis": 1792551600000
      }
@@ -292,13 +292,13 @@
   {
    "id": "elan",
    "nom": "Élan sur 4 semaines",
-   "valeur": 9950.01,
+   "valeur": 9952.83,
    "dd": 0.0135,
    "investi": 0.022,
    "n": 17,
    "frais": 10.32,
    "debut": 1792195251497,
-   "jours": 4.87,
+   "jours": 4.92,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -313,7 +313,7 @@
    "n": 0,
    "frais": 0,
    "debut": 1792195251497,
-   "jours": 4.87,
+   "jours": 4.92,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -322,13 +322,13 @@
   {
    "id": "S2",
    "nom": "S2 · Retour à la moyenne (RSI 2)",
-   "valeur": 10044.67,
+   "valeur": 10046.22,
    "dd": 0.0051,
    "investi": 0.155,
    "n": 2,
    "frais": 2.26,
    "debut": 1792195251497,
-   "jours": 4.87,
+   "jours": 4.92,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -337,13 +337,13 @@
   {
    "id": "A2",
    "nom": "Agents version 2 (règles du dossier)",
-   "valeur": 9919.59,
+   "valeur": 9912.69,
    "dd": 0.0139,
-   "investi": 0.564,
+   "investi": 0.563,
    "n": 2,
    "frais": 8.49,
    "debut": 1792195251497,
-   "jours": 4.87,
+   "jours": 4.92,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -382,7 +382,7 @@
     "trades": [],
     "ouvertes": [],
     "debut": 1792288815366,
-    "jours": 3.79,
+    "jours": 3.83,
     "arret": null
    },
    "demo": {
@@ -415,13 +415,13 @@
   {
    "id": "S5",
    "nom": "S5 · Rotation momentum mensuelle",
-   "valeur": 10072.96,
+   "valeur": 10079.58,
    "dd": 0.0058,
    "investi": 0.134,
    "n": 2,
    "frais": 1.91,
    "debut": 1792324824374,
-   "jours": 3.38,
+   "jours": 3.42,
    "nT": 0,
    "n30": 0,
    "esp30": null,
