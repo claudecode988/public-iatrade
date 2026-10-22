@@ -1,11 +1,11 @@
 {
- "maj": 1792645507772,
- "du": 1792040707772,
- "au": 1792645507772,
+ "maj": 1792649113001,
+ "du": 1792044313001,
+ "au": 1792649113001,
  "verif": {
   "agents": {
    "ok": true,
-   "n": 1519
+   "n": 1531
   },
   "familles": {
    "ok": true,
@@ -15,28 +15,28 @@
  "agents": {
   "nom": "Agents actuels",
   "note": "avec frais",
-  "n": 14,
+  "n": 13,
   "gagnants": 2,
-  "reussite": 0.14285714285714285,
+  "reussite": 0.15384615384615385,
   "gainMoy": 76.56710000000001,
-  "perteMoy": -27.256108333333334,
-  "esperance": -12.424221428571428,
-  "total": -173.9391,
+  "perteMoy": -26.764663636363636,
+  "esperance": -10.867469230769228,
+  "total": -141.27710000000002,
   "erreurs": [
-   {
-    "cause": "sortie sur signal inversé",
-    "n": 4
-   },
    {
     "cause": "mauvaise entrée",
     "n": 4
+   },
+   {
+    "cause": "sortie sur signal inversé",
+    "n": 3
    },
    {
     "cause": "sortie trop rapide sur un signal inversé",
     "n": 2
    }
   ],
-  "action": "Le vrai problème est l’entrée : le prix part du mauvais côté juste après. « Sortir moins vite » a été mesuré sur 12 mois et sur 5 ans et aggrave les pertes ; la piste utile est de filtrer les entrées (liste de contrôle, heures creuses, frais : déjà appliqués le 16/10)."
+  "action": "Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4)."
  },
  "strategies": [
   {
