@@ -1,11 +1,11 @@
 {
- "maj": 1792678207894,
- "du": 1792073407894,
- "au": 1792678207894,
+ "maj": 1792681836407,
+ "du": 1792077036407,
+ "au": 1792681836407,
  "verif": {
   "agents": {
    "ok": true,
-   "n": 1628
+   "n": 1640
   },
   "familles": {
    "ok": true,
@@ -15,17 +15,17 @@
  "agents": {
   "nom": "Agents actuels",
   "note": "avec frais",
-  "n": 10,
+  "n": 9,
   "gagnants": 2,
-  "reussite": 0.2,
+  "reussite": 0.2222222222222222,
   "gainMoy": 76.56710000000001,
-  "perteMoy": -28.605987500000005,
-  "esperance": -7.5713700000000035,
-  "total": -75.71369999999999,
+  "perteMoy": -28.850857142857144,
+  "esperance": -5.424644444444446,
+  "total": -48.82179999999999,
   "erreurs": [
    {
     "cause": "mauvaise entrée",
-    "n": 4
+    "n": 3
    },
    {
     "cause": "sortie trop rapide sur un signal inversé",
