@@ -1,11 +1,11 @@
 {
- "maj": 1792667288104,
- "du": 1792062488104,
- "au": 1792667288104,
+ "maj": 1792670927750,
+ "du": 1792066127750,
+ "au": 1792670927750,
  "verif": {
   "agents": {
    "ok": true,
-   "n": 1591
+   "n": 1603
   },
   "familles": {
    "ok": true,
@@ -15,25 +15,25 @@
  "agents": {
   "nom": "Agents actuels",
   "note": "avec frais",
-  "n": 12,
+  "n": 11,
   "gagnants": 2,
-  "reussite": 0.16666666666666666,
+  "reussite": 0.18181818181818182,
   "gainMoy": 76.56710000000001,
-  "perteMoy": -29.364530000000002,
-  "esperance": -11.709258333333334,
-  "total": -140.5111,
+  "perteMoy": -29.173122222222226,
+  "esperance": -9.947627272727273,
+  "total": -109.4239,
   "erreurs": [
    {
     "cause": "mauvaise entrée",
     "n": 4
    },
    {
-    "cause": "sortie sur signal inversé",
+    "cause": "sortie trop rapide sur un signal inversé",
     "n": 2
    },
    {
-    "cause": "sortie trop rapide sur un signal inversé",
-    "n": 2
+    "cause": "sortie sur signal inversé",
+    "n": 1
    }
   ],
   "action": "Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4)."
