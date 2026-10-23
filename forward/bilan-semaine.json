@@ -1,32 +1,28 @@
 {
- "maj": 1792758207137,
- "du": 1792153407137,
- "au": 1792758207137,
+ "maj": 1792761817312,
+ "du": 1792157017312,
+ "au": 1792761817312,
  "verif": {
   "agents": {
    "ok": true,
-   "n": 1894
+   "n": 1906
   },
   "familles": {
    "ok": true,
-   "n": 252
+   "n": 256
   }
  },
  "agents": {
   "nom": "Agents actuels",
   "note": "avec frais",
-  "n": 4,
+  "n": 3,
   "gagnants": 0,
   "reussite": 0,
   "gainMoy": 0,
-  "perteMoy": -29.1712,
-  "esperance": -29.1712,
-  "total": -116.6848,
+  "perteMoy": -28.011533333333336,
+  "esperance": -28.011533333333336,
+  "total": -84.03460000000001,
   "erreurs": [
-   {
-    "cause": "sortie trop rapide sur un signal inversé",
-    "n": 1
-   },
    {
     "cause": "mauvaise entrée",
     "n": 1
@@ -34,9 +30,13 @@
    {
     "cause": "stop touché",
     "n": 1
+   },
+   {
+    "cause": "frais plus grands que le gain",
+    "n": 1
    }
   ],
-  "action": "Garder la position plus longtemps a été mesuré et aggrave les pertes ; mieux vaut moins d’entrées, mieux confirmées (filtres appliqués le 16/10)."
+  "action": "Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4)."
  },
  "strategies": [
   {
