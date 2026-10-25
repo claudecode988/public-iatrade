@@ -1,11 +1,11 @@
 {
- "maj": 1792965539435,
- "du": 1792360739435,
- "au": 1792965539435,
+ "maj": 1792969171131,
+ "du": 1792364371131,
+ "au": 1792969171131,
  "verif": {
   "agents": {
    "ok": true,
-   "n": 2587
+   "n": 2599
   },
   "familles": {
    "ok": true,
@@ -106,7 +106,7 @@
   {
    "id": "regime",
    "nom": "Tendance lente + régime du bitcoin",
-   "note": "bitcoin + euro-dollar, avec frais",
+   "note": "bitcoin + euro-dollar, avec frais ; mêmes trades que « Prudente (tendance + régime + volatilité cible + pause Fed) »",
    "n": 2,
    "gagnants": 0,
    "reussite": 0,
