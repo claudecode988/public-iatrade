@@ -38,5 +38,7 @@ const verif={agents:verifier(path.join(DIR,'journal.jsonl')),familles:verifier(p
 const fam=lire(path.join(DIR,'familles-resume.json'),{lignes:[]}),strat=[];
 for(const id of['A2','prudente','regime']){const L=fam.lignes.find(x=>x.id===id);if(!L)continue;const conv=a=>(a||[]).filter(x=>x.fin>=now-J7).map(x=>({pnl:x.pnl,paire:x.paire,cause:causeFam(x.pourquoi||'')}));
   const A=L.focus||L;strat.push({id,...resume(L.nom,conv(A.trades),L.focus?'bitcoin + euro-dollar, avec frais':'avec frais'),demo:L.demo?resume(L.nom,conv(L.demo.trades),'démo sans frais'):null})}
+// Prudente et Tendance + Bitcoin ne tradent que 2 actifs et prennent souvent exactement les mêmes trades : on le signale pour ne pas compter deux fois la même perte.
+const sig=x=>JSON.stringify([x.n,Math.round(x.total*100)]);for(let a=0;a<strat.length;a++)for(let b=0;b<a;b++)if(strat[a].n&&sig(strat[a])===sig(strat[b]))strat[a].note=(strat[a].note?strat[a].note+' ; ':'')+`mêmes trades que « ${strat[b].nom} »`;
 fs.writeFileSync(F_OUT,JSON.stringify({maj:now,du:now-J7,au:now,verif,agents:resume('Agents actuels',ag,'avec frais'),strategies:strat},null,1));
 console.log('Bilan de la semaine :',`journaux ${Object.entries(verif).map(([k,v])=>k+' '+(v.ok?'intact':v.erreur)).join(', ')} |`,`agents ${ag.length} trades`,strat.map(x=>`${x.id} ${x.n}`).join(' | '));
