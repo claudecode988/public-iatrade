@@ -288,7 +288,7 @@ function regimeBTC(T,J){const o=new Array(T.length).fill(0);if(!J||!J.length)ret
   const R=J.map(x=>{n++;e=e===null?x.c:x.c*2/51+e*49/51;return{fin:x.t+864e5,v:n>=50?(x.c>e?1:-1):0}});
   for(let i=0;i<T.length;i++){while(j<R.length&&R[j].fin<=T[i]+TF.bar){cur=R[j].v;j++}o[i]=cur}return o}
 // Clôtures journalières (UTC) d'une paire : jc = clôtures des journées fermées, ji[t] = nombre de journées fermées à la fin de la bougie t.
-function joursFermes(T,J){const jc=J.map(x=>x.c),jh=J.map(x=>x.h??x.c),jl=J.map(x=>x.l??x.c),jv=J.map(x=>x.v??0),ji=new Array(T.length);let j=0;for(let i=0;i<T.length;i++){while(j<J.length&&J[j].t+864e5<=T[i]+TF.bar)j++;ji[i]=j}return{jc,jh,jl,jv,ji}}
+function joursFermes(T,J){const jc=J.map(x=>x.c),jh=J.map(x=>x.h??x.c),jl=J.map(x=>x.l??x.c),jv=J.map(x=>x.v??0),ji=new Array(T.length),jt=J.map(x=>x.t);let j=0;for(let i=0;i<T.length;i++){while(j<J.length&&J[j].t+864e5<=T[i]+TF.bar)j++;ji[i]=j}return{jc,jh,jl,jv,ji,jt}}
 // Dernier taux de financement connu à la fin de chaque bougie (null si absent ou de plus de 9 h). L : [{t,r}] trié.
 function financement(T,L){const o=new Array(T.length).fill(null);if(!L||!L.length)return o;let j=-1;
   for(let i=0;i<T.length;i++){const fin=T[i]+TF.bar;while(j+1<L.length&&L[j+1].t<=fin)j++;if(j>=0&&fin-L[j].t<=9*H1)o[i]=L[j].r}return o}
@@ -667,7 +667,7 @@ const STRAT_PRO={
     sortie:(P,i,p)=>{p.stop=Math.max(p.stop,Math.min(...P.jl.slice(i-19,i+1)));const a=mmJ(P.jc,i,50),b=mmJ(P.jc,i,200);return a&&b&&a<b?'MM50 repassée sous la MM200':''}},
   S2:{nom:'S2 · Retour à la moyenne (RSI 2)',txt:'Achat si la clôture est au-dessus de la MM200 et le RSI 2 jours sous 10 ; sortie au-dessus de la MM5 ou après 5 jours ; stop 3 × ATR.',
     entree:(P,i)=>{const b=mmJ(P.jc,i,200),r=rsiJ(P.jc,i,2),x=atrJ(P,i);return b&&x&&r!==null&&P.jc[i]>b&&r<10?{stop:P.jc[i]-3*x}:null},
-    sortie:(P,i,p)=>{const m5=mmJ(P.jc,i,5);return m5&&P.jc[i]>m5?'clôture au-dessus de la MM5':i-p.j>=5?'stop temps : 5 jours':''}},
+    sortie:(P,i,p)=>{const m5=mmJ(P.jc,i,5);return m5&&P.jc[i]>m5?'clôture au-dessus de la MM5':(p.age??i-p.j)>=5?'stop temps : 5 jours':''}},
   S3:{nom:'S3 · Cassure de Donchian (20 jours, filtre volume)',txt:'Achat si la clôture dépasse le plus haut des 20 jours précédents avec un volume au-dessus de sa moyenne 20 jours ; stop 2 × ATR ; sortie sous le plus bas des 10 jours précédents.',
     entree:(P,i)=>{if(i<21)return null;const x=atrJ(P,i),vm=mmJ(P.jv,i-1,20);return x&&vm&&P.jc[i]>Math.max(...P.jh.slice(i-20,i))&&P.jv[i]>vm?{stop:P.jc[i]-2*x}:null},
     sortie:(P,i)=>P.jc[i]<Math.min(...P.jl.slice(i-10,i))?'clôture sous le plus bas des 10 jours':''},
@@ -706,18 +706,21 @@ const STRAT_PRO={
       if(!L)p.stop=Math.max(p.stop,A.dernierCreux?A.dernierCreux-.5*A.atr:p.stop);else p.stop=Math.min(p.stop,A.dernierSommet?A.dernierSommet+.5*A.atr:p.stop);
       return''}},
   S5:{nom:'S5 · Rotation momentum mensuelle',txt:'Le premier jour du mois : les 2 paires qui ont le plus monté sur 6 mois, à parts égales ; une paire sous sa MM200 est remplacée par des liquidités. Pas de stop (rééquilibrage mensuel seulement).',rotation:true}};
-function reglePro(id){const S=STRAT_PRO[id];return(F,t,st,n)=>{const P0=F.p[F.Q[0]],k=P0.ji[t];if(!k||k===st._kj)return null;st._kj=k;const I=q=>F.p[q].ji[t]-1,o={},v=st._v||1e4,f=st._f||0;
+// Nouvelle journée détectée par la DATE du dernier jour fermé (et non par son numéro) : sur le serveur, l'historique journalier
+// est une fenêtre glissante de 300 jours, donc le numéro du dernier jour reste le même chaque jour (bug corrigé le 25/10/2026 :
+// les stratégies journalières ne décidaient plus après leur premier jour). L'âge d'une position se compte aussi en dates.
+function reglePro(id){const S=STRAT_PRO[id];return(F,t,st,n)=>{const P0=F.p[F.Q[0]],j0=P0.ji[t];if(!j0)return null;const k=P0.jt?P0.jt[j0-1]:j0;if(k===st._kj)return null;st._kj=k;const I=q=>F.p[q].ji[t]-1,o={},v=st._v||1e4,f=st._f||0;
     st._T=st._T||[];st._pk=Math.max(st._pk||v,v);const mois=new Date(F.T[t]+TF.bar).toISOString().slice(0,7);if(st._mois!==mois){st._mois=mois;st._m0=v}
     const pj=st._j0?v/st._j0-1:0;st._j0=v;const dd=(st._pk-v)/st._pk;st._pos=st._pos||{};const pos=st._pos;
-    const fermer=(q,raison)=>{const p=pos[q],P=F.p[q],x=P.jc[I(q)],g=p.side==='short'?1-x/p.e:x/p.e-1;st._T.push({q,r:(g-2*f)/p.rf,raison,j:I(q),e:p.e,x,side:p.side||'long',why:p.why||''});delete pos[q];o[q]=0};
+    const fermer=(q,raison)=>{const p=pos[q],P=F.p[q],x=P.jc[I(q)],g=p.side==='short'?1-x/p.e:x/p.e-1;st._T.push({q,r:(g-2*f)/p.rf,raison,j:I(q),j0:p.j,t0:p.t0??null,t1:P.jt?P.jt[I(q)]:null,pnl:(p.w||0)*(g-2*f),e:p.e,x,side:p.side||'long',why:p.why||''});delete pos[q];o[q]=0};
     // Baisse ≥ 15 % : le dossier dit « arrêt total, retour en paper trading ». portefeuille() vend tout et arrête la stratégie ;
     // la date est aussi notée ici (calcul « papier », sansArret, qui continue pour information).
     if(dd>=.15&&!st._arret)st._arret=new Date(F.T[t]).toISOString();
     if(S.rotation){if(mois===st._rot)return null;st._rot=mois;const L=F.Q.map(q=>{const P=F.p[q],i=I(q);return{q,P,i,m:i>=182?P.jc[i]/P.jc[i-182]-1:null,b:mmJ(P.jc,i,200)}}).filter(x=>x.m!==null).sort((a,b)=>b.m-a.m).slice(0,2);
       const garde=new Set(L.filter(x=>x.b&&x.P.jc[x.i]>x.b).map(x=>x.q));for(const q in pos)if(!garde.has(q))fermer(q,'rotation mensuelle');
       if((v/st._m0-1)>-.06)for(const q of garde)if(!pos[q]){const P=F.p[q],i=I(q),x=P.jc[i],a=atrJ(P,i),rf=a?2*a/x:null;if(!rf)continue;const w=Math.min(.5,(st._risque||PRO_RISQUE)/rf); // 1 % risqué : stop implicite à 2 × ATR journalier
-        pos[q]={e:x,rf,w,j:i};o[q]=w}return o}
-    for(const q in pos){const P=F.p[q],p=pos[q],i=I(q),x=P.jc[i];if(p.side==='short'?x>=p.stop:x<=p.stop){fermer(q,'stop touché (clôture journalière)');continue}const r=S.sortie(P,i,p);if(r)fermer(q,r)}
+        pos[q]={e:x,rf,w,j:i,t0:P.jt?P.jt[i]:null};o[q]=w}return o}
+    for(const q in pos){const P=F.p[q],p=pos[q],i=I(q),x=P.jc[i];p.age=P.jt&&p.t0!=null?Math.round((P.jt[i]-p.t0)/864e5):i-p.j;if(p.side==='short'?x>=p.stop:x<=p.stop){fermer(q,'stop touché (clôture journalière)');continue}const r=S.sortie(P,i,p);if(r)fermer(q,r)}
     const bloque=(v/st._m0-1)<=-.06?'perte du mois ≥ 6 %':pj<=-.02?'perte du jour ≥ 2 %':S.filtre&&!S.filtre(F,t,'long')&&!S.filtre(F,t,'short')?'filtre de Pistache (marché du bitcoin défavorable ou annonce de la Fed)':'';st._bloque=bloque;if(bloque)return o;
     let expo=Object.values(pos).reduce((a,p)=>a+(p.w||0),0),risque=Object.keys(pos).reduce((a,q)=>{const p=pos[q],x=F.p[q].jc[I(q)];return a+Math.max(0,p.w*(p.side==='short'?p.stop-x:x-p.stop)/x)},0);
     const cands=[];for(const q of F.Q){if(pos[q])continue;const P=F.p[q],i=I(q);if(i<1)continue;const s=S.entree(P,i,F,t);if(s&&(!S.filtre||S.filtre(F,t,s.side||'long')))cands.push({q,P,i,s})}
@@ -725,7 +728,7 @@ function reglePro(id){const S=STRAT_PRO[id];return(F,t,st,n)=>{const P0=F.p[F.Q[
     const RQ=st._risque||PRO_RISQUE;for(const{q,P,i,s}of cands){if(risque+RQ>PRO_RISQUE_TOTAL+1e-9)break;const x=P.jc[i],sh=s.side==='short',rf=(sh?s.stop-x:x-s.stop)/x;if(!(rf>0))continue;
       if(Object.keys(pos).filter(h=>correl(P,i,F.p[h],I(h))>.8).length>=2)continue;
       const w=Math.min(.5,RQ/rf,1-expo);if(!(w>.01))continue; // jamais de levier : la somme des positions ne dépasse pas le capital
-      pos[q]={e:x,stop:s.stop,objectif:s.objectif,rf,w,j:i,side:sh?'short':'long',why:s.why||''};o[q]=sh?-w:w;risque+=w*rf;expo+=w}
+      pos[q]={e:x,stop:s.stop,objectif:s.objectif,rf,w,j:i,t0:P.jt?P.jt[i]:null,side:sh?'short':'long',why:s.why||''};o[q]=sh?-w:w;risque+=w*rf;expo+=w}
     return o}}
 for(const id in STRAT_PRO){const r=reglePro(id);r.pro=true;FAMILLES[id]={nom:STRAT_PRO[id].nom,txt:STRAT_PRO[id].txt,pro:true,regle:r}}
 FAMILLES.bh.regle.reference=true;
@@ -742,7 +745,7 @@ function plafondRisque(F,t,w,c,pos,v){if(!w||!c.risqueEgal)return w;const R=c.ri
 // J : {paire:[{t,o,h,l,c,v}]} journées fermées, alignées sur les dates communes ; btcJ : journées du bitcoin pour le filtre de régime.
 function Fjour(J,btcJ){setTF(60);const Q=Object.keys(J).filter(q=>J[q].length);if(!Q.length)return null;const dates=Q.map(q=>new Set(J[q].map(x=>x.t)));
   const T0=J[Q[0]].map(x=>x.t).filter(t=>dates.every(d=>d.has(t)));const F={Q,N:T0.length,T:T0.map(t=>t+864e5-TF.bar),p:{},jour:true};
-  for(const q of Q){const m=new Map(J[q].map(x=>[x.t,x])),A=T0.map(t=>m.get(t));F.p[q]={c:A.map(x=>x.c),jc:A.map(x=>x.c),jh:A.map(x=>x.h??x.c),jl:A.map(x=>x.l??x.c),jv:A.map(x=>x.v||0),ji:A.map((x,i)=>i+1)}}
+  for(const q of Q){const m=new Map(J[q].map(x=>[x.t,x])),A=T0.map(t=>m.get(t));F.p[q]={c:A.map(x=>x.c),jc:A.map(x=>x.c),jh:A.map(x=>x.h??x.c),jl:A.map(x=>x.l??x.c),jv:A.map(x=>x.v||0),ji:A.map((x,i)=>i+1),jt:T0.slice()}}
   F.reg=regimeBTC(F.T,btcJ);return F}
 // Proposition du jour (format de 03_checklist_trade.md) pour la stratégie gelée, en rejouant depuis la date de gel (pas avant : un arrêt
 // à 15 % survenu des années plus tôt ne doit pas bloquer aujourd'hui). La dernière journée fermée donne l'action à faire maintenant.
@@ -750,7 +753,10 @@ function proposition(F,id,depuis,c){const from=F.T.findIndex(t=>t>=depuis);if(fr
   return{jour:F.T[i]+TF.bar-864e5,papier:!!(r.arret||st._arret),valeur:1e4+r.pnl,baisse:r.dd,arret:r.arret||st._arret||null,bloque:st._bloque||'',L:F.Q.map(q=>{const P=F.p[q],p=P0[q],x=P.jc[i],sortie=(st._T||[]).filter(z=>z.q===q&&z.j===i).pop();
     const a=sortie?{action:'VENDRE',raison:sortie.raison,prix:x,resultatR:sortie.r}:p&&p.j===i?{action:'ACHETER',prix:x,stop:p.stop,objectif:p.objectif||null,part:p.w,risque:p.w*(x-p.stop)/x,gr:p.objectif?(p.objectif-x)/(x-p.stop):null}
       :p?{action:'GARDER',prix:x,entree:p.e,stop:p.stop,objectif:p.objectif||null,part:p.w,risque:Math.max(0,p.w*(x-p.stop)/x)}:{action:'RIEN',prix:x,raison:st._bloque||'aucun signal aujourd’hui'};
-    return{paire:q,...a}})}}
+    // Suivi de la proposition comme un vrai trade fictif : trades fermés depuis le gel (dates, prix, résultat ≈ en part du capital) et position ouverte.
+    const fermes=(st._T||[]).filter(z=>z.q===q).map(z=>({du:z.t0??(z.j0!=null?F.T[z.j0]:null),au:z.t1??F.T[z.j],entree:z.e,sortie:z.x,r:z.r,pnl:z.pnl,raison:z.raison}));
+    const ouvert=p?{du:p.t0??F.T[p.j],entree:p.e,stop:p.stop,latent:(p.w||0)*(x/p.e-1)}:null;
+    return{paire:q,...a,suivi:{fermes,ouvert}}})}}
 function statutPro(x,fw){const c=[[x.expR!==null&&x.expR>0,'espérance positive après frais'],[x.nT>=100,`au moins 100 trades (${x.nT})`],[x.dd<.2&&!x.arret,'pire baisse sous 20 % et seuil d’arrêt de 15 % jamais atteint'],
     [x.ent>0&&x.test>0,'positive sur les 70 % d’optimisation et sur les 30 % de vérification'],[!!(fw&&fw.jours>=28&&fw.valeur>=1e4*(1-1.5*x.dd)),'paper trading de 4 semaines cohérent']];
   const sus=fw&&(fw.dd>1.5*x.dd||(fw.n30>=30&&fw.esp30<0));return{statut:sus?'SUSPENDUE':c.every(z=>z[0])?'VALIDÉE':'À TESTER',criteres:c}}
@@ -783,16 +789,18 @@ const TROIS=['A2','prudente','regime'];
 const RETIREES=['S1','S3','S4','A3'];
 // « Pourquoi en attente » : pour chaque actif d'un onglet, ce que la stratégie regarde en ce moment, en une phrase.
 // Lecture seule des mêmes indicateurs que la règle (aucune décision ici). Bitcoin sous sa moyenne 50 jours = F.reg -1.
-function attenteStrat(F,t,id,q){const P=F.p[q];if(!P)return'données absentes';const nom=q==='EURUSDT'?'EUR/USD':q.replace('USDT',''),btc=F.reg&&F.reg[t];
+function attenteStrat(F,t,id,q,acc){const P=F.p[q];if(!P)return'données absentes';const tient=acc&&acc.pos&&acc.pos[q],px=x=>x>=100?Math.round(x).toLocaleString('fr-FR'):(+x).toPrecision(5);const nom=q==='EURUSDT'?'EUR/USD':q.replace('USDT',''),btc=F.reg&&F.reg[t];
   if(id==='regime'||id==='prudente'){if(id==='prudente'&&pauseFed(F.T[t]+TF.bar).pause)return`${nom} : pause autour d’une annonce de la Fed, aucune nouvelle entrée`;
     if(btc===-1)return`${nom} : bitcoin sous sa moyenne 50 jours (marché baissier) : rien n’est acheté`;
     if(!(P.ef[t]>P.es[t]))return`${nom} : tendance lente baissière (moyenne 50 h sous la moyenne 200 h) : on attend qu’elle remonte`;
-    return`${nom} : tendance haussière et bitcoin favorable : détenu${id==='prudente'?' (part réduite si le marché est agité)':''}`}
+    return`${nom} : tendance haussière et bitcoin favorable : ${tient?'détenu':'achat à la prochaine décision'}${id==='prudente'?' (part réduite si le marché est agité)':''}`}
   if(id==='A2'){const i=P.ji?P.ji[t]-1:-1;if(!(i>=205))return`${nom} : pas encore assez de jours d’historique`;const a=mmJ(P.jc,i,50),b=mmJ(P.jc,i,200),c=P.jc[i];
+    const p=acc&&acc.st&&acc.st._pos&&acc.st._pos[q];if(p)return`${nom} : détenu (entrée à ${px(p.e)}), stop à ${px(p.stop)} : on sort sous ce stop ou si la clôture repasse sous la MM50`;
     if(btc===-1)return`${nom} : bitcoin sous sa moyenne 50 jours : aucune entrée`;
     if(FOMC.some(x=>x>F.T[t]&&x-F.T[t]<=24*H1))return`${nom} : annonce de la Fed demain : aucune entrée`;
     if(!(a>b))return`${nom} : tendance de fond baissière (MM50 sous la MM200 journalières) : aucune entrée`;
     if(!(c>a))return`${nom} : clôture sous la MM50 : on attend que le prix repasse au-dessus`;
+    const sg=STRAT_PRO.A2.entree(P,i,F,t);if(sg)return`${nom} : signal d’achat sur la dernière clôture (${sg.why||'déclencheur atteint'}) : achat à la prochaine décision si le risque le permet`;
     return`${nom} : tendance de fond haussière : on attend le déclencheur (cassure des 20 jours avec volume, ou reprise après un repli)`}
   return''}
 function journalTrois(F,c0){const c={...c0,risqueEgal:true},W=Math.min(Math.max(TF.W,200*Math.round(H1/TF.bar)+20),Math.floor(F.N/4)),o={};
@@ -809,7 +817,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-18 13:11';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-25 23:40';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;
@@ -1128,7 +1136,7 @@ let REPS_='';
 function bilanHTML(){const e=$('bil');if(!e)return;const B=SV.bil;if(!B||!B.agents){e.innerHTML=`<span class="mut">${SV.at?'Pas encore de bilan publié par le serveur.':'Lecture du serveur…'}</span>`;return}
   const L=[B.agents,...B.strategies.flatMap(x=>x.demo?[{...x,nom:x.nom+' (avec frais)'},{...x.demo,nom:x.nom+' (démo sans frais)',demo:1}]:[x])],pc=x=>x==null?'–':Math.round(x*100)+' %';
   const ouv=!!(e.querySelector('details')||{}).open;
-  e.innerHTML=L.map(x=>`<div class="row"${x.demo?' style="opacity:.7"':''}><span><b>${x.nom}</b><br><span class="mut">${x.n} trade${x.n>1?'s':''} · réussite ${pc(x.reussite)} · espérance ${x.esperance==null?'–':fmt(x.esperance)} par trade</span></span><span class="${x.total>=0?'up':'dn'}">${fmt(x.total)}</span></div>`).join('')+
+  e.innerHTML=L.map(x=>`<div class="row"${x.demo?' style="opacity:.7"':''}><span><b>${x.nom}</b>${/mêmes trades/.test(x.note||'')?`<br><span class="mut">${x.note.split(' ; ').filter(t=>/mêmes trades/.test(t)).join(' ; ')} : ce n’est pas une perte de plus</span>`:''}<br><span class="mut">${x.n} trade${x.n>1?'s':''} · réussite ${pc(x.reussite)} · espérance ${x.esperance==null?'–':fmt(x.esperance)} par trade</span></span><span class="${x.total>=0?'up':'dn'}">${fmt(x.total)}</span></div>`).join('')+
     `<details class="plus"><summary>Erreurs récurrentes et action proposée</summary>${L.filter(x=>x.n).map(x=>`<p><b>${x.nom}</b> : gain moyen ${fmt(x.gainMoy)}, perte moyenne ${fmt(x.perteMoy)}.${x.erreurs.length?` Causes des pertes : ${x.erreurs.map(z=>`${z.cause} (${z.n})`).join(', ')}.`:''}${x.action?`<br><span class="mut">Action proposée : ${x.action}</span>`:''}</p>`).join('')||'<p class="mut">Pas encore de trade terminé cette semaine.</p>'}<p class="mut">Du ${new Date(B.du).toLocaleDateString('fr-FR')} au ${new Date(B.au).toLocaleDateString('fr-FR')}. Les actions proposées ne sont jamais appliquées sans ton accord.</p>${B.verif?`<p class="mut">Journaux du serveur vérifiés (chaîne d’empreintes) : ${Object.entries(B.verif).map(([k,v])=>`${k} ${v.ok?'intact':'⚠️ '+v.erreur} (${v.n} lignes)`).join(' · ')}.</p>`:''}</details>`;
   if(ouv)e.querySelector('details').open=true}
 // ---------- Onglets des trois stratégies suivies : portefeuille fictif de 100 €, gains, pertes, trades, et petite analyse de chaque trade ----------
@@ -1155,6 +1163,9 @@ function stratHTML(){for(const k in ONGLETS){const e=$('st'+k);if(!e)continue;co
   <p class="foot">Argent fictif. Démo sans frais : en vrai, chaque achat et chaque vente coûtent des frais. Les gains passés ne garantissent rien.</p>`;if(e.dataset.h!==h){e.dataset.h=h;e.innerHTML=h}}}
 // Proposition du jour (serveur) : stratégie gelée appliquée à la crypto et à la paire forex choisies, format de la liste de contrôle.
 // Ce n'est qu'une proposition du bot : l'utilisateur décide et passe l'ordre lui-même, chez son courtier.
+function suiviHTML(x){const S=x.suivi;if(!S||(!S.fermes.length&&!S.ouvert))return'';const d=t=>t?new Date(t).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}):'–',pp=v=>v<10?(+v).toFixed(4):Math.round(v).toLocaleString('fr-FR'),
+    tot=S.fermes.reduce((a,z)=>a+z.pnl,0)*1e4;
+  return`<details class="plus"><summary>Suivi fictif depuis le gel : ${S.fermes.length} trade${S.fermes.length>1?'s':''} fermé${S.fermes.length>1?'s':''} (${fmt(tot)})${S.ouvert?', 1 ouvert':''}</summary>${S.fermes.map(z=>`<div class="row"><span>${d(z.du)} → ${d(z.au)} · achat ${pp(z.entree)} → vente ${pp(z.sortie)}<br><span class="mut">${z.raison}</span></span><span class="${z.pnl>=0?'up':'dn'}">${fmt(z.pnl*1e4)}</span></div>`).join('')}${S.ouvert?`<div class="row"><span>Depuis le ${d(S.ouvert.du)} · achat ${pp(S.ouvert.entree)} · stop ${pp(S.ouvert.stop)}</span><span class="${S.ouvert.latent>=0?'up':'dn'}">${fmt(S.ouvert.latent*1e4)} latent</span></div>`:''}<p class="mut">Comme si tu avais suivi chaque proposition, frais compris (montants approchés, base 100 €).</p></details>`}
 function propHTML(){const e=$('prop');if(!e)return;const P=SV.prop;if(!P||!P.propositions){e.innerHTML=`<span class="mut">${SV.at?'Pas encore de proposition publiée par le serveur.':'Lecture du serveur…'}</span>`;return}
   const cap=+S.cfg.capReel||0,eur=x=>cap?` (${(x*cap).toFixed(0)} € sur ${cap} €)`:'',p2=x=>(x*100).toFixed(1).replace('.',',')+' %',px=x=>x==null?'–':x<10?x.toFixed(4):x.toFixed(2),nom=q=>q.replace('USDT','')+(/USDT$/.test(q)?' · crypto':' · forex');
   const ch={ACHETER:'long',VENDRE:'short',GARDER:'out',RIEN:''},fed=FOMC.find(x=>x>Date.now()&&x-Date.now()<36*H1),jours=(Date.now()-Date.parse(P.depuis))/864e5;
@@ -1163,7 +1174,7 @@ function propHTML(){const e=$('prop');if(!e)return;const P=SV.prop;if(!P||!P.pro
       const d=x.action==='ACHETER'?`Entrée vers ${px(x.prix)} · stop ${px(x.stop)} · objectif ${x.objectif?px(x.objectif):'aucun (stop suiveur)'} · taille ${p2(x.part)} du capital${eur(x.part)} · risque ${p2(x.risque)}${eur(x.risque)}${x.gr?` · gain/risque ${x.gr.toFixed(1).replace('.',',')}`:''}`
         :x.action==='GARDER'?`Position gardée (entrée ${px(x.entree)}) · stop à placer à ${px(x.stop)} · taille ${p2(x.part)} du capital`
         :x.action==='VENDRE'?`Vendre vers ${px(x.prix)} : ${x.raison}`:`Rien à faire : ${x.raison}.`;
-      return`<div class="ess"><b>${nom(q)}</b>${x.controle?' <span class="mut">(contrôle seulement, pas à trader)</span>':''} <span class="chip ${ch[x.action]||''}">${x.action}</span><br>${d}<br><span class="mut">Données : ${x.source}. Coûts comptés : ${String(x.couts.fee).replace('.',',')} % + ${String(x.couts.slip).replace('.',',')} % par côté. Compte fictif de la stratégie : ${fmt(x.valeur)}.</span>${x.papier?'<br><b class="dn">⚠ Baisse de 15 % atteinte depuis le gel : argent réel en pause, suivre seulement en papier (règle du dossier).</b>':''}</div>`}).join('')+
+      return`<div class="ess"><b>${nom(q)}</b>${x.controle?' <span class="mut">(contrôle seulement, pas à trader)</span>':''} <span class="chip ${ch[x.action]||''}">${x.action}</span><br>${d}<br><span class="mut">Données : ${x.source}. Coûts comptés : ${String(x.couts.fee).replace('.',',')} % + ${String(x.couts.slip).replace('.',',')} % par côté. Compte fictif de la stratégie : ${fmt(x.valeur)}.</span>${suiviHTML(x)}${x.papier?'<br><b class="dn">⚠ Baisse de 15 % atteinte depuis le gel : argent réel en pause, suivre seulement en papier (règle du dossier).</b>':''}</div>`}).join('')+
     `<p class="mut">${fed?`⚠ Annonce de la Fed le ${new Date(fed).toLocaleString('fr-FR')} : prudence. `:''}Proposition du bot, pas un conseil : c’est toi qui décides et qui passes l’ordre. ${jours<28?`Période de test en argent fictif : encore ${Math.max(0,Math.ceil(28-jours))} jours avant d’envisager un petit montant réel.`:'4 semaines de test écoulées : comparer le résultat fictif au backtest avant tout argent réel.'}</p>`}
 // Première phrase seulement dans la fiche (le reste est dans « Ce qu'il regarde ») ; un indice reste présenté comme une note du bot.
 const court=t=>{t=String(t||'');const m=t.match(/^.{20,140}?[.!?](\s|$)/),c=m?m[0].trim():t.length>140?t.slice(0,139)+'…':t;return/indice \d+ %/.test(c)&&!/pas une probabilité/.test(c)?c.replace(/\.$/,'')+' (note du bot, pas une probabilité).':c};
