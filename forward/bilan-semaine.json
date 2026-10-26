@@ -1,11 +1,11 @@
 {
- "maj": 1793032866184,
- "du": 1792428066184,
- "au": 1793032866184,
+ "maj": 1793036523228,
+ "du": 1792431723228,
+ "au": 1793036523228,
  "verif": {
   "agents": {
    "ok": true,
-   "n": 2786
+   "n": 2798
   },
   "familles": {
    "ok": true,
@@ -15,18 +15,14 @@
  "agents": {
   "nom": "Agents actuels",
   "note": "avec frais",
-  "n": 3,
+  "n": 2,
   "gagnants": 0,
   "reussite": 0,
   "gainMoy": 0,
-  "perteMoy": -41.135733333333334,
-  "esperance": -41.135733333333334,
-  "total": -123.4072,
+  "perteMoy": -27.2658,
+  "esperance": -27.2658,
+  "total": -54.5316,
   "erreurs": [
-   {
-    "cause": "stop touché",
-    "n": 1
-   },
    {
     "cause": "frais plus grands que le gain",
     "n": 1
@@ -36,7 +32,7 @@
     "n": 1
    }
   ],
-  "action": "Stop trop serré par rapport aux mouvements normaux : vérifier qu’il est au moins à 2 × la variation moyenne (ATR)."
+  "action": "Trop de petits trades : décider moins souvent (bougies plus longues) pour que les frais pèsent moins."
  },
  "strategies": [
   {
