@@ -1,7 +1,7 @@
 {
- "geleeLe": "2026-10-16T23:00:22Z",
- "note": "Le 2026-10-16, avec l’accord de l’utilisateur (« règle tous les problèmes ») : trois filtres d’entrée ajoutés aux agents (liste de contrôle 3 sur 4, heures creuses évitées, filtre de frais). Ils ne font que refuser des entrées. Mesure : 12 mois en 5 min −6,2 % au lieu de −15,1 % ; 5 ans en 1 h −9,8 % au lieu de −15,1 %. Toujours perdant avec frais. Le forward test des agents repart de zéro (ancien journal archivé). Risque par trade 1 % inchangé. Le 2026-10-16 : perte maximale du jour ramenée de 5 % à 2 % (plafond du dossier, renforcement) ; le test des agents repart de zéro.",
- "tf": 5,
+ "geleeLe": "2026-10-28T18:21:56Z",
+ "note": "Le 2026-10-16, avec l’accord de l’utilisateur (« règle tous les problèmes ») : trois filtres d’entrée ajoutés aux agents (liste de contrôle 3 sur 4, heures creuses évitées, filtre de frais). Ils ne font que refuser des entrées. Mesure : 12 mois en 5 min −6,2 % au lieu de −15,1 % ; 5 ans en 1 h −9,8 % au lieu de −15,1 %. Toujours perdant avec frais. Le forward test des agents repart de zéro (ancien journal archivé). Risque par trade 1 % inchangé. Le 2026-10-16 : perte maximale du jour ramenée de 5 % à 2 % (plafond du dossier, renforcement) ; le test des agents repart de zéro. Le 2026-10-28 : agents passés aux bougies d’1 h (mesure : même année, 5 min −6,2 %, 1 h +1,2 % ; 5 ans en 1 h −9,8 %), avec l’accord de l’utilisateur ; le test des agents repart de zéro.",
+ "tf": 60,
  "regles": [
   "conf",
   "heures",
