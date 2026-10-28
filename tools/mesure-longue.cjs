@@ -47,8 +47,9 @@ async function chargerFin(q){const out=[],d=new Date();for(let m=MOIS;m>=1;m--){
   // sur la MÊME période de 12 mois (bougies regroupées à partir des mêmes données 5 min), puis 1 h sur 5 ans. Mesure seulement : rien n'est changé.
   const tfs=[];{const un=(FF,lab,periode)=>{const W=Math.min(E.TF().W,Math.floor(FF.N/4)),N=FF.N,cut=W+Math.floor((N-W)*.7),r=E.simuler(FF,W,N,c,R);
       return{lab,periode,n:r.n,pnl:r.pnl,dd:r.dd,expR:r.expR,frais:r.fees??null,sansFrais:E.simuler(FF,W,N,{...c,fee:0,slip:0},R).pnl,cout2:E.simuler(FF,W,N,{...c,fee:c.fee*2,slip:c.slip*2},R).pnl,ent:E.simuler(FF,W,cut,c,R).pnl,test:E.simuler(FF,cut,N,c,R).pnl,du:FF.T[W],au:FF.T[N-1]}};
-    tfs.push(un(F,'5 min','12 mois'));
-    for(const m of[10,60]){E.setTF(m);const D2={};for(const q in al.D)D2[q]=E.agreger(al.D[q],3e5);const a2=E.aligner(D2);if(a2&&Object.keys(a2.D).length)tfs.push(un(E.prep(a2.D,null,{fund}),m===10?'10 min':'1 h','12 mois'))}
+    tfs.push(un(F,TF.lab,'12 mois'));
+    if(+G.tf===5)for(const m of[10,60]){ // regroupement possible seulement à partir de bougies 5 min
+E.setTF(m);const D2={};for(const q in al.D)D2[q]=E.agreger(al.D[q],3e5);const a2=E.aligner(D2);  if(a2&&Object.keys(a2.D).length)tfs.push(un(E.prep(a2.D,null,{fund}),m===10?'10 min':'1 h','12 mois'))}
     if(F3x){E.setTF(60);tfs.push(un(F3x,'1 h','5 ans'))}E.setTF(G.tf);
     console.log('Piste 3 :',tfs.map(x=>`${x.lab} ${x.periode} ${x.pnl.toFixed(0)} $ (${x.n} trades)`).join(' | '))}
   const diag=E.simuler(F,Math.min(TF.W,Math.floor(F.N/4)),F.N,{...c,diag:1},R).diag;console.log('Diagnostic des agents :',JSON.stringify(diag));
