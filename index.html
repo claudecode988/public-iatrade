@@ -274,7 +274,9 @@ function fngNews(d,now){if(!d||!isFinite(d.value)||!d.ts)return{ok:false,why:'do
 // 1. Calendrier des décisions de taux de la Fed (FOMC), publié à l'avance. Annonce à 14 h heure de New York (18 h UTC l'été, 19 h l'hiver) :
 //    on retient 18 h UTC. Après la dernière date connue, la règle n'a plus de donnée et ne bloque rien (à compléter chaque année).
 const FOMC=['2025-01-29','2025-03-19','2025-05-07','2025-06-18','2025-07-30','2025-09-17','2025-10-29','2025-12-10',
-  '2026-01-28','2026-03-18','2026-04-29','2026-06-17','2026-07-29','2026-09-16','2026-10-28','2026-12-09'].map(d=>Date.parse(d+'T18:00:00Z'));
+  '2026-01-28','2026-03-18','2026-04-29','2026-06-17','2026-07-29','2026-09-16','2026-10-28','2026-12-09',
+  // 2027 : calendrier provisoire publié par la Fed le 05/09/2025 (jour de décision = 2e jour de chaque réunion), et première réunion de 2028.
+  '2027-01-27','2027-03-17','2027-04-28','2027-06-09','2027-07-28','2027-09-15','2027-10-27','2027-12-08','2028-01-26'].map(d=>Date.parse(d+'T18:00:00Z'));
 const FOMC_AVANT=12*H1,FOMC_APRES=6*H1;
 function pauseFed(t){const connu=t>=FOMC[0]-31*864e5&&t<=FOMC[FOMC.length-1]+FOMC_APRES,d=FOMC.find(x=>t>=x-FOMC_AVANT&&t<=x+FOMC_APRES);return{connu,pause:connu&&!!d,d}}
 // 2. Taux de financement des contrats perpétuels Binance (payé toutes les 8 h entre acheteurs et vendeurs à crédit).
@@ -721,7 +723,7 @@ function reglePro(id){const S=STRAT_PRO[id];return(F,t,st,n)=>{const P0=F.p[F.Q[
       if((v/st._m0-1)>-.06)for(const q of garde)if(!pos[q]){const P=F.p[q],i=I(q),x=P.jc[i],a=atrJ(P,i),rf=a?2*a/x:null;if(!rf)continue;const w=Math.min(.5,(st._risque||PRO_RISQUE)/rf); // 1 % risqué : stop implicite à 2 × ATR journalier
         pos[q]={e:x,rf,w,j:i,t0:P.jt?P.jt[i]:null};o[q]=w}return o}
     for(const q in pos){const P=F.p[q],p=pos[q],i=I(q),x=P.jc[i];p.age=P.jt&&p.t0!=null?Math.round((P.jt[i]-p.t0)/864e5):i-p.j;if(p.side==='short'?x>=p.stop:x<=p.stop){fermer(q,'stop touché (clôture journalière)');continue}const r=S.sortie(P,i,p);if(r)fermer(q,r)}
-    const bloque=(v/st._m0-1)<=-.06?'perte du mois ≥ 6 %':pj<=-.02?'perte du jour ≥ 2 %':S.filtre&&!S.filtre(F,t,'long')&&!S.filtre(F,t,'short')?'filtre de Pistache (marché du bitcoin défavorable ou annonce de la Fed)':'';st._bloque=bloque;if(bloque)return o;
+    const bloque=(v/st._m0-1)<=-.06?'perte du mois ≥ 6 %':pj<=-.02?'perte du jour ≥ 2 %':S.filtre&&!S.filtre(F,t,'long')&&!S.filtre(F,t,'short')?(F.reg&&F.reg[t]===-1?'marché du bitcoin baissier (sous sa moyenne 50 jours)':FOMC.some(x=>x>F.T[t]&&x-F.T[t]<=24*H1)?`annonce de la Fed le ${new Date(FOMC.find(x=>x>F.T[t])).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',timeZone:'Europe/Paris'})} : pas d’entrée la veille`:'filtre de Pistache (bitcoin ou Fed)'):'';st._bloque=bloque;if(bloque)return o;
     let expo=Object.values(pos).reduce((a,p)=>a+(p.w||0),0),risque=Object.keys(pos).reduce((a,q)=>{const p=pos[q],x=F.p[q].jc[I(q)];return a+Math.max(0,p.w*(p.side==='short'?p.stop-x:x-p.stop)/x)},0);
     const cands=[];for(const q of F.Q){if(pos[q])continue;const P=F.p[q],i=I(q);if(i<1)continue;const s=S.entree(P,i,F,t);if(s&&(!S.filtre||S.filtre(F,t,s.side||'long')))cands.push({q,P,i,s})}
     cands.sort((a,b)=>(b.s.force||0)-(a.s.force||0));
@@ -790,14 +792,14 @@ const RETIREES=['S1','S3','S4','A3'];
 // « Pourquoi en attente » : pour chaque actif d'un onglet, ce que la stratégie regarde en ce moment, en une phrase.
 // Lecture seule des mêmes indicateurs que la règle (aucune décision ici). Bitcoin sous sa moyenne 50 jours = F.reg -1.
 function attenteStrat(F,t,id,q,acc){const P=F.p[q];if(!P)return'données absentes';const tient=acc&&acc.pos&&acc.pos[q],px=x=>x>=100?Math.round(x).toLocaleString('fr-FR'):(+x).toPrecision(5);const nom=q==='EURUSDT'?'EUR/USD':q.replace('USDT',''),btc=F.reg&&F.reg[t];
-  if(id==='regime'||id==='prudente'){if(id==='prudente'&&pauseFed(F.T[t]+TF.bar).pause)return`${nom} : pause autour d’une annonce de la Fed, aucune nouvelle entrée`;
+  if(id==='regime'||id==='prudente'){if(id==='prudente'&&pauseFed(F.T[t]+TF.bar).pause){const f=pauseFed(F.T[t]+TF.bar);return`${nom} : pause autour de l’annonce de la Fed du ${new Date(f.d).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'})} (de 12 h avant à 6 h après) : aucune nouvelle entrée`}
     if(btc===-1)return`${nom} : bitcoin sous sa moyenne 50 jours (marché baissier) : rien n’est acheté`;
     if(!(P.ef[t]>P.es[t]))return`${nom} : tendance lente baissière (moyenne 50 h sous la moyenne 200 h) : on attend qu’elle remonte`;
     return`${nom} : tendance haussière et bitcoin favorable : ${tient?'détenu':'achat à la prochaine décision'}${id==='prudente'?' (part réduite si le marché est agité)':''}`}
   if(id==='A2'){const i=P.ji?P.ji[t]-1:-1;if(!(i>=205))return`${nom} : pas encore assez de jours d’historique`;const a=mmJ(P.jc,i,50),b=mmJ(P.jc,i,200),c=P.jc[i];
     const p=acc&&acc.st&&acc.st._pos&&acc.st._pos[q];if(p)return`${nom} : détenu (entrée à ${px(p.e)}), stop à ${px(p.stop)} : on sort sous ce stop ou si la clôture repasse sous la MM50`;
     if(btc===-1)return`${nom} : bitcoin sous sa moyenne 50 jours : aucune entrée`;
-    if(FOMC.some(x=>x>F.T[t]&&x-F.T[t]<=24*H1))return`${nom} : annonce de la Fed demain : aucune entrée`;
+    {const x=FOMC.find(x=>x>F.T[t]&&x-F.T[t]<=24*H1);if(x)return`${nom} : annonce de la Fed le ${new Date(x).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'})} : aucune entrée avant`}
     if(!(a>b))return`${nom} : tendance de fond baissière (MM50 sous la MM200 journalières) : aucune entrée`;
     if(!(c>a))return`${nom} : clôture sous la MM50 : on attend que le prix repasse au-dessus`;
     const sg=STRAT_PRO.A2.entree(P,i,F,t);if(sg)return`${nom} : signal d’achat sur la dernière clôture (${sg.why||'déclencheur atteint'}) : achat à la prochaine décision si le risque le permet`;
@@ -817,7 +819,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-25 23:40';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-10-28 14:56';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;
