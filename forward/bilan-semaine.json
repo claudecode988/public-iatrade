@@ -1,38 +1,34 @@
 {
- "maj": 1793210935427,
- "du": 1792606135427,
- "au": 1793210935427,
+ "maj": 1793214552435,
+ "du": 1792609752435,
+ "au": 1793214552435,
  "verif": {
   "agents": {
    "ok": true,
-   "n": 3379
+   "n": 2
   },
   "familles": {
    "ok": true,
-   "n": 361
+   "n": 366
   }
  },
  "agents": {
   "nom": "Agents actuels",
   "note": "avec frais",
-  "n": 2,
+  "n": 1,
   "gagnants": 0,
   "reussite": 0,
   "gainMoy": 0,
-  "perteMoy": -27.2658,
-  "esperance": -27.2658,
-  "total": -54.5316,
+  "perteMoy": -48.3681,
+  "esperance": -48.3681,
+  "total": -48.3681,
   "erreurs": [
-   {
-    "cause": "frais plus grands que le gain",
-    "n": 1
-   },
    {
     "cause": "sortie trop rapide sur un signal inversé",
     "n": 1
    }
   ],
-  "action": "Trop de petits trades : décider moins souvent (bougies plus longues) pour que les frais pèsent moins."
+  "action": "Garder la position plus longtemps a été mesuré et aggrave les pertes ; mieux vaut moins d’entrées, mieux confirmées (filtres appliqués le 16/10)."
  },
  "strategies": [
   {
