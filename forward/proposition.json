@@ -1,6 +1,6 @@
 {
- "maj": 1793145623227,
- "jourCalcul": 1793059200000,
+ "maj": 1793232062984,
+ "jourCalcul": 1793145600000,
  "strategie": "A2",
  "nom": "Agents version 2 (règles du dossier)",
  "depuis": "2026-10-15T00:00:00Z",
@@ -13,16 +13,16 @@
  ],
  "propositions": {
   "BTCUSDT": {
-   "jour": 1793059200000,
+   "jour": 1793145600000,
    "papier": false,
    "valeur": 9977.526911855264,
    "baisse": 0.006626714036805848,
    "arret": null,
-   "bloque": "filtre de Pistache (marché du bitcoin défavorable ou annonce de la Fed)",
+   "bloque": "",
    "paire": "BTCUSDT",
    "action": "RIEN",
-   "prix": 80909.77,
-   "raison": "filtre de Pistache (marché du bitcoin défavorable ou annonce de la Fed)",
+   "prix": 81343.5,
+   "raison": "aucun signal aujourd’hui",
    "suivi": {
     "fermes": [
      {
@@ -45,16 +45,16 @@
    "controle": false
   },
   "EURUSD": {
-   "jour": 1793059200000,
+   "jour": 1793145600000,
    "papier": false,
    "valeur": 10000,
    "baisse": 0,
    "arret": null,
-   "bloque": "filtre de Pistache (marché du bitcoin défavorable ou annonce de la Fed)",
+   "bloque": "",
    "paire": "EURUSD",
    "action": "RIEN",
-   "prix": 1.1173808574676514,
-   "raison": "filtre de Pistache (marché du bitcoin défavorable ou annonce de la Fed)",
+   "prix": 1.1129660606384277,
+   "raison": "aucun signal aujourd’hui",
    "suivi": {
     "fermes": [],
     "ouvert": null
@@ -67,16 +67,16 @@
    "controle": false
   },
   "ETHUSDT": {
-   "jour": 1793059200000,
+   "jour": 1793145600000,
    "papier": false,
    "valeur": 10000,
    "baisse": 0,
    "arret": null,
-   "bloque": "filtre de Pistache (marché du bitcoin défavorable ou annonce de la Fed)",
+   "bloque": "",
    "paire": "ETHUSDT",
    "action": "RIEN",
-   "prix": 2350.36,
-   "raison": "filtre de Pistache (marché du bitcoin défavorable ou annonce de la Fed)",
+   "prix": 2359.68,
+   "raison": "aucun signal aujourd’hui",
    "suivi": {
     "fermes": [],
     "ouvert": null
@@ -91,8 +91,8 @@
  },
  "tests": {
   "BTCUSDT": {
-   "du": 1635548400000,
-   "au": 1793142000000,
+   "du": 1635634800000,
+   "au": 1793228400000,
    "lignes": [
     {
      "id": "S2",
@@ -103,13 +103,13 @@
      "expR": -0.003511623499955664,
      "wrT": 0.6033057851239669,
      "arret": null,
-     "ent": -12.855758658832201,
+     "ent": 4.479205076237122,
      "test": -31.726599229526983,
      "cout2": -366.2316443188156,
      "sansFrais": 323.52039612610133,
      "sharpe": -0.0010644417598909435,
-     "chanceGain": 0.489,
-     "dd95": 0.0808879998424558
+     "chanceGain": 0.497,
+     "dd95": 0.07975287846352272
     },
     {
      "id": "A2",
@@ -125,31 +125,31 @@
      "cout2": 1183.6833319696489,
      "sansFrais": 1477.9647289247278,
      "sharpe": 0.027803159012926838,
-     "chanceGain": 0.889,
-     "dd95": 0.13897127814815935
+     "chanceGain": 0.885,
+     "dd95": 0.13437460109145424
     },
     {
      "id": "S5",
      "nom": "S5 · Rotation momentum mensuelle",
-     "pnl": 1135.6358116006068,
+     "pnl": 1143.434183985226,
      "dd": 0.07877106289951488,
      "nT": 5,
      "expR": 2.1811360973227556,
      "wrT": 0.6,
      "arret": null,
      "ent": 1194.0857503998268,
-     "test": -66.17252199361064,
-     "cout2": 1106.0621334719763,
-     "sansFrais": 1165.2743178897908,
-     "sharpe": 0.019089692723300404,
-     "chanceGain": 0.776,
-     "dd95": 0.21301371721129425
+     "test": -46.85480830275992,
+     "cout2": 1113.8311166367293,
+     "sansFrais": 1173.102164415881,
+     "sharpe": 0.01920276550270285,
+     "chanceGain": 0.766,
+     "dd95": 0.21571366563706354
     }
    ]
   },
   "EURUSD": {
-   "du": 1571871600000,
-   "au": 1793142000000,
+   "du": 1571958000000,
+   "au": 1793228400000,
    "lignes": [
     {
      "id": "S2",
@@ -160,13 +160,13 @@
      "expR": -0.01989467617021455,
      "wrT": 0.5877862595419847,
      "arret": null,
-     "ent": 30.217996051593218,
+     "ent": 60.68191067894986,
      "test": -239.80964449128805,
      "cout2": -366.27475212895297,
      "sansFrais": 8.657087024101202,
      "sharpe": -0.012279821463335566,
-     "chanceGain": 0.30800000000000005,
-     "dd95": 0.08371822872485976
+     "chanceGain": 0.29600000000000004,
+     "dd95": 0.08259798388713967
     },
     {
      "id": "A2",
@@ -177,13 +177,13 @@
      "expR": -0.0480353033626943,
      "wrT": 0.2631578947368421,
      "arret": null,
-     "ent": 9.569574385894157,
-     "test": -0.2771434994865558,
+     "ent": 7.567660471017007,
+     "test": -45.019604729106504,
      "cout2": -28.51613239825383,
      "sansFrais": 47.23624584934805,
      "sharpe": 0.0010180328240377062,
-     "chanceGain": 0.509,
-     "dd95": 0.08151754290621516
+     "chanceGain": 0.534,
+     "dd95": 0.0767791691208303
     },
     {
      "id": "S5",
@@ -194,19 +194,19 @@
      "expR": -0.0998190898876179,
      "wrT": 0.2,
      "arret": null,
-     "ent": -127.78121282507345,
-     "test": 170.5063603280305,
+     "ent": -97.80711960385997,
+     "test": 165.70977101272,
      "cout2": 52.76452507801332,
      "sansFrais": 93.06418923329329,
      "sharpe": 0.0033620087335701305,
-     "chanceGain": 0.5680000000000001,
-     "dd95": 0.12213362717608656
+     "chanceGain": 0.5429999999999999,
+     "dd95": 0.1168421980739946
     }
    ]
   },
   "ETHUSDT": {
-   "du": 1635548400000,
-   "au": 1793142000000,
+   "du": 1635634800000,
+   "au": 1793228400000,
    "lignes": [
     {
      "id": "S2",
@@ -222,8 +222,8 @@
      "cout2": -369.1803126728828,
      "sansFrais": 64.08607524538274,
      "sharpe": -0.008349497751885735,
-     "chanceGain": 0.358,
-     "dd95": 0.0992871191465803
+     "chanceGain": 0.369,
+     "dd95": 0.09817350401406923
     },
     {
      "id": "A2",
@@ -239,8 +239,8 @@
      "cout2": 704.8299665351187,
      "sansFrais": 852.0894597131701,
      "sharpe": 0.02067031797037739,
-     "chanceGain": 0.806,
-     "dd95": 0.1467698542718244
+     "chanceGain": 0.8089999999999999,
+     "dd95": 0.13962098064783046
     },
     {
      "id": "S5",
@@ -252,12 +252,12 @@
      "wrT": 0.5,
      "arret": "2025-11-04T23:00:00.000Z",
      "ent": -133.46125102125188,
-     "test": -243.3601016223547,
+     "test": -239.97796828856735,
      "cout2": -263.18906694380894,
      "sansFrais": -248.79581623392187,
-     "sharpe": -0.002466568549606928,
-     "chanceGain": 0.41500000000000004,
-     "dd95": 0.2754006490011395
+     "sharpe": -0.0024665685496069274,
+     "chanceGain": 0.43000000000000005,
+     "dd95": 0.28296687700065876
     }
    ]
   }
