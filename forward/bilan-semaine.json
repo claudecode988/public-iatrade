@@ -1,11 +1,11 @@
 {
- "maj": 1793378310711,
- "du": 1792773510711,
- "au": 1793378310711,
+ "maj": 1793381939391,
+ "du": 1792777139391,
+ "au": 1793381939391,
  "verif": {
   "agents": {
    "ok": true,
-   "n": 47
+   "n": 48
   },
   "familles": {
    "ok": true,
@@ -15,20 +15,15 @@
  "agents": {
   "nom": "Agents actuels",
   "note": "avec frais",
-  "n": 1,
+  "n": 0,
   "gagnants": 0,
-  "reussite": 0,
+  "reussite": null,
   "gainMoy": 0,
-  "perteMoy": -48.3681,
-  "esperance": -48.3681,
-  "total": -48.3681,
-  "erreurs": [
-   {
-    "cause": "sortie trop rapide sur un signal inversé",
-    "n": 1
-   }
-  ],
-  "action": "Garder la position plus longtemps a été mesuré et aggrave les pertes ; mieux vaut moins d’entrées, mieux confirmées (filtres appliqués le 16/10)."
+  "perteMoy": 0,
+  "esperance": null,
+  "total": 0,
+  "erreurs": [],
+  "action": null
  },
  "strategies": [
   {
