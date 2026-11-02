@@ -800,7 +800,7 @@ function attenteStrat(F,t,id,q,acc){const P=F.p[q];if(!P)return'données absente
   if(id==='regime'||id==='prudente'){if(id==='prudente'&&pauseFed(F.T[t]+TF.bar).pause){const f=pauseFed(F.T[t]+TF.bar);return`${nom} : pause autour de l’annonce de la Fed du ${new Date(f.d).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'})} (de 12 h avant à 6 h après) : aucune nouvelle entrée`}
     if(!regOk(F,t,q))return`${nom} : bitcoin sous sa moyenne 50 jours (marché baissier) : rien n’est acheté`;
     if(!(P.ef[t]>P.es[t]))return`${nom} : tendance lente baissière (moyenne 50 h sous la moyenne 200 h) : on attend qu’elle remonte`;
-    return`${nom} : tendance haussière et bitcoin favorable : ${tient?'détenu':'achat à la prochaine décision'}${id==='prudente'?' (part réduite si le marché est agité)':''}`}
+    return`${nom} : tendance haussière${q==='BTCUSDT'||!(WL.FOREX.includes(q)||WL.FOREX.includes(q+'T'))?' et bitcoin favorable':' (le bitcoin ne compte pas pour une monnaie)'} : ${tient?'détenu':'achat à la prochaine décision'}${id==='prudente'?' (part réduite si le marché est agité)':''}`}
   if(id==='A2'){const i=P.ji?P.ji[t]-1:-1;if(!(i>=205))return`${nom} : pas encore assez de jours d’historique`;const a=mmJ(P.jc,i,50),b=mmJ(P.jc,i,200),c=P.jc[i];
     const p=acc&&acc.st&&acc.st._pos&&acc.st._pos[q];if(p)return`${nom} : détenu (entrée à ${px(p.e)}), stop à ${px(p.stop)} : on sort sous ce stop ou si la clôture repasse sous la MM50`;
     if(!regOk(F,t,q))return`${nom} : bitcoin sous sa moyenne 50 jours : aucune entrée`;
@@ -824,7 +824,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-11-02 09:19';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-11-02 10:14';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;
