@@ -789,7 +789,9 @@ function pistes(F,c,R){const W=Math.min(TF.W,Math.floor(F.N/4)),N=F.N,cut=W+Math
 const TROIS=['A2','prudente','regime'];
 // Règle du régime du bitcoin : par défaut elle bloque TOUTES les paires quand le bitcoin est sous sa moyenne 50 jours.
 // REG_FX (point du 02/11/2026) : ne l'appliquer qu'aux cryptos, pas à l'euro-dollar (une monnaie ne dépend pas du bitcoin).
-let REG_FX=false;const setRegFx=b=>{REG_FX=!!b};const regOk=(F,t,q)=>!F.reg||F.reg[t]!==-1||(REG_FX&&!!q&&(WL.FOREX.includes(q)||WL.FOREX.includes(q+'T')));
+// Mesure sur 5 ans (02/11/2026) : Version 2 sur BTC + EUR/USD +3,1 % → +5,4 % (pire baisse 11 % → 10 %) ; Tendance et Prudente inchangées
+// (−14,0 → −13,9 % et −14,1 → −14,1 %) ; toutes paires inchangé (Version 2 +20,8 → +20,6 %). Activé avec l'accord de l'utilisateur.
+let REG_FX=true;const setRegFx=b=>{REG_FX=!!b};const regOk=(F,t,q)=>!F.reg||F.reg[t]!==-1||(REG_FX&&!!q&&(WL.FOREX.includes(q)||WL.FOREX.includes(q+'T')));
 // Stratégies arrêtées à −15 % dans la mesure sur 5 ans et retirées du suivi (accord de l'utilisateur, 18/10/2026). Elles restent dans la mesure longue.
 const RETIREES=['S1','S3','S4','A3'];
 // « Pourquoi en attente » : pour chaque actif d'un onglet, ce que la stratégie regarde en ce moment, en une phrase.
@@ -822,7 +824,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-11-02 09:07';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-11-02 09:19';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;
