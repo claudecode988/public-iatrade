@@ -539,7 +539,7 @@ const FAMILLES={
   bh:{nom:'Acheter et garder',txt:'Toutes les paires à parts égales au début, plus aucun échange ensuite.',
     regle:(F,t,st,n,h)=>h===0?Object.fromEntries(F.Q.map(q=>[q,1/n])):null},
   regime:{nom:'Tendance lente + régime du bitcoin',txt:'Comme le suivi de tendance lent, mais rien n’est détenu quand le bitcoin clôture sous sa moyenne 50 jours.',
-    regle:(F,t,st,n)=>{const o={};for(const q of F.Q){const P=F.p[q],in_=P.ef[t]>P.es[t]&&F.reg[t]!==-1;if(in_!==!!st[q]){st[q]=in_;o[q]=in_?1/n:0}}return o}},
+    regle:(F,t,st,n)=>{const o={};for(const q of F.Q){const P=F.p[q],in_=P.ef[t]>P.es[t]&&regOk(F,t,q);if(in_!==!!st[q]){st[q]=in_;o[q]=in_?1/n:0}}return o}},
   volcible:{nom:'Tendance lente + volatilité cible',txt:'Comme le suivi de tendance lent, mais la part d’une paire agitée est réduite pour viser 2,5 % de variation par jour (jamais plus que la part égale), revue une fois par jour.',
     regle:(F,t,st,n,h)=>poidsCible(F,t,st,n,h,false)},
   prudente:{nom:'Prudente (tendance + régime + volatilité cible + pause Fed)',txt:'Les trois idées ensemble ; en plus, aucune nouvelle entrée de 12 h avant à 6 h après une annonce de la Fed.',
@@ -566,7 +566,7 @@ function poidsJour(F,t,st,n,h,sig){const o={};if(h%24!==0)return o;
 // Revue une fois par jour (ou à l'entrée / la sortie) et seulement si l'écart dépasse 20 % de la part égale, pour limiter les frais.
 const VOL_CIBLE=.025;
 function poidsCible(F,t,st,n,h,prud){const o={},jour=h%24===0,pz=prud&&pauseFed(F.T[t]+TF.bar).pause;
-  for(const q of F.Q){const P=F.p[q],w0=st[q]||0,in_=P.ef[t]>P.es[t]&&(!prud||F.reg[t]!==-1);
+  for(const q of F.Q){const P=F.p[q],w0=st[q]||0,in_=P.ef[t]>P.es[t]&&(!prud||regOk(F,t,q));
     let w=in_?(P.vj[t]?Math.min(1,VOL_CIBLE/P.vj[t]):1)/n:0;if(pz&&!w0)w=0;
     if(!w&&!w0)continue;if(!w!==!w0||jour&&Math.abs(w-w0)>.2/n){st[q]=w;o[q]=w}}
   return o}
@@ -683,7 +683,7 @@ const STRAT_PRO={
   // contrôle (tous les points doivent être OUI), les paires les plus fortes sur 3 mois d'abord ; Rocky : gestion du risque du dossier ;
   // sortie : stop 2 × ATR remonté au plus bas des 20 jours, ou clôture sous la MM50 (les gains peuvent courir, les pertes sont coupées).
   A2:{nom:'Agents version 2 (règles du dossier)',txt:'Les six agents avec les règles du dossier : bougies journalières, tendance de fond haussière obligatoire (MM50 > MM200, clôture au-dessus de la MM50, bitcoin au-dessus de sa moyenne 50 jours), déclencheur cassure 20 jours avec volume ou reprise après repli, pas d’entrée la veille d’une annonce de la Fed, 1 % risqué par trade, stop suiveur.',
-    filtre:(F,t,side)=>side!=='short'&&F.reg[t]!==-1&&!FOMC.some(x=>x>F.T[t]&&x-F.T[t]<=24*H1),
+    filtre:(F,t,side,q)=>side!=='short'&&regOk(F,t,q)&&!FOMC.some(x=>x>F.T[t]&&x-F.T[t]<=24*H1),
     entree:(P,i)=>{if(i<205)return null;const a=mmJ(P.jc,i,50),b=mmJ(P.jc,i,200),x=atrJ(P,i),c=P.jc[i];if(!(a&&b&&x&&a>b&&c>a))return null;
       const vm=mmJ(P.jv,i-1,20),casse=c>Math.max(...P.jh.slice(i-20,i))&&vm&&P.jv[i]>vm;let rep=false;
       if(!casse){let touche=false;for(let k=i-3;k<i;k++){const m=mmJ(P.jc,k,20);if(m&&P.jl[k]<=m)touche=true}rep=touche&&c>P.jh[i-1]}
@@ -723,9 +723,9 @@ function reglePro(id){const S=STRAT_PRO[id];return(F,t,st,n)=>{const P0=F.p[F.Q[
       if((v/st._m0-1)>-.06)for(const q of garde)if(!pos[q]){const P=F.p[q],i=I(q),x=P.jc[i],a=atrJ(P,i),rf=a?2*a/x:null;if(!rf)continue;const w=Math.min(.5,(st._risque||PRO_RISQUE)/rf); // 1 % risqué : stop implicite à 2 × ATR journalier
         pos[q]={e:x,rf,w,j:i,t0:P.jt?P.jt[i]:null};o[q]=w}return o}
     for(const q in pos){const P=F.p[q],p=pos[q],i=I(q),x=P.jc[i];p.age=P.jt&&p.t0!=null?Math.round((P.jt[i]-p.t0)/864e5):i-p.j;if(p.side==='short'?x>=p.stop:x<=p.stop){fermer(q,'stop touché (clôture journalière)');continue}const r=S.sortie(P,i,p);if(r)fermer(q,r)}
-    const bloque=(v/st._m0-1)<=-.06?'perte du mois ≥ 6 %':pj<=-.02?'perte du jour ≥ 2 %':S.filtre&&!S.filtre(F,t,'long')&&!S.filtre(F,t,'short')?(F.reg&&F.reg[t]===-1?'marché du bitcoin baissier (sous sa moyenne 50 jours)':FOMC.some(x=>x>F.T[t]&&x-F.T[t]<=24*H1)?`annonce de la Fed le ${new Date(FOMC.find(x=>x>F.T[t])).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',timeZone:'Europe/Paris'})} : pas d’entrée la veille`:'filtre de Pistache (bitcoin ou Fed)'):'';st._bloque=bloque;if(bloque)return o;
+    const bloque=(v/st._m0-1)<=-.06?'perte du mois ≥ 6 %':pj<=-.02?'perte du jour ≥ 2 %':S.filtre&&F.Q.every(q=>!S.filtre(F,t,'long',q)&&!S.filtre(F,t,'short',q))?(F.reg&&F.reg[t]===-1?'marché du bitcoin baissier (sous sa moyenne 50 jours)':FOMC.some(x=>x>F.T[t]&&x-F.T[t]<=24*H1)?`annonce de la Fed le ${new Date(FOMC.find(x=>x>F.T[t])).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',timeZone:'Europe/Paris'})} : pas d’entrée la veille`:'filtre de Pistache (bitcoin ou Fed)'):'';st._bloque=bloque;if(bloque)return o;
     let expo=Object.values(pos).reduce((a,p)=>a+(p.w||0),0),risque=Object.keys(pos).reduce((a,q)=>{const p=pos[q],x=F.p[q].jc[I(q)];return a+Math.max(0,p.w*(p.side==='short'?p.stop-x:x-p.stop)/x)},0);
-    const cands=[];for(const q of F.Q){if(pos[q])continue;const P=F.p[q],i=I(q);if(i<1)continue;const s=S.entree(P,i,F,t);if(s&&(!S.filtre||S.filtre(F,t,s.side||'long')))cands.push({q,P,i,s})}
+    const cands=[];for(const q of F.Q){if(pos[q])continue;const P=F.p[q],i=I(q);if(i<1)continue;const s=S.entree(P,i,F,t);if(s&&(!S.filtre||S.filtre(F,t,s.side||'long',q)))cands.push({q,P,i,s})}
     cands.sort((a,b)=>(b.s.force||0)-(a.s.force||0));
     const RQ=st._risque||PRO_RISQUE;for(const{q,P,i,s}of cands){if(risque+RQ>PRO_RISQUE_TOTAL+1e-9)break;const x=P.jc[i],sh=s.side==='short',rf=(sh?s.stop-x:x-s.stop)/x;if(!(rf>0))continue;
       if(Object.keys(pos).filter(h=>correl(P,i,F.p[h],I(h))>.8).length>=2)continue;
@@ -787,18 +787,21 @@ function pistes(F,c,R){const W=Math.min(TF.W,Math.floor(F.N/4)),N=F.N,cut=W+Math
   return{lignes:L,du:F.T[W],coupe:F.T[cut],au:F.T[N-1]}}
 // Les trois stratégies suivies en détail (onglets du site) : journal de tous les trades sur la longue période, avec la petite analyse.
 const TROIS=['A2','prudente','regime'];
+// Règle du régime du bitcoin : par défaut elle bloque TOUTES les paires quand le bitcoin est sous sa moyenne 50 jours.
+// REG_FX (point du 02/11/2026) : ne l'appliquer qu'aux cryptos, pas à l'euro-dollar (une monnaie ne dépend pas du bitcoin).
+let REG_FX=false;const setRegFx=b=>{REG_FX=!!b};const regOk=(F,t,q)=>!F.reg||F.reg[t]!==-1||(REG_FX&&!!q&&(WL.FOREX.includes(q)||WL.FOREX.includes(q+'T')));
 // Stratégies arrêtées à −15 % dans la mesure sur 5 ans et retirées du suivi (accord de l'utilisateur, 18/10/2026). Elles restent dans la mesure longue.
 const RETIREES=['S1','S3','S4','A3'];
 // « Pourquoi en attente » : pour chaque actif d'un onglet, ce que la stratégie regarde en ce moment, en une phrase.
 // Lecture seule des mêmes indicateurs que la règle (aucune décision ici). Bitcoin sous sa moyenne 50 jours = F.reg -1.
 function attenteStrat(F,t,id,q,acc){const P=F.p[q];if(!P)return'données absentes';const tient=acc&&acc.pos&&acc.pos[q],px=x=>x>=100?Math.round(x).toLocaleString('fr-FR'):(+x).toPrecision(5);const nom=q==='EURUSDT'?'EUR/USD':q.replace('USDT',''),btc=F.reg&&F.reg[t];
   if(id==='regime'||id==='prudente'){if(id==='prudente'&&pauseFed(F.T[t]+TF.bar).pause){const f=pauseFed(F.T[t]+TF.bar);return`${nom} : pause autour de l’annonce de la Fed du ${new Date(f.d).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'})} (de 12 h avant à 6 h après) : aucune nouvelle entrée`}
-    if(btc===-1)return`${nom} : bitcoin sous sa moyenne 50 jours (marché baissier) : rien n’est acheté`;
+    if(!regOk(F,t,q))return`${nom} : bitcoin sous sa moyenne 50 jours (marché baissier) : rien n’est acheté`;
     if(!(P.ef[t]>P.es[t]))return`${nom} : tendance lente baissière (moyenne 50 h sous la moyenne 200 h) : on attend qu’elle remonte`;
     return`${nom} : tendance haussière et bitcoin favorable : ${tient?'détenu':'achat à la prochaine décision'}${id==='prudente'?' (part réduite si le marché est agité)':''}`}
   if(id==='A2'){const i=P.ji?P.ji[t]-1:-1;if(!(i>=205))return`${nom} : pas encore assez de jours d’historique`;const a=mmJ(P.jc,i,50),b=mmJ(P.jc,i,200),c=P.jc[i];
     const p=acc&&acc.st&&acc.st._pos&&acc.st._pos[q];if(p)return`${nom} : détenu (entrée à ${px(p.e)}), stop à ${px(p.stop)} : on sort sous ce stop ou si la clôture repasse sous la MM50`;
-    if(btc===-1)return`${nom} : bitcoin sous sa moyenne 50 jours : aucune entrée`;
+    if(!regOk(F,t,q))return`${nom} : bitcoin sous sa moyenne 50 jours : aucune entrée`;
     {const x=FOMC.find(x=>x>F.T[t]&&x-F.T[t]<=24*H1);if(x)return`${nom} : annonce de la Fed le ${new Date(x).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'})} : aucune entrée avant`}
     if(!(a>b))return`${nom} : tendance de fond baissière (MM50 sous la MM200 journalières) : aucune entrée`;
     if(!(c>a))return`${nom} : clôture sous la MM50 : on attend que le prix repasse au-dessus`;
@@ -819,7 +822,7 @@ function comparer(D5,c,R,tfActuel){const L=[];try{for(const m of[5,10,60]){setTF
 /* MOTEUR-FIN */
 
 const TN='https://testnet.binance.vision',PUB='https://api.binance.com',WSB='wss://stream.binance.com:9443/stream?streams='; // prix publics en lecture seule ; les ordres vont uniquement au testnet (TN)
-const VERSION='2026-10-28 19:07';const TNP=['BTCUSDT','ETHUSDT'];
+const VERSION='2026-11-02 09:07';const TNP=['BTCUSDT','ETHUSDT'];
 // Argent fictif affiché pour un capital de départ de CAPF € : les calculs restent en base 10 000 (tout est proportionnel,
 // frais compris) et chaque montant est ramené à cette base à l'affichage.
 const CAPF=100;

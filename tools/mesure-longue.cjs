@@ -6,7 +6,7 @@
 const fs=require('fs'),path=require('path'),zlib=require('zlib');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 const E=new Function(html.slice(html.indexOf('/* MOTEUR-DEBUT'),html.indexOf('/* MOTEUR-FIN'))+
-  ';return{TF:()=>TF,WL,setTF,agreger,aligner,prep,mesurer,walkForward,robustesse,valeurAgents,familles,pistes,simuler,journalTrois,dsr,fiabilite,sharpe,cleEssai,setEssai:f=>{ESSAI=f}}')();
+  ';return{TF:()=>TF,portefeuille,FAMILLES,setRegFx,WL,setTF,agreger,aligner,prep,mesurer,walkForward,robustesse,valeurAgents,familles,pistes,simuler,journalTrois,dsr,fiabilite,sharpe,cleEssai,setEssai:f=>{ESSAI=f}}')();
 const DIR=process.argv[2]||'forward',G=JSON.parse(fs.readFileSync(path.join(DIR,'config.json'),'utf8')),MOIS=+process.env.MOIS||12,MOIS3=+process.env.MOIS3||60;
 const TF=E.setTF(G.tf),c={...G.cfg,tf:G.tf},R=Object.fromEntries((G.regles||[]).map(k=>[k,1]));
 // Lecteur ZIP minimal : premier fichier de l'archive, méthode « deflate » (celle des fichiers Binance).
@@ -39,7 +39,13 @@ async function chargerFin(q){const out=[],d=new Date();for(let m=MOIS;m>=1;m--){
   let fam3=null,F3x=null;{const T3=E.setTF(60);const D3={};
     if(process.env.FAUX_PRIX){for(const q of Object.keys(al.D))D3[q]=E.agreger(al.D[q].filter((x,i)=>i%12===11).map(x=>({...x})),36e5)}
     else for(const q of L){const a=await charger(q,'1h',MOIS3);if(a.length)D3[q]=a;console.log(q,a.length,'bougies 1 h')}
-    const al3=E.aligner(D3);if(al3&&Object.keys(al3.D).length){const F3=E.prep(al3.D);F3x=F3;fam3={...E.familles(F3,c,R),pairs:F3.Q.length,ecartees:al3.ecartees};const w3=Math.min(T3.W,Math.floor(F3.N/4));fam3.diag60=E.simuler(F3,w3,F3.N,{...c,diag:1},R).diag;fam3.trois16=E.journalTrois(F3,c);{const FQ=['BTCUSDT','EURUSDT'].filter(q=>al3.D[q]);fam3.trois=FQ.length===2?E.journalTrois(E.prep(Object.fromEntries(FQ.map(q=>[q,al3.D[q]]))),c):null;fam3.troisActifs=FQ} // onglets : bitcoin + euro-dollar ; trois16 : toutes les paires, pour comparaison
+    const al3=E.aligner(D3);if(al3&&Object.keys(al3.D).length){const F3=E.prep(al3.D);F3x=F3;fam3={...E.familles(F3,c,R),pairs:F3.Q.length,ecartees:al3.ecartees};const w3=Math.min(T3.W,Math.floor(F3.N/4));fam3.diag60=E.simuler(F3,w3,F3.N,{...c,diag:1},R).diag;fam3.trois16=E.journalTrois(F3,c);{const FQ=['BTCUSDT','EURUSDT'].filter(q=>al3.D[q]);fam3.trois=FQ.length===2?E.journalTrois(E.prep(Object.fromEntries(FQ.map(q=>[q,al3.D[q]]))),c):null;fam3.troisActifs=FQ;
+      // Point du 02/11/2026 : règle du bitcoin appliquée seulement aux cryptos (pas à l'euro-dollar), avant / après, sur BTC + EUR/USD et sur toutes les paires.
+      const Ff=FQ.length===2?E.prep(Object.fromEntries(FQ.map(q=>[q,al3.D[q]]))):null;fam3.regFx={};
+      for(const[lab,FF]of[['focus',Ff],['toutes',F3]]){if(!FF)continue;const W=Math.min(Math.max(E.TF().W,220),Math.floor(FF.N/4));
+        for(const id of['regime','prudente','A2']){const un=b=>{E.setRegFx(b);const x=E.portefeuille(FF,W,FF.N,{...c,risqueEgal:true},E.FAMILLES[id].regle),y=E.portefeuille(FF,W,FF.N,{...c,risqueEgal:true,fee:0,slip:0},E.FAMILLES[id].regle);E.setRegFx(false);
+            return{pnl:x.pnl,dd:x.dd,n:x.n,nT:x.nT,expR:x.expR,arret:x.arret,papier:x.pnlPapier,sansFrais:y.pnl}};fam3.regFx[lab+':'+id]={avant:un(false),apres:un(true)}}}
+      console.log('Règle bitcoin pour les cryptos seulement :',JSON.stringify(Object.fromEntries(Object.entries(fam3.regFx).map(([k,v])=>[k,[Math.round(v.avant.pnl),Math.round(v.apres.pnl)]]))))} // onglets : bitcoin + euro-dollar ; trois16 : toutes les paires, pour comparaison
     fam3.pistes=E.pistes(F3,c,R);console.log('Pistes 5 ans :',fam3.pistes.lignes.map(x=>`${x.id} ${x.pnl.toFixed(0)} $`).join(' | '));
       console.log('Familles 3 ans :',fam3.lignes.map(x=>`${x.nom} ${x.pnl.toFixed(0)} $`).join(' | '))}else console.log('Familles 3 ans : données introuvables');
     E.setTF(G.tf)}
