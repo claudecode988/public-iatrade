@@ -1,9 +1,9 @@
 {
- "maj": 1793577648806,
- "jourCalcul": null,
+ "maj": 1793607693683,
+ "jourCalcul": 1793491200000,
  "strategie": "A2",
  "nom": "Agents version 2 (règles du dossier)",
- "depuis": "2026-10-15T00:00:00Z",
+ "depuis": "2026-11-02T00:00:00Z",
  "actifs": [
   "BTCUSDT",
   "EURUSD"
@@ -13,30 +13,7 @@
  ],
  "propositions": {
   "BTCUSDT": {
-   "jour": 1793491200000,
-   "papier": false,
-   "valeur": 9977.526911855264,
-   "baisse": 0.006626714036805848,
-   "arret": null,
-   "bloque": "marché du bitcoin baissier (sous sa moyenne 50 jours)",
-   "paire": "BTCUSDT",
-   "action": "RIEN",
-   "prix": 78354,
-   "raison": "marché du bitcoin baissier (sous sa moyenne 50 jours)",
-   "suivi": {
-    "fermes": [
-     {
-      "du": 1792281600000,
-      "au": 1792627200000,
-      "entree": 82116,
-      "sortie": 81416.09,
-      "r": -0.2249804953452073,
-      "pnl": -0.002249804953452073,
-      "raison": "clôture sous la MM50 : tendance perdue"
-     }
-    ],
-    "ouvert": null
-   },
+   "erreur": "première proposition après la clôture du 2026-11-02 (journée UTC)",
    "source": "Binance (journalier)",
    "couts": {
     "fee": 0.1,
@@ -45,20 +22,7 @@
    "controle": false
   },
   "EURUSD": {
-   "jour": 1793318400000,
-   "papier": false,
-   "valeur": 10000,
-   "baisse": 0,
-   "arret": null,
-   "bloque": "",
-   "paire": "EURUSD",
-   "action": "RIEN",
-   "prix": 1.1182805299758911,
-   "raison": "aucun signal aujourd’hui",
-   "suivi": {
-    "fermes": [],
-    "ouvert": null
-   },
+   "erreur": "première proposition après la clôture du 2026-11-02 (journée UTC)",
    "source": "Yahoo Finance (journalier, plus haut et plus bas inclus)",
    "couts": {
     "fee": 0,
@@ -67,20 +31,7 @@
    "controle": false
   },
   "ETHUSDT": {
-   "jour": 1793491200000,
-   "papier": false,
-   "valeur": 10000,
-   "baisse": 0,
-   "arret": null,
-   "bloque": "marché du bitcoin baissier (sous sa moyenne 50 jours)",
-   "paire": "ETHUSDT",
-   "action": "RIEN",
-   "prix": 2275.31,
-   "raison": "marché du bitcoin baissier (sous sa moyenne 50 jours)",
-   "suivi": {
-    "fermes": [],
-    "ouvert": null
-   },
+   "erreur": "première proposition après la clôture du 2026-11-02 (journée UTC)",
    "source": "Binance (journalier)",
    "couts": {
     "fee": 0.1,
