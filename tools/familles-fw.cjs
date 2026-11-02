@@ -52,11 +52,13 @@ const resumeCompte=P=>P?{valeur:+(P.val??1e4).toFixed(2),dd:+(P.dd||0).toFixed(4
   // Stratégies journalières (S2, S5, Version 2) : jusqu'au 25/10 elles ne décidaient plus après leur premier jour (numéro de jour figé
   // dans la fenêtre glissante). Leurs comptes repartent de zéro avec le correctif (marque vj).
   for(const k of Object.keys(S.fams)){const id=k.split('~')[0];if(E.FAMILLES[id]&&E.FAMILLES[id].pro&&!S.fams[k].vj)delete S.fams[k]}
+  // Règle du bitcoin appliquée seulement aux cryptos (02/11/2026) : Tendance + bitcoin, Prudente et Version 2 repartent de zéro (marque rf).
+  for(const k of Object.keys(S.fams)){const id=k.split('~')[0];if(['regime','prudente','A2'].includes(id)&&!S.fams[k].rf)delete S.fams[k]}
   for(const k of E.RETIREES)delete S.fams[k];if(S.fams.S5&&!S.fams.S5.v1pc){delete S.fams.S5}
   const IDS=Object.keys(E.FAMILLES).filter(id=>!E.RETIREES.includes(id));
   const comptes=[...IDS.map(id=>[id,id,f,c,F]),...(F2?E.TROIS.flatMap(id=>[[id+'~focus',id,f,c,F2],[id+'~focus~sansfrais',id,0,{...c,fee:0,slip:0},F2]]):[])];
   if(!F2)console.error('Familles : bitcoin ou euro-dollar absent de cette heure : comptes recentrés non mis à jour.');
-  for(const[key,id,f,c,F]of comptes){const i=F.N-1;const fm=E.FAMILLES[id],P=S.fams[key]=S.fams[key]||{v1pc:1,vj:1,debut:now,cash:1e4,pos:{},px:{},st:{},pk:1e4,dd:0,fees:0,n:0};
+  for(const[key,id,f,c,F]of comptes){const i=F.N-1;const fm=E.FAMILLES[id],P=S.fams[key]=S.fams[key]||{v1pc:1,vj:1,rf:1,debut:now,cash:1e4,pos:{},px:{},st:{},pk:1e4,dd:0,fees:0,n:0};
     // positions : valeur mise à jour au prix de clôture ; une paire disparue des données est vendue à son dernier prix connu
     for(const q in P.pos){if(F.p[q]){P.pos[q]*=F.p[q].c[i]/P.px[q];if(P.pos[q]<0&&f>0){const e=-P.pos[q]*E.EMPRUNT_J/24*(S0?Math.max(1,Math.round((tb-S0.lastBar)/H)):1);P.cash-=e;P.fees+=e}}else{const co=Math.abs(P.pos[q])*f;P.cash+=P.pos[q]-co;P.fees+=co;P.n++;ajout({famille:key,paire:q,montant:-P.pos[q],raison:'paire absente des données : vendue au dernier prix connu'});delete P.pos[q]}}
     const v=P.cash+Object.values(P.pos).reduce((a,b)=>a+b,0);P.st._v=v;P.st._f=f;P.st._risque=c.riskPct/100;const w0=P.arret?null:fm.regle(F,i,P.st,F.Q.length,S.h),w=!w0?null:fm.regle.pro||fm.regle.reference?w0:E.plafondRisque(F,i,w0,c,P.pos,v);
