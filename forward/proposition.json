@@ -1,6 +1,6 @@
 {
- "maj": 1793607693683,
- "jourCalcul": 1793491200000,
+ "maj": 1793664022803,
+ "jourCalcul": 1793577600000,
  "strategie": "A2",
  "nom": "Agents version 2 (règles du dossier)",
  "depuis": "2026-11-02T00:00:00Z",
@@ -13,7 +13,20 @@
  ],
  "propositions": {
   "BTCUSDT": {
-   "erreur": "première proposition après la clôture du 2026-11-02 (journée UTC)",
+   "jour": 1793577600000,
+   "papier": false,
+   "valeur": 10000,
+   "baisse": 0,
+   "arret": null,
+   "bloque": "marché du bitcoin baissier (sous sa moyenne 50 jours)",
+   "paire": "BTCUSDT",
+   "action": "RIEN",
+   "prix": 76816,
+   "raison": "marché du bitcoin baissier (sous sa moyenne 50 jours)",
+   "suivi": {
+    "fermes": [],
+    "ouvert": null
+   },
    "source": "Binance (journalier)",
    "couts": {
     "fee": 0.1,
@@ -31,7 +44,20 @@
    "controle": false
   },
   "ETHUSDT": {
-   "erreur": "première proposition après la clôture du 2026-11-02 (journée UTC)",
+   "jour": 1793577600000,
+   "papier": false,
+   "valeur": 10000,
+   "baisse": 0,
+   "arret": null,
+   "bloque": "marché du bitcoin baissier (sous sa moyenne 50 jours)",
+   "paire": "ETHUSDT",
+   "action": "RIEN",
+   "prix": 2253.29,
+   "raison": "marché du bitcoin baissier (sous sa moyenne 50 jours)",
+   "suivi": {
+    "fermes": [],
+    "ouvert": null
+   },
    "source": "Binance (journalier)",
    "couts": {
     "fee": 0.1,
@@ -42,25 +68,25 @@
  },
  "tests": {
   "BTCUSDT": {
-   "du": 1635980400000,
-   "au": 1793574000000,
+   "du": 1636066800000,
+   "au": 1793660400000,
    "lignes": [
     {
      "id": "S2",
      "nom": "S2 · Retour à la moyenne (RSI 2)",
-     "pnl": -14.711622674683895,
+     "pnl": -40.35258159458499,
      "dd": 0.023981527300427963,
      "nT": 121,
      "expR": -0.003511623499955664,
      "wrT": 0.6033057851239669,
      "arret": null,
      "ent": 32.92480303324555,
-     "test": -47.48009841908424,
-     "cout2": -357.875746723912,
-     "sansFrais": 340.5490719991558,
-     "sharpe": -0.0003504434897430918,
-     "chanceGain": 0.46399999999999997,
-     "dd95": 0.08296573952376042
+     "test": -73.03691203354356,
+     "cout2": -382.6079680728035,
+     "sansFrais": 313.96634157807785,
+     "sharpe": -0.0018027007155806472,
+     "chanceGain": 0.46699999999999997,
+     "dd95": 0.08522574211304812
     },
     {
      "id": "A2",
@@ -76,25 +102,25 @@
      "cout2": 1183.6833319696489,
      "sansFrais": 1477.9647289247278,
      "sharpe": 0.02780315901292683,
-     "chanceGain": 0.881,
-     "dd95": 0.140253609136886
+     "chanceGain": 0.877,
+     "dd95": 0.14376036336589262
     },
     {
      "id": "S5",
      "nom": "S5 · Rotation momentum mensuelle",
-     "pnl": 1089.6836150971649,
+     "pnl": 1062.0307049282965,
      "dd": 0.07877106289951488,
      "nT": 5,
      "expR": 2.1811360973227556,
      "wrT": 0.6,
      "arret": null,
-     "ent": 1251.1470629765208,
-     "test": -121.32178165533696,
-     "cout2": 1060.2831140290455,
-     "sansFrais": 1119.1484439221385,
-     "sharpe": 0.018409075061691385,
-     "chanceGain": 0.752,
-     "dd95": 0.22383435871519314
+     "ent": 1226.9655622659047,
+     "test": -113.09783958093612,
+     "cout2": 1032.7344175879625,
+     "sansFrais": 1091.391018894752,
+     "sharpe": 0.018003319968114825,
+     "chanceGain": 0.748,
+     "dd95": 0.22658863518689787
     }
    ]
   },
@@ -156,25 +182,25 @@
    ]
   },
   "ETHUSDT": {
-   "du": 1635980400000,
-   "au": 1793574000000,
+   "du": 1636066800000,
+   "au": 1793660400000,
    "lignes": [
     {
      "id": "S2",
      "nom": "S2 · Retour à la moyenne (RSI 2)",
-     "pnl": -149.1801338150508,
+     "pnl": -157.35933865954394,
      "dd": 0.03323311257724488,
      "nT": 105,
      "expR": -0.017098555808461875,
      "wrT": 0.638095238095238,
      "arret": null,
      "ent": -109.8775255628916,
-     "test": -39.73925333457555,
-     "cout2": -366.0526585431817,
-     "sansFrais": 72.52061989733738,
-     "sharpe": -0.008018217389357402,
-     "chanceGain": 0.351,
-     "dd95": 0.09673677930997078
+     "test": -48.009327709927675,
+     "cout2": -374.0418252258514,
+     "sansFrais": 64.14691957109608,
+     "sharpe": -0.00848629158607892,
+     "chanceGain": 0.355,
+     "dd95": 0.10004863355576259
     },
     {
      "id": "A2",
@@ -189,9 +215,9 @@
      "test": 545.2623963536971,
      "cout2": 704.8299665351187,
      "sansFrais": 852.0894597131701,
-     "sharpe": 0.02067031797037739,
-     "chanceGain": 0.79,
-     "dd95": 0.14474060981616646
+     "sharpe": 0.020670317970377397,
+     "chanceGain": 0.794,
+     "dd95": 0.1404214920242867
     },
     {
      "id": "S5",
@@ -203,12 +229,12 @@
      "wrT": 0.5,
      "arret": "2025-11-04T23:00:00.000Z",
      "ent": -133.46125102125188,
-     "test": -270.5949843155686,
+     "test": -278.58581865140513,
      "cout2": -263.18906694380894,
      "sansFrais": -248.79581623392187,
      "sharpe": -0.002466568549606927,
-     "chanceGain": 0.41700000000000004,
-     "dd95": 0.2867430475553765
+     "chanceGain": 0.406,
+     "dd95": 0.2840467389511688
     }
    ]
   }
