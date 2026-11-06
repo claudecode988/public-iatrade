@@ -1,5 +1,5 @@
 {
- "maj": 1793959224540,
+ "maj": 1793962875594,
  "debut": 1793211782409,
  "geleeLe": "2026-10-28T18:21:56Z",
  "tf": "1 h",
@@ -10,8 +10,8 @@
   "heures",
   "fee"
  ],
- "decisions": 211,
- "passages": 209,
+ "decisions": 212,
+ "passages": 210,
  "trades": 1,
  "frais": 6.02,
  "glissement": 3.01,
@@ -21,9 +21,9 @@
  "gagne": 0,
  "perdu": -25.14,
  "pf": 0,
- "valeur": 9923.61,
+ "valeur": 9940.71,
  "plusHaut": 10086.92,
- "baisse": 0.0162,
+ "baisse": 0.0145,
  "position": {
   "paire": "BCHUSDT",
   "sens": "short",
@@ -33,6 +33,6 @@
  },
  "retardMedianS": 35,
  "retardMaxS": 1382,
- "dernierHash": "5792de99aabadee35c6320789ba8312abe69f6a31864f6541a5637a3b0d0565d",
+ "dernierHash": "2bb2801590204194172143bb5fb3cbf3f7b5da34bededec8e2a18ee3d26bbfde",
  "faux": false
 }
