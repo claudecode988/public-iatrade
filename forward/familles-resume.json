@@ -1,21 +1,21 @@
 {
- "maj": 1794222053946,
+ "maj": 1794225611619,
  "debut": 1792195251497,
- "heure": "2026-11-09T10:00:00.000Z",
+ "heure": "2026-11-09T11:00:00.000Z",
  "pairs": 16,
- "dernierHash": "0858d04389ca22c49116a85a6040f0bcd79fe500dff4463ae512aecfb660bbdd",
+ "dernierHash": "8adb388ba0c0748941c1ea53633876e9c040c5f98442d70823036a519a02ee3f",
  "faux": false,
  "lignes": [
   {
    "id": "tendance",
    "nom": "Suivi de tendance lent",
-   "valeur": 9387.68,
-   "dd": 0.0637,
-   "investi": 0,
-   "n": 52,
-   "frais": 45.45,
+   "valeur": 9386.8,
+   "dd": 0.0638,
+   "investi": 0.063,
+   "n": 53,
+   "frais": 46.33,
    "debut": 1792195251497,
-   "jours": 23.46,
+   "jours": 23.5,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -24,13 +24,13 @@
   {
    "id": "retour",
    "nom": "Retour à la moyenne",
-   "valeur": 9665.79,
+   "valeur": 9676.61,
    "dd": 0.0494,
    "investi": 0.362,
-   "n": 296,
-   "frais": 244.55,
+   "n": 297,
+   "frais": 244.57,
    "debut": 1792195251497,
-   "jours": 23.46,
+   "jours": 23.5,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -39,13 +39,13 @@
   {
    "id": "reeq",
    "nom": "Rééquilibrage hebdomadaire",
-   "valeur": 9155.92,
+   "valeur": 9165.38,
    "dd": 0.1043,
-   "investi": 0.525,
+   "investi": 0.526,
    "n": 35,
    "frais": 9.52,
    "debut": 1792195251497,
-   "jours": 23.46,
+   "jours": 23.5,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -54,13 +54,13 @@
   {
    "id": "bh",
    "nom": "Acheter et garder",
-   "valeur": 8408.41,
+   "valeur": 8436.55,
    "dd": 0.1867,
    "investi": 1.002,
    "n": 16,
    "frais": 15,
    "debut": 1792195251497,
-   "jours": 23.46,
+   "jours": 23.5,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -69,13 +69,13 @@
   {
    "id": "regime",
    "nom": "Tendance lente + régime du bitcoin",
-   "valeur": 9845.07,
-   "dd": 0.0155,
-   "investi": 0,
-   "n": 12,
-   "frais": 11.02,
+   "valeur": 9844.14,
+   "dd": 0.0156,
+   "investi": 0.063,
+   "n": 13,
+   "frais": 11.94,
    "debut": 1793610833695,
-   "jours": 7.07,
+   "jours": 7.12,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -86,12 +86,12 @@
    ],
    "attente": [
     "BTC : bitcoin sous sa moyenne 50 jours (marché baissier) : rien n’est acheté",
-    "EUR/USD : tendance lente baissière (moyenne 50 h sous la moyenne 200 h) : on attend qu’elle remonte"
+    "EUR/USD : tendance haussière (le bitcoin ne compte pas pour une monnaie) : détenu"
    ],
    "focus": {
-    "valeur": 9846.34,
-    "dd": 0.0154,
-    "frais": 31.83,
+    "valeur": 9841.29,
+    "dd": 0.0159,
+    "frais": 36.88,
     "hist": [
      [
       "2026-11-02",
@@ -123,7 +123,7 @@
      ],
      [
       "2026-11-09",
-      9846.34
+      9841.29
      ]
     ],
     "nTrades": 3,
@@ -168,9 +168,16 @@
       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,1 % en 1 jour avant la sortie. Sortie : le bitcoin est passé sous sa moyenne 50 jours : sortie par prudence. Le marché du bitcoin était baissier."
      }
     ],
-    "ouvertes": [],
+    "ouvertes": [
+     {
+      "paire": "EURUSDT",
+      "valeur": 3367.73,
+      "entree": 1.1353,
+      "depuis": 1794225600000
+     }
+    ],
     "debut": 1793610833695,
-    "jours": 7.07,
+    "jours": 7.12,
     "arret": null
    },
    "demo": {
@@ -253,19 +260,26 @@
       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,1 % en 1 jour avant la sortie. Sortie : le bitcoin est passé sous sa moyenne 50 jours : sortie par prudence. Le marché du bitcoin était baissier."
      }
     ],
-    "ouvertes": []
+    "ouvertes": [
+     {
+      "paire": "EURUSDT",
+      "valeur": 3378.56,
+      "entree": 1.1353,
+      "depuis": 1794225600000
+     }
+    ]
    }
   },
   {
    "id": "volcible",
    "nom": "Tendance lente + volatilité cible",
-   "valeur": 9483.52,
-   "dd": 0.0533,
-   "investi": 0,
-   "n": 55,
-   "frais": 41.73,
+   "valeur": 9482.63,
+   "dd": 0.0534,
+   "investi": 0.063,
+   "n": 56,
+   "frais": 42.62,
    "debut": 1792195251497,
-   "jours": 23.46,
+   "jours": 23.5,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -274,13 +288,13 @@
   {
    "id": "prudente",
    "nom": "Prudente (tendance + régime + volatilité cible + pause Fed)",
-   "valeur": 9862.16,
-   "dd": 0.0138,
-   "investi": 0,
-   "n": 12,
-   "frais": 9.87,
+   "valeur": 9861.24,
+   "dd": 0.0139,
+   "investi": 0.063,
+   "n": 13,
+   "frais": 10.8,
    "debut": 1793610833695,
-   "jours": 7.07,
+   "jours": 7.12,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -291,12 +305,12 @@
    ],
    "attente": [
     "BTC : bitcoin sous sa moyenne 50 jours (marché baissier) : rien n’est acheté",
-    "EUR/USD : tendance lente baissière (moyenne 50 h sous la moyenne 200 h) : on attend qu’elle remonte"
+    "EUR/USD : tendance haussière (le bitcoin ne compte pas pour une monnaie) : détenu (part réduite si le marché est agité)"
    ],
    "focus": {
-    "valeur": 9846.34,
-    "dd": 0.0154,
-    "frais": 31.83,
+    "valeur": 9841.29,
+    "dd": 0.0159,
+    "frais": 36.88,
     "hist": [
      [
       "2026-11-02",
@@ -328,7 +342,7 @@
      ],
      [
       "2026-11-09",
-      9846.34
+      9841.29
      ]
     ],
     "nTrades": 3,
@@ -373,9 +387,16 @@
       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,1 % en 1 jour avant la sortie. Sortie : le bitcoin est passé sous sa moyenne 50 jours : sortie par prudence. Le marché du bitcoin était baissier."
      }
     ],
-    "ouvertes": [],
+    "ouvertes": [
+     {
+      "paire": "EURUSDT",
+      "valeur": 3367.73,
+      "entree": 1.1353,
+      "depuis": 1794225600000
+     }
+    ],
     "debut": 1793610833695,
-    "jours": 7.07,
+    "jours": 7.12,
     "arret": null
    },
    "demo": {
@@ -458,7 +479,14 @@
       "pourquoi": "Perte : la tendance s’est retournée peu après l’entrée (faux signal), le prix a baissé de 0,1 % en 1 jour avant la sortie. Sortie : le bitcoin est passé sous sa moyenne 50 jours : sortie par prudence. Le marché du bitcoin était baissier."
      }
     ],
-    "ouvertes": []
+    "ouvertes": [
+     {
+      "paire": "EURUSDT",
+      "valeur": 3378.56,
+      "entree": 1.1353,
+      "depuis": 1794225600000
+     }
+    ]
    }
   },
   {
@@ -470,7 +498,7 @@
    "n": 32,
    "frais": 20.25,
    "debut": 1792195251497,
-   "jours": 23.46,
+   "jours": 23.5,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -485,7 +513,7 @@
    "n": 2,
    "frais": 1.17,
    "debut": 1792195251497,
-   "jours": 23.46,
+   "jours": 23.5,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -494,13 +522,13 @@
   {
    "id": "S2",
    "nom": "S2 · Retour à la moyenne (RSI 2)",
-   "valeur": 10010.98,
+   "valeur": 10020.99,
    "dd": 0.018,
-   "investi": 0.234,
+   "investi": 0.235,
    "n": 28,
    "frais": 30.88,
    "debut": 1792969237038,
-   "jours": 14.5,
+   "jours": 14.54,
    "nT": 13,
    "n30": 13,
    "esp30": 0.0495,
@@ -515,7 +543,7 @@
    "n": 0,
    "frais": 0,
    "debut": 1793610833695,
-   "jours": 7.07,
+   "jours": 7.12,
    "nT": 0,
    "n30": 0,
    "esp30": null,
@@ -570,7 +598,7 @@
     "trades": [],
     "ouvertes": [],
     "debut": 1793610833695,
-    "jours": 7.07,
+    "jours": 7.12,
     "arret": null
    },
    "demo": {
@@ -619,13 +647,13 @@
   {
    "id": "S5",
    "nom": "S5 · Rotation momentum mensuelle",
-   "valeur": 9819.72,
+   "valeur": 9829.53,
    "dd": 0.023,
-   "investi": 0.109,
+   "investi": 0.11,
    "n": 2,
    "frais": 1.87,
    "debut": 1792969237038,
-   "jours": 14.5,
+   "jours": 14.54,
    "nT": 0,
    "n30": 0,
    "esp30": null,
