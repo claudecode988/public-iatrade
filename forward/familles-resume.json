@@ -1,7 +1,7 @@
 {
- "maj": 1794434310635,
+ "maj": 1794434446870,
  "debut": 1792195251497,
- "heure": "2026-11-11T20:00:00.000Z",
+ "heure": "2026-11-11T21:00:00.000Z",
  "pairs": 16,
  "dernierHash": "a34cc2e2af3fde61cbb18d5234097b0e67e868e820f5242c573a22f2d7e2a6d7",
  "faux": false,
@@ -9,7 +9,7 @@
   {
    "id": "tendance",
    "nom": "Suivi de tendance lent",
-   "valeur": 9379.88,
+   "valeur": 9380.02,
    "dd": 0.0651,
    "investi": 0.063,
    "n": 55,
@@ -39,9 +39,9 @@
   {
    "id": "reeq",
    "nom": "Rééquilibrage hebdomadaire",
-   "valeur": 9180.06,
+   "valeur": 9159.1,
    "dd": 0.1111,
-   "investi": 0.527,
+   "investi": 0.526,
    "n": 35,
    "frais": 9.52,
    "debut": 1792195251497,
@@ -54,7 +54,7 @@
   {
    "id": "bh",
    "nom": "Acheter et garder",
-   "valeur": 8464.96,
+   "valeur": 8429.88,
    "dd": 0.1931,
    "investi": 1.002,
    "n": 16,
@@ -301,7 +301,7 @@
   {
    "id": "volcible",
    "nom": "Tendance lente + volatilité cible",
-   "valeur": 9474.18,
+   "valeur": 9474.26,
    "dd": 0.0546,
    "investi": 0.034,
    "n": 58,
@@ -578,9 +578,9 @@
   {
    "id": "S2",
    "nom": "S2 · Retour à la moyenne (RSI 2)",
-   "valeur": 10010.28,
+   "valeur": 9998.05,
    "dd": 0.0196,
-   "investi": 0.234,
+   "investi": 0.233,
    "n": 28,
    "frais": 30.88,
    "debut": 1792969237038,
@@ -719,9 +719,9 @@
   {
    "id": "S5",
    "nom": "S5 · Rotation momentum mensuelle",
-   "valeur": 9841.56,
+   "valeur": 9832.41,
    "dd": 0.0236,
-   "investi": 0.111,
+   "investi": 0.11,
    "n": 2,
    "frais": 1.87,
    "debut": 1792969237038,
