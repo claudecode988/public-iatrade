@@ -1,15 +1,15 @@
 {
- "maj": 1794510964568,
- "du": 1793906164568,
- "au": 1794510964568,
+ "maj": 1794514615559,
+ "du": 1793909815559,
+ "au": 1794514615559,
  "verif": {
   "agents": {
    "ok": true,
-   "n": 369
+   "n": 370
   },
   "familles": {
    "ok": true,
-   "n": 749
+   "n": 750
   }
  },
  "agents": {
@@ -62,34 +62,34 @@
    "id": "prudente",
    "nom": "Prudente (tendance + régime + volatilité cible + pause Fed)",
    "note": "bitcoin + euro-dollar, avec frais",
-   "n": 3,
+   "n": 2,
    "gagnants": 0,
    "reussite": 0,
    "gainMoy": 0,
-   "perteMoy": -65.55782543035615,
-   "esperance": -65.55782543035615,
-   "total": -196.67347629106843,
+   "perteMoy": -45.99820036672779,
+   "esperance": -45.99820036672779,
+   "total": -91.99640073345557,
    "erreurs": [
     {
      "cause": "faux signal (tendance retournée juste après l’entrée)",
-     "n": 3
+     "n": 2
     }
    ],
    "action": "Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4).",
    "demo": {
     "nom": "Prudente (tendance + régime + volatilité cible + pause Fed)",
     "note": "démo sans frais",
-    "n": 3,
+    "n": 2,
     "gagnants": 0,
     "reussite": 0,
     "gainMoy": 0,
-    "perteMoy": -56.31147429502706,
-    "esperance": -56.31147429502706,
-    "total": -168.93442288508118,
+    "perteMoy": -34.7704144535071,
+    "esperance": -34.7704144535071,
+    "total": -69.5408289070142,
     "erreurs": [
      {
       "cause": "faux signal (tendance retournée juste après l’entrée)",
-      "n": 3
+      "n": 2
      }
     ],
     "action": "Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4)."
@@ -99,34 +99,34 @@
    "id": "regime",
    "nom": "Tendance lente + régime du bitcoin",
    "note": "bitcoin + euro-dollar, avec frais ; mêmes trades que « Prudente (tendance + régime + volatilité cible + pause Fed) »",
-   "n": 3,
+   "n": 2,
    "gagnants": 0,
    "reussite": 0,
    "gainMoy": 0,
-   "perteMoy": -65.55782543035615,
-   "esperance": -65.55782543035615,
-   "total": -196.67347629106843,
+   "perteMoy": -45.99820036672779,
+   "esperance": -45.99820036672779,
+   "total": -91.99640073345557,
    "erreurs": [
     {
      "cause": "faux signal (tendance retournée juste après l’entrée)",
-     "n": 3
+     "n": 2
     }
    ],
    "action": "Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4).",
    "demo": {
     "nom": "Tendance lente + régime du bitcoin",
     "note": "démo sans frais",
-    "n": 3,
+    "n": 2,
     "gagnants": 0,
     "reussite": 0,
     "gainMoy": 0,
-    "perteMoy": -56.31147429502706,
-    "esperance": -56.31147429502706,
-    "total": -168.93442288508118,
+    "perteMoy": -34.7704144535071,
+    "esperance": -34.7704144535071,
+    "total": -69.5408289070142,
     "erreurs": [
      {
       "cause": "faux signal (tendance retournée juste après l’entrée)",
-      "n": 3
+      "n": 2
      }
     ],
     "action": "Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4)."
