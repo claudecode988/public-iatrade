@@ -1,38 +1,34 @@
 {
- "maj": 1794572853285,
- "du": 1793968053285,
- "au": 1794572853285,
+ "maj": 1794576487616,
+ "du": 1793971687616,
+ "au": 1794576487616,
  "verif": {
   "agents": {
    "ok": true,
-   "n": 388
+   "n": 389
   },
   "familles": {
    "ok": true,
-   "n": 764
+   "n": 765
   }
  },
  "agents": {
   "nom": "Agents actuels",
   "note": "avec frais",
-  "n": 3,
+  "n": 2,
   "gagnants": 1,
-  "reussite": 0.3333333333333333,
+  "reussite": 0.5,
   "gainMoy": 258.1902,
-  "perteMoy": -43.0071,
-  "esperance": 57.391999999999996,
-  "total": 172.176,
+  "perteMoy": -20.9973,
+  "esperance": 118.59645,
+  "total": 237.1929,
   "erreurs": [
-   {
-    "cause": "stop touché",
-    "n": 1
-   },
    {
     "cause": "mauvaise entrée",
     "n": 1
    }
   ],
-  "action": "Stop trop serré par rapport aux mouvements normaux : vérifier qu’il est au moins à 2 × la variation moyenne (ATR)."
+  "action": "Entrées trop tôt : demander une confirmation de plus avant d’entrer (liste de contrôle 3 sur 4)."
  },
  "strategies": [
   {
