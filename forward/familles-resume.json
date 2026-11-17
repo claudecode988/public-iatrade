@@ -1,9 +1,9 @@
 {
- "maj": 1794913079566,
+ "maj": 1794913218702,
  "debut": 1792195251497,
- "heure": "2026-11-17T09:00:00.000Z",
+ "heure": "2026-11-17T10:00:00.000Z",
  "pairs": 16,
- "dernierHash": "31ed51dacd5907cb7d2fdc4dde196243855d9b28a1ce803e5104bf075db50e8b",
+ "dernierHash": "62853519e1fb68da5174266433802dfc1921069b655dbbb64614dabad0373948",
  "faux": false,
  "lignes": [
   {
@@ -24,11 +24,11 @@
   {
    "id": "retour",
    "nom": "Retour à la moyenne",
-   "valeur": 9432.32,
+   "valeur": 9428.79,
    "dd": 0.0902,
-   "investi": 0,
-   "n": 382,
-   "frais": 306.56,
+   "investi": 0.25,
+   "n": 386,
+   "frais": 310.1,
    "debut": 1792195251497,
    "jours": 31.46,
    "nT": 0,
@@ -54,7 +54,7 @@
   {
    "id": "bh",
    "nom": "Acheter et garder",
-   "valeur": 7514.69,
+   "valeur": 7469.57,
    "dd": 0.2978,
    "investi": 1.002,
    "n": 16,
@@ -674,7 +674,7 @@
   {
    "id": "S2",
    "nom": "S2 · Retour à la moyenne (RSI 2)",
-   "valeur": 9726.72,
+   "valeur": 9722.95,
    "dd": 0.0457,
    "investi": 0.044,
    "n": 36,
@@ -863,9 +863,9 @@
   {
    "id": "S5",
    "nom": "S5 · Rotation momentum mensuelle",
-   "valeur": 9705.86,
+   "valeur": 9698.47,
    "dd": 0.0393,
-   "investi": 0.099,
+   "investi": 0.098,
    "n": 2,
    "frais": 1.87,
    "debut": 1792969237038,
