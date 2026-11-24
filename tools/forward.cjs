@@ -58,7 +58,7 @@ const BASES=['https://data-api.binance.vision','https://api.binance.com'],FNG='h
   const d0=new Date(now).toISOString().slice(0,10);if(S.day!==d0){S.day=d0;S.nToday=0;S.lossToday=0}
   const cloturer=(price,raison,jid,t)=>{const P=S.pos,r=E.fermer(P,price,c);S.frais=(S.frais||0)+P.fe+r.xf;S.gliss=(S.gliss||0)+r.slip;S.cash+=P.size+r.g-r.xf;S.trades.push(+r.pnl.toFixed(4));S.lossToday+=r.pnl;S.nToday+=P.nb;S.lastX=t;
     const res={statut:'trade clos',net:+r.pnl.toFixed(4),frais:+(P.fe+r.xf).toFixed(4),glissement:+r.slip.toFixed(4),prixSortie:r.fx,raison};
-    if(r.pnl<0)Object.assign(res,analysePerte(P,r,price,raison,t));resultat(P.jid,res);resultat(jid,res);S.pos=null};
+    Object.assign(res,r.pnl<0?analysePerte(P,r,price,raison,t):analyseGain(P,r,price,raison,t));resultat(P.jid,res);resultat(jid,res);S.pos=null};
   // Analyse automatique de chaque perte (demandée par l'utilisateur) : cause principale et contexte, écrite dans le journal.
   // Elle ne modifie jamais les règles : une correction n'est proposée que si la même cause revient, testée sur 5 ans, et appliquée avec accord.
   const analysePerte=(P,r,price,raison,t)=>{const sg=P.side==='long'?1:-1,mv=sg*(price/P.px-1),brut=sg*P.n*(price-P.px),couts=brut-r.pnl,min=Math.round((t-P.t0)/6e4),
@@ -70,15 +70,22 @@ const BASES=['https://data-api.binance.vision','https://api.binance.com'],FNG='h
     else{cause='mauvaise entrée';txt=`le prix est allé contre la position (${pc(mv)}) pendant ${min} min avant la sortie sur signal inversé`}
     if(tend&&tend!==sg)txt+=` ; à l'entrée, la tendance d'une heure allait dans l'autre sens (trade à contre-tendance)`;
     return{cause,analyse:`Perte de ${(-r.pnl/100).toFixed(2)} € (base 100 €) : ${txt}.`,dureeMin:min}};
+  // Même chose pour chaque gain (demandé par l'utilisateur) : ce qui a marché, pour ne pas confondre chance et règle. Texte seulement.
+  const analyseGain=(P,r,price,raison,t)=>{const sg=P.side==='long'?1:-1,mv=sg*(price/P.px-1),brut=sg*P.n*(price-P.px),couts=brut-r.pnl,min=Math.round((t-P.t0)/6e4),
+      X=F.p[P.q],tend=X?X.tr4[i]:0,pc=x=>(x*100).toFixed(2).replace('.',',')+' %',h=min>=120?`${Math.round(min/60)} h`:`${min} min`;
+    let txt=`le prix est allé dans le sens du pari (${P.side==='long'?'hausse':'baisse'}) de ${pc(mv)} en ${h}, sortie sur ${raison}`;
+    if(brut>0)txt+=` ; les frais et le glissement ont pris ${Math.round(100*couts/brut)} % du gain brut`;
+    if(tend&&tend===sg)txt+=` ; la tendance d'une heure allait aussi dans ce sens à la sortie`;
+    return{cause:/stop/.test(raison)?'stop touché en gain':'sortie sur signal',analyse:`Gain de ${(r.pnl/100).toFixed(2)} € (base 100 €) : ${txt}. Un seul gain ne prouve pas que la règle marche : seul le total sur plusieurs semaines compte.`,dureeMin:min}};
   // 1. Stops sur chaque bougie écoulée depuis le passage précédent (plus bas / plus haut), dans l'ordre.
   if(S.pos){const k0=F.T.findIndex(t=>t>Math.max(S.lastBar,S.pos.t0));for(let k=k0<0?i+1:k0;k<=i&&S.pos;k++){const x=F.p[S.pos.q]&&F.p[S.pos.q].C[k];if(!x)continue;
       const hit=E.stopTick(S.pos,x.l,x.h,R,x.o);if(hit!==null){const jid=ajout({k:'decision',agent:'Bouclier',type:'sortie',paire:S.pos.q,sens:S.pos.side,raison:`stop touché dans la bougie de ${new Date(F.T[k]).toISOString().slice(11,16)} UTC (vérifié au passage suivant)`,confiance:null,prix:{stop:S.pos.stop},trade:S.pos.jid});cloturer(hit,'stop',jid,F.T[k])}}}
   // 2. Une décision sur la dernière bougie fermée.
-  const ord=F.Q.slice().sort((x,y)=>Math.abs(E.sigAt(F.p[y],i,R).sc)-Math.abs(E.sigAt(F.p[x],i,R).sc)),P=S.pos,{b}=E.choisir(F,i,c,R),q=P?P.q:b?b.q:ord[0],Pq=F.p[q],s=E.sigAt(Pq,i,R);
+  const ord=F.Q.slice().sort((x,y)=>Math.abs(E.sigAt(F.p[y],i,R).sc)-Math.abs(E.sigAt(F.p[x],i,R).sc)),P=S.pos,{b,refus}=E.choisir(F,i,c,R),q=P?P.q:b?b.q:ord[0],Pq=F.p[q],s=E.sigAt(Pq,i,R);
   const entrees=qq=>{const X=F.p[qq],z=E.sigAt(X,i,R);return{bougie:new Date(tb+TF.bar).toISOString(),prisme:{note:+z.sc.toFixed(4),tendance:X.tr4[i],cassure:X.brk[i],regimeRSI:X.rr[i],volume:+X.vr[i].toFixed(3),atr:+X.atrP[i].toFixed(5)},radar:{actualite:news,valeur:radar},bouclier:{tradesJour:S.nToday,solde:+S.cash.toFixed(2)}}};
   if(P){const r=E.sortieCloture(F,P,i,c,R);if(r){const jid=ajout({k:'decision',agent:'Boussole',type:'sortie',paire:q,sens:P.side,raison:r,confiance:Math.round(s.pr*100),prix:{cloture:Pq.c[i]},entrees:entrees(q),trade:P.jid});cloturer(Pq.c[i],r,jid,tb)}
     else ajout({k:'decision',agent:'Boussole',type:'abstention',paire:q,sens:P.side,raison:'position ouverte, rien à changer',confiance:Math.round(s.pr*100),prix:{cloture:Pq.c[i]},entrees:entrees(q)})}
-  else if(!b)ajout({k:'decision',agent:'Boussole',type:'abstention',paire:q,sens:s.dir,raison:`aucune paire ne passe à la fois le seuil de ${c.thr} % et les règles (indice le plus haut : ${q} ${Math.round(s.pr*100)} %)`,confiance:Math.round(s.pr*100),prix:{cloture:Pq.c[i]},entrees:entrees(q)});
+  else if(!b)ajout({k:'decision',agent:'Boussole',type:'abstention',paire:q,sens:s.dir,raison:`aucune paire ne passe à la fois le seuil de ${c.thr} % et les règles (indice le plus haut : ${q} ${Math.round(s.pr*100)} %)`+((refus||[]).length?` ; au-dessus du seuil mais bloquées par une règle : ${refus.slice().sort((x,y)=>y.pr-x.pr).slice(0,3).map(x=>`${x.q} ${Math.round(x.pr*100)} % (${x.r})`).join(', ')}`:''),confiance:Math.round(s.pr*100),prix:{cloture:Pq.c[i]},entrees:entrees(q)});
   else{const v=S.cash,pk=Math.max(S.pk,v),rk=E.risque(c,v,pk,E.distanceStop(F,b.q,i,c,R));
     let veto=R.cool&&(tb-S.lastX)/TF.bar<4?'repos après la dernière sortie':R.serie&&E.pauseSerie(S.trades,S.lastX,tb)?'3 pertes de suite : pause de 12 h':S.nToday+c.nb>c.maxTrades?'maximum de trades par jour':-S.lossToday>=S.start*c.maxLoss/100?'perte maximale du jour':!rk.ok?rk.regle:S.cash<rk.taille*(1+c.fee/100)?'solde fictif insuffisant':'';
     const jid=ajout({k:'decision',agent:'Boussole',type:'entrée',paire:b.q,sens:b.dir,raison:`indice ${Math.round(b.pr*100)} %, au-dessus du seuil de ${c.thr} %`,confiance:Math.round(b.pr*100),prix:{cloture:F.p[b.q].c[i]},entrees:entrees(b.q)});
