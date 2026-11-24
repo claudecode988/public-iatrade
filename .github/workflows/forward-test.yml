@@ -1,8 +1,9 @@
 # Forward test 24 h/24 : le même moteur que le site décide sur chaque bougie fermée avec la configuration gelée de
 # forward/config.json (branche forward-test). Argent fictif, aucun ordre, aucune clé.
 # Les familles de stratégies sont suivies en parallèle (tools/familles-fw.cjs, une décision par heure fermée).
-# GitHub retarde souvent les tâches programmées : chaque tâche reste donc active environ 50 minutes et vérifie chaque
-# minute si une nouvelle bougie s'est fermée ; une nouvelle tâche est demandée tous les quarts d'heure (une seule à la fois).
+# GitHub retarde ou saute souvent les tâches programmées : chaque tâche reste donc active environ 5 h 30 et vérifie chaque
+# minute si une nouvelle bougie s'est fermée, puis demande elle-même la tâche suivante (relance automatique).
+# La programmation tous les quarts d'heure reste en secours si une relance se perd (une seule tâche à la fois).
 name: Forward test 24 h/24
 on:
   schedule:
@@ -10,13 +11,15 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  actions: write
 concurrency:
-  group: forward-test
+  # nouveau nom de groupe : une tâche fantôme bloquée depuis le 11/11 (impossible à annuler) occupait l'ancien
+  group: forward-test-v2
   cancel-in-progress: false
 jobs:
   passage:
     runs-on: ubuntu-latest
-    timeout-minutes: 58
+    timeout-minutes: 350
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,12 +31,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Décisions sur chaque bougie fermée pendant environ 50 minutes
+      - name: Décisions sur chaque bougie fermée pendant environ 5 h 30
         run: |
           cd data
           git config user.name "forward-test"
           git config user.email "forward-test@users.noreply.github.com"
-          fin=$(( $(date +%s) + 50*60 ))
+          fin=$(( $(date +%s) + 330*60 ))
           # En cas de conflit avec la branche distante : on abandonne le rebase et on repart de la version distante
           # (les programmes reprennent là où l'état enregistré s'est arrêté). Jamais de fichier en conflit enregistré.
           sync() { git pull -q --rebase origin forward-test || { git rebase --abort 2>/dev/null; git fetch -q origin forward-test && git reset -q --hard origin/forward-test; return 1; }; }
@@ -51,3 +54,13 @@ jobs:
             fi
             sleep 60
           done
+      - name: Relance automatique de la tâche suivante
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for k in 1 2 3; do
+            gh workflow run forward-test.yml --repo "${{ github.repository }}" --ref main && exit 0
+            sleep 10
+          done
+          echo "::warning::relance impossible : la programmation tous les quarts d'heure prendra le relais"
