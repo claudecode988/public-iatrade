@@ -1,6 +1,6 @@
 {
- "maj": 1795564814887,
- "jourCalcul": null,
+ "maj": 1795565739109,
+ "jourCalcul": 1795478400000,
  "strategie": "A2",
  "nom": "Agents version 2 (règles du dossier)",
  "depuis": "2026-11-02T00:00:00Z",
@@ -35,9 +35,26 @@
    "controle": false
   },
   "EURUSD": {
+   "jour": 1795478400000,
+   "papier": false,
+   "valeur": 10000,
+   "baisse": 0,
+   "arret": null,
+   "bloque": "",
    "paire": "EURUSD",
-   "erreur": "données insuffisantes (dernière journée pas encore publiée par les sources) : nouvel essai dans 15 min",
-   "source": "Yahoo Finance : dernière journée 2026-11-23, en retard ; Stooq : réponse inutilisable ; BCE injoignable"
+   "action": "RIEN",
+   "prix": 1.090809941291809,
+   "raison": "aucun signal aujourd’hui",
+   "suivi": {
+    "fermes": [],
+    "ouvert": null
+   },
+   "source": "Yahoo Finance (journalier, plus haut et plus bas inclus)",
+   "couts": {
+    "fee": 0,
+    "slip": 0.02
+   },
+   "controle": false
   },
   "ETHUSDT": {
    "jour": 1795478400000,
@@ -120,6 +137,63 @@
     }
    ]
   },
+  "EURUSD": {
+   "du": 1574290800000,
+   "au": 1795561200000,
+   "lignes": [
+    {
+     "id": "S2",
+     "nom": "S2 · Retour à la moyenne (RSI 2)",
+     "pnl": -180.58294455502983,
+     "dd": 0.0405896266987148,
+     "nT": 131,
+     "expR": -0.01989467617021455,
+     "wrT": 0.5877862595419847,
+     "arret": null,
+     "ent": 25.1255150713514,
+     "test": -203.35997466482513,
+     "cout2": -366.27475212895297,
+     "sansFrais": 8.657087024101202,
+     "sharpe": -0.012279821463335571,
+     "chanceGain": 0.28800000000000003,
+     "dd95": 0.08654077064945197
+    },
+    {
+     "id": "A2",
+     "nom": "Agents version 2 (règles du dossier)",
+     "pnl": 9.292165671879047,
+     "dd": 0.03880263609067872,
+     "nT": 19,
+     "expR": -0.0480353033626943,
+     "wrT": 0.2631578947368421,
+     "arret": null,
+     "ent": -11.538455981139123,
+     "test": 20.854684739206277,
+     "cout2": -28.51613239825383,
+     "sansFrais": 47.23624584934805,
+     "sharpe": 0.0010180328240377062,
+     "chanceGain": 0.514,
+     "dd95": 0.07727892749733624
+    },
+    {
+     "id": "S5",
+     "nom": "S5 · Rotation momentum mensuelle",
+     "pnl": 72.89621868440736,
+     "dd": 0.06642166652090022,
+     "nT": 10,
+     "expR": -0.0998190898876179,
+     "wrT": 0.2,
+     "arret": null,
+     "ent": -158.0381056797014,
+     "test": 236.81966298779662,
+     "cout2": 52.76452507801332,
+     "sansFrais": 93.06418923329329,
+     "sharpe": 0.0033620087335701297,
+     "chanceGain": 0.524,
+     "dd95": 0.12117350206202379
+    }
+   ]
+  },
   "ETHUSDT": {
    "du": 1637967600000,
    "au": 1795561200000,
@@ -178,6 +252,14 @@
    ]
   }
  },
- "controleEURUSDT": null,
+ "controleEURUSDT": {
+  "jour": 1795478400000,
+  "binance": 1.0974,
+  "reference": 1.090809941291809,
+  "ecart": 0.006041436238091613,
+  "ecartMax30j": 0.028096232726851023,
+  "source": "Yahoo Finance (journalier, plus haut et plus bas inclus)",
+  "alerte": "écart de plus de 1 % entre Binance EURUSDT et le vrai taux : les trades des agents sur l’euro-dollar sont à lire avec prudence"
+ },
  "faux": false
 }
