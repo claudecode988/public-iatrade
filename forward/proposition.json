@@ -1,6 +1,6 @@
 {
- "maj": 1795565739109,
- "jourCalcul": 1795478400000,
+ "maj": 1795651216654,
+ "jourCalcul": 1795564800000,
  "strategie": "A2",
  "nom": "Agents version 2 (règles du dossier)",
  "depuis": "2026-11-02T00:00:00Z",
@@ -13,7 +13,7 @@
  ],
  "propositions": {
   "BTCUSDT": {
-   "jour": 1795478400000,
+   "jour": 1795564800000,
    "papier": false,
    "valeur": 10000,
    "baisse": 0,
@@ -21,7 +21,7 @@
    "bloque": "marché du bitcoin baissier (sous sa moyenne 50 jours)",
    "paire": "BTCUSDT",
    "action": "RIEN",
-   "prix": 59832,
+   "prix": 60458.01,
    "raison": "marché du bitcoin baissier (sous sa moyenne 50 jours)",
    "suivi": {
     "fermes": [],
@@ -35,7 +35,7 @@
    "controle": false
   },
   "EURUSD": {
-   "jour": 1795478400000,
+   "jour": 1795564800000,
    "papier": false,
    "valeur": 10000,
    "baisse": 0,
@@ -43,13 +43,13 @@
    "bloque": "",
    "paire": "EURUSD",
    "action": "RIEN",
-   "prix": 1.090809941291809,
+   "prix": 1.0935,
    "raison": "aucun signal aujourd’hui",
    "suivi": {
     "fermes": [],
     "ouvert": null
    },
-   "source": "Yahoo Finance (journalier, plus haut et plus bas inclus)",
+   "source": "BCE via frankfurter.app (clôture seule : plus haut et plus bas inconnus) — Yahoo Finance : dernière journée 2026-11-24, en retard ; Stooq : réponse inutilisable",
    "couts": {
     "fee": 0,
     "slip": 0.02
@@ -57,7 +57,7 @@
    "controle": false
   },
   "ETHUSDT": {
-   "jour": 1795478400000,
+   "jour": 1795564800000,
    "papier": false,
    "valeur": 10000,
    "baisse": 0,
@@ -65,7 +65,7 @@
    "bloque": "marché du bitcoin baissier (sous sa moyenne 50 jours)",
    "paire": "ETHUSDT",
    "action": "RIEN",
-   "prix": 1680.11,
+   "prix": 1692.65,
    "raison": "marché du bitcoin baissier (sous sa moyenne 50 jours)",
    "suivi": {
     "fermes": [],
@@ -81,8 +81,8 @@
  },
  "tests": {
   "BTCUSDT": {
-   "du": 1637967600000,
-   "au": 1795561200000,
+   "du": 1638054000000,
+   "au": 1795647600000,
    "lignes": [
     {
      "id": "S2",
@@ -93,13 +93,13 @@
      "expR": -0.00015324305770050633,
      "wrT": 0.6033057851239669,
      "arret": null,
-     "ent": 143.43910377573047,
+     "ent": 148.02724695075085,
      "test": -132.86395322796488,
      "cout2": -331.1643133850921,
      "sansFrais": 369.7043712279392,
      "sharpe": 0.0012309467794361217,
-     "chanceGain": 0.522,
-     "dd95": 0.08097486103229519
+     "chanceGain": 0.528,
+     "dd95": 0.08053954067176178
     },
     {
      "id": "A2",
@@ -110,93 +110,93 @@
      "expR": 0.5232769342055223,
      "wrT": 0.36,
      "arret": null,
-     "ent": 1568.9802731272666,
+     "ent": 1577.5383450232403,
      "test": -148.86408986230344,
      "cout2": 1183.6833319696489,
      "sansFrais": 1477.9647289247278,
-     "sharpe": 0.027803159012926813,
-     "chanceGain": 0.869,
-     "dd95": 0.1395904702573716
+     "sharpe": 0.027803159012926806,
+     "chanceGain": 0.866,
+     "dd95": 0.1457520003092465
     },
     {
      "id": "S5",
      "nom": "S5 · Rotation momentum mensuelle",
-     "pnl": 957.6326851439098,
+     "pnl": 969.0985018010906,
      "dd": 0.09781207075576909,
      "nT": 4,
      "expR": 3.185615632314433,
      "wrT": 0.75,
      "arret": null,
-     "ent": 1750.9430990355431,
-     "test": -620.2683060588424,
-     "cout2": 931.8641892807518,
-     "sansFrais": 983.4493185881183,
-     "sharpe": 0.01647371558583764,
-     "chanceGain": 0.755,
-     "dd95": 0.21970624622584403
+     "ent": 1761.234056590849,
+     "test": -604.9425957948552,
+     "cout2": 943.2898293952949,
+     "sansFrais": 994.9554152825149,
+     "sharpe": 0.016642424537259667,
+     "chanceGain": 0.735,
+     "dd95": 0.22105780199704314
     }
    ]
   },
   "EURUSD": {
-   "du": 1574290800000,
-   "au": 1795561200000,
+   "du": 1606518000000,
+   "au": 1795647600000,
    "lignes": [
     {
      "id": "S2",
      "nom": "S2 · Retour à la moyenne (RSI 2)",
-     "pnl": -180.58294455502983,
-     "dd": 0.0405896266987148,
-     "nT": 131,
-     "expR": -0.01989467617021455,
-     "wrT": 0.5877862595419847,
+     "pnl": -36.827816979026466,
+     "dd": 0.027275155249175332,
+     "nT": 91,
+     "expR": -0.043384171090242875,
+     "wrT": 0.5494505494505495,
      "arret": null,
-     "ent": 25.1255150713514,
-     "test": -203.35997466482513,
-     "cout2": -366.27475212895297,
-     "sansFrais": 8.657087024101202,
-     "sharpe": -0.012279821463335571,
-     "chanceGain": 0.28800000000000003,
-     "dd95": 0.08654077064945197
+     "ent": -67.65289195903824,
+     "test": 31.035035973578488,
+     "cout2": -187.10984822562023,
+     "sansFrais": 115.73534000616564,
+     "sharpe": -0.0027844749206801037,
+     "chanceGain": 0.45399999999999996,
+     "dd95": 0.05540288478270109
     },
     {
      "id": "A2",
      "nom": "Agents version 2 (règles du dossier)",
-     "pnl": 9.292165671879047,
-     "dd": 0.03880263609067872,
-     "nT": 19,
-     "expR": -0.0480353033626943,
-     "wrT": 0.2631578947368421,
+     "pnl": -244.1506696693541,
+     "dd": 0.03652368587842141,
+     "nT": 24,
+     "expR": -0.39642576065808804,
+     "wrT": 0.16666666666666666,
      "arret": null,
-     "ent": -11.538455981139123,
-     "test": 20.854684739206277,
-     "cout2": -28.51613239825383,
-     "sansFrais": 47.23624584934805,
-     "sharpe": 0.0010180328240377062,
-     "chanceGain": 0.514,
-     "dd95": 0.07727892749733624
+     "ent": -273.0788905229638,
+     "test": 29.7403675099431,
+     "cout2": -290.88052416810024,
+     "sansFrais": -197.20531949588622,
+     "sharpe": -0.017328392464798403,
+     "chanceGain": 0.251,
+     "dd95": 0.09195497722247678
     },
     {
      "id": "S5",
      "nom": "S5 · Rotation momentum mensuelle",
-     "pnl": 72.89621868440736,
-     "dd": 0.06642166652090022,
-     "nT": 10,
-     "expR": -0.0998190898876179,
-     "wrT": 0.2,
+     "pnl": -76.1243728823465,
+     "dd": 0.06445011809927059,
+     "nT": 7,
+     "expR": -0.7817736841441663,
+     "wrT": 0.14285714285714285,
      "arret": null,
-     "ent": -158.0381056797014,
-     "test": 236.81966298779662,
-     "cout2": 52.76452507801332,
-     "sansFrais": 93.06418923329329,
-     "sharpe": 0.0033620087335701297,
-     "chanceGain": 0.524,
-     "dd95": 0.12117350206202379
+     "ent": -352.9616113321172,
+     "test": 286.96603796555974,
+     "cout2": -90.01224139016995,
+     "sansFrais": -62.219825591493645,
+     "sharpe": -0.0026003196924611043,
+     "chanceGain": 0.45899999999999996,
+     "dd95": 0.11427917476873621
     }
    ]
   },
   "ETHUSDT": {
-   "du": 1637967600000,
-   "au": 1795561200000,
+   "du": 1638054000000,
+   "au": 1795647600000,
    "lignes": [
     {
      "id": "S2",
@@ -211,9 +211,9 @@
      "test": -107.36029338794833,
      "cout2": -428.0080425733049,
      "sansFrais": 4.620986034227826,
-     "sharpe": -0.011792787313059331,
-     "chanceGain": 0.28600000000000003,
-     "dd95": 0.10109454374001546
+     "sharpe": -0.01179278731305933,
+     "chanceGain": 0.30900000000000005,
+     "dd95": 0.10298339752309249
     },
     {
      "id": "A2",
@@ -229,8 +229,8 @@
      "cout2": 704.8299665351187,
      "sansFrais": 852.0894597131701,
      "sharpe": 0.020670317970377397,
-     "chanceGain": 0.8049999999999999,
-     "dd95": 0.14415777923457487
+     "chanceGain": 0.79,
+     "dd95": 0.14485364503097314
     },
     {
      "id": "S5",
@@ -242,23 +242,23 @@
      "wrT": 0.5,
      "arret": "2025-11-04T23:00:00.000Z",
      "ent": -93.73366495955997,
-     "test": -486.5870186793418,
+     "test": -482.0363800521209,
      "cout2": -224.87687075234498,
      "sansFrais": -208.63859685941134,
      "sharpe": -0.0017931109009540066,
-     "chanceGain": 0.46399999999999997,
-     "dd95": 0.27801883948862005
+     "chanceGain": 0.43700000000000006,
+     "dd95": 0.28197311208199893
     }
    ]
   }
  },
  "controleEURUSDT": {
-  "jour": 1795478400000,
-  "binance": 1.0974,
-  "reference": 1.090809941291809,
-  "ecart": 0.006041436238091613,
-  "ecartMax30j": 0.028096232726851023,
-  "source": "Yahoo Finance (journalier, plus haut et plus bas inclus)",
+  "jour": 1795564800000,
+  "binance": 1.0983,
+  "reference": 1.0935,
+  "ecart": 0.0043895747599451695,
+  "ecartMax30j": 0.029090583601861786,
+  "source": "BCE via frankfurter.app (clôture seule : plus haut et plus bas inconnus) — Yahoo Finance : dernière journée 2026-11-24, en retard ; Stooq : réponse inutilisable",
   "alerte": "écart de plus de 1 % entre Binance EURUSDT et le vrai taux : les trades des agents sur l’euro-dollar sont à lire avec prudence"
  },
  "faux": false
